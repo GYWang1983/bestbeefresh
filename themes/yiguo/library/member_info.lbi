@@ -1,0 +1,80 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+{if $user_info}
+
+<div class="MemberID"><a href="user.php"><b>{$user_info.username}</b></a></div>
+        <div class="MemberCenter">
+        	<div class="MemberTit"><a href="user.php">会员中心<em class="arrow-up"></em></a></div>
+        	<div class="MemberCenterBox">
+            	<ul>
+                	<li><a href="user.php?act=order_list">我的订单</a></li>
+                    <li><a href="user.php?act=collection_list">我的收藏</a></li>
+                </ul>
+            </div>
+        </div>
+        <script type="text/javascript">
+	$(".MemberCenter").hover(
+        function () {                    
+            $(this).children('.MemberCenterBox').fadeIn(0);
+			$(".MemberCenter").addClass("hover");
+        },
+		
+        function () {
+            $(this).children('.MemberCenterBox').fadeOut(0);
+			$(".MemberCenter").removeClass("hover");
+        }
+    );
+</script>
+        
+        <div class="Quit"><a href="user.php?act=logout">{$lang.user_logout}</a></div>
+
+{else}
+ 
+<div class="Login"> <a href="user.php">登录<em class="arrow-up"></em></a>
+          <div class="LoginCon">
+            <form name="formLogin" action="user.php" method="post" onSubmit="return userLogin()">
+              <p class="LoginInput">
+                <input name="username" onfocus="if(this.value=='用户名'){this.value='';this.style.color='#000';}" onblur="if(this.value==''){this.value='用户名';this.style.color='#999';}" autocomplete="false" value="用户名" type="text" size="17"/>
+              </p>
+              <p class="LoginInput">
+                <input name="password" type="password" size="17" />
+              </p>
+              <p>
+                <input type="checkbox" checked="true" name="remember" id="remember" style="margin:2px 3px 0 0; width: 13px; float: left; clear: left;">
+                <label for="remember">保存此次登录</label>
+                <input type="hidden" name="act" value="act_login" />
+                <input type="hidden" name="back_act" value="{$back_act}" />
+                <input type="submit" name="submit" value="登录" class="smLoginBtn" />
+              </p>
+              <!-- 判断是否启用验证码{if $enabled_captcha} -->
+              <div class="coLogin_one">
+                <p>{$lang.comment_captcha}：</p>
+                <div class="coLoginTxt_2">
+                  <div class="coLogin_txt_2_all">
+                    <input type="text" size="17" name="captcha" class="coLogin_txt_2"  />
+                  </div>
+                  <div class="coLoginTxt_2_img"> <img src="captcha.php?is_login=1&{$rand}" alt="captcha" style="vertical-align: middle;cursor: pointer;" onClick="this.src='captcha.php?is_login=1&'+Math.random()" /></div>
+                </div>
+              </div>
+              <!--{/if}-->
+              <p class="lh18"><a href="user.php?act=qpassword_name" >忘记密码？</a></p>
+            </form>
+          </div>
+        </div>
+        <div class="Registration"><a href="user.php?act=register">注册</a></div>
+        
+{/if}
+<script type="text/javascript">            
+    $(".Login").hover(
+        function () {                    
+            $(this).children('.LoginCon').fadeIn(0);
+			$(".Login").addClass("hover");
+			$(".Login a").css("color","#c0a86b");
+        },
+		
+        function () {
+            $(this).children('.LoginCon').fadeOut(0);
+			$(".Login").removeClass("hover");
+			$(".Login a").css("color","#c8c9ca");
+        }
+    );
+</script>

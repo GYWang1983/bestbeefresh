@@ -1,0 +1,5 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<div class="AdUserPassport" style="padding:40px 50px 0 0;">
+	<p>{insert name='ads' id=45 num=1}</p>
+    <p>{insert name='ads' id=46 num=1}</p>
+</div>

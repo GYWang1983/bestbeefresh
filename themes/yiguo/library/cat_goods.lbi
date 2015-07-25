@@ -1,0 +1,46 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<div class="title_list">
+  <div class="title_txt"><a href="{$goods_cat.url}" >{$goods_cat.name|escape:html}</a></div>
+  <div class="title_key">
+    <dl>
+      <dd><a href="{$goods_cat.url}" target="_blank">查看更多{$goods_cat.name|escape:html}商品 ></a></dd>
+    </dl>
+  </div>
+</div>
+<div class="title_body">
+  <div class="brand_right" >
+    <div class="brand_list_out">
+    <ul> 
+    	<li><?php echo get_adv('index_1',$GLOBALS['smarty']->_var['cat_goods']['id'])?></li>
+      <!--{foreach from=$cat_goods item=goods name=nocat}--> 
+      {if !$smarty.foreach.nocat.last}
+      <li {if $smarty.foreach.nocat.index mod 5 eq 4} style="margin-right:0px"{/if} >
+      <div class="brand_list">
+        <div class="brand_img" onMouseOver="this.className='brand_img brand_img_on'" onMouseOut="this.className='brand_img'">
+        	<a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" width="170" height="170" /></a>
+            <div class="p-quick">
+            	<a href="javascript:;" onClick="quickView({$goods.id})" class="quick-view"></a>
+                <a href="javascript:addToCartShowDiv({$goods.id},1,'promotion')" class="addcart"></a>
+            </div>
+        </div>
+        
+        <div class="brand_txt"> <b><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_name|escape:html}</a></b>
+          <p> 
+            <!-- {if $goods.promote_price neq ""} --> 
+            <font class="shop_s">{$goods.promote_price}<span class="shop_d"></span></font> 
+            <!-- {else}--> 
+            <font class="shop_s">{$goods.shop_price}<span class="shop_d"></span></font> 
+            <!--{/if}--> 
+            <font class="marker_s">{$goods.market_price}</font> </p>
+        </div >
+      </div>
+      <div class="sucess_joinCart" id="addtocartdialog_retui_{$goods.id}_promotion"></div>
+      </li>
+      {/if} 
+      <!--{/foreach}--> 
+      </ul>
+    </div>
+  </div>
+</div>
+

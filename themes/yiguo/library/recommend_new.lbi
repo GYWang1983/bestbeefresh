@@ -1,0 +1,27 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- {if $new_goods} -->
+<ul>
+	<!--{foreach name=no from=$new_goods item=goods}-->
+    <li {if $smarty.foreach.no.index mod 7 eq 6} style="margin-right: 0;" {/if}>
+    	<div class="MainProImg"><a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" width="140" height="140" /></a></div>
+        <div class="MainProText">
+        	<p class="price" >
+            	<font class="aa"> 
+           			<!-- {if $goods.promote_price neq ""} -->
+          			{$goods.promote_price}
+          			<!-- {else}-->
+          			{$goods.shop_price}
+          			<!--{/if}-->
+           		</font>
+                <font class="bb"><s>{$goods.market_price}</s></font>
+           	</p>
+            <p class="MainProName"><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_style_name}</a></p>
+        </div>
+        <div class="MainProBut"><a href="javascript:addToCartShowDiv({$goods.id},1,'best')" >加入购物车</a></div>
+        <div class="sucess_joinCart" id="addtocartdialog_retui_{$goods.id}_best"></div>
+    </li>
+	<!--{/foreach}-->
+</ul>
+<!-- {/if} -->
+
+

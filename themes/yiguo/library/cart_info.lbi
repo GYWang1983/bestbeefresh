@@ -1,0 +1,81 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <Div class="Cart shop_txt">
+  	<div class="CartTit"><a class="aa" href="flow.php">{$str}</a></div>
+  <!-- {if $goods} -->
+<div class="CartCon shopBody" id="shopBody">
+<div class="CartBox">
+<p class="total">目前选购商品共<b>{$str}</b>件</p>
+<ul>
+ {foreach from=$goods item=goods name=goods}
+ <li class="shopWhite" onMouseOver="show_del(this)" onMouseOut="hide_del(this)">
+
+ <div class="shopLi_img">
+ <a href="{$goods.url}" title="{$goods.goods_name}"><img src="{$goods.goods_thumb}" style="width:43px; height:43px;" alt="{$goods.goods_name}"></a>
+  </div>
+  <div class="shopLi_txt">
+ <p><a  href="{$goods.url}" title="{$goods.short_name}">{$goods.short_name}</a></p>
+ 
+ 
+<p class="shopLi_pink"><span>{$goods.goods_price}</span><span style=" color:#999">×{$goods.goods_number}</span></p> 
+ </div>
+<div class="shopLi_del"><a  href="javascript:" onClick="deleteCartGoods({$goods.rec_id})">删除</a></div>
+
+
+</li>
+ {/foreach}
+ </ul>
+ <div class="shopSet">
+                    <div class="set_txt">
+                        <p>共<b>{$str}</b>件商品&nbsp;&nbsp;&nbsp;&nbsp;总计<span class="arial">¥</span><span class="set_gray">{$amount}</span></p>
+                    </div>
+                    <div class="set_btn">
+                        <a href="flow.php">立刻结算</a>
+                    </div>
+                </div>
+ 
+</div>
+ </div>
+<!-- {else} -->
+<div class="CartCon shopBody" id="shopBody">
+<div class="CartBox">
+<p class="shopNo">购物袋内还没有商品，赶快选购吧！</p>
+</div>
+</div>
+<!-- {/if} -->
+
+</a> </Div>
+<script type="text/javascript">
+function deleteCartGoods(rec_id)
+{
+Ajax.call('delete_cart_goods.php', 'id='+rec_id, deleteCartGoodsResponse, 'POST', 'JSON');
+}
+
+/**
+ * 接收返回的信息
+ */
+function deleteCartGoodsResponse(res)
+{
+  if (res.error)
+  {
+    alert(res.err_msg);
+  }
+  else
+  {
+	  $("#ECS_CARTINFO").html(res.content);
+  }
+}
+
+$(function(){
+	$("#ECS_CARTINFO li.shopWhite").mouseenter(function(){
+		$(this).removeClass("shopWhite");
+		$(this).addClass("shopGray");
+	});
+
+	$("#ECS_CARTINFO li.shopWhite").mouseleave(function(){
+		$(this).removeClass("shopGray");
+		$(this).addClass("shopWhite");
+	});	
+})
+</script>
+
+

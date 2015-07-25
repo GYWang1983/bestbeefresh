@@ -1,0 +1,30 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<div class="RightComment">
+            	<div class="picScroll-top">
+					<div class="hd">
+						<a class="next"></a>
+						<ul></ul>
+						<a class="prev"></a>
+						<span class="pageState"></span>
+					</div>
+					<div class="bd">
+						<ul class="picList">
+                        <!--{foreach from=$new_comments item=comments} -->
+							<li>
+                    			<dl>
+                        			<dt><a href="{$comments.url}" title="{$comments.goods_name}"><img src="{$comments.thumb}" alt="{$comments.goods_name}" /></a></dt>
+                                    <dd><a href="{$comments.url}" title="{$comments.goods_name}">{$comments.short_name}</a></dd>
+                                    <dd class="member"><!--{if $comments.user_name}-->{$comments.user_name}<!--{else}-->{$lang.anonymous}<!-- {/if} --></dd>
+                                    <dd class="reply">{$comments.content}</dd>
+                        		</dl>
+							</li>
+                           <!--{/foreach}-->
+						</ul>
+					</div>
+				</div>
+        		<script type="text/javascript">
+					jQuery(".picScroll-top").slide({titCell:".hd ul",mainCell:".bd ul",autoPage:true,effect:"topLoop",autoPlay:true,vis:3});
+				</script>
+            </div>
+

@@ -1,0 +1,9 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<div class="GoodsLeftAd">
+	<ul>
+    	<li>{insert name='ads' id=41 num=1}</li>
+        <li>{insert name='ads' id=42 num=1}</li>
+        <li>{insert name='ads' id=43 num=1}</li>
+    </ul>
+</div>

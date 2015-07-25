@@ -1,0 +1,97 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">
+var process_request = "{$lang.process_request}";
+</script>
+<script type="text/javascript">
+//收藏本站 bbs.ecmoban.com
+function AddFavorite(title, url) {
+  try {
+      window.external.addFavorite(url, title);
+  }
+catch (e) {
+     try {
+       window.sidebar.addPanel(title, url, "");
+    }
+     catch (e) {
+         alert("抱歉，您所使用的浏览器无法完成此操作。\n\n加入收藏失败，请使用Ctrl+D进行添加");
+     }
+  }
+}
+</script>
+<div class="header ">
+  <div class="headBody"> {insert_scripts files='jquery-1.9.1.min.js,jquery.json.js,jquery.SuperSlide.js'}
+    {insert_scripts files='transport_jquery.js,utils.js,ecmoban_common.js,default.js'}
+    <div class="headBox">
+      <div class="logo"><a href="../index.php" name="top"><img src="../images/logo.gif" /></a></div>
+      <div class="HeadRight">
+        <!--search start-->
+        <div id="search"  class="headSearch">
+          <form id="searchForm" name="searchForm" method="get" action="search.php" onSubmit="return checkSearchForm()"  >
+            <div class="headSearch_input">
+              <input class="input" name="keywords" type="text" id="keyword" value="请输入产品名或编号" onclick="javascript:if(this.value=='请输入产品名或编号')this.value=''"  />
+            </div>
+            <div class="headSearch_btn">
+              <input name="imageField" type="submit" value=""  style="cursor:pointer;" />
+            </div>
+          </form>
+        </div>
+        <!--search end-->
+        <div class="f_r">
+        <div class="language mr20" style="display:none;"> <a href="/" class="select">中文</a>/ <a href="http://en.yiguo.com">EN</a> </div>
+        <a href="#"><img src="../images/tel.png"></a> <a href="#"><img src="../images/sina-weibo.png" class="ie6png mr5"></a> <a href="#"><img src="../images/app-phone.png" class="ie6png"></a>
+        </div>
+      </div>
+    </div>
+    <div class="HeadNavBox">
+    <div class="headNav" style="position:relative; z-index:999;">
+      <div class="LeftNav">
+        <div class="All">
+          <div class="AllTitle"><a href="#">全部商品<em class="arrow-up"></em></a></div>
+          <div class="AllCon">
+          	<ul>
+            	<!--{foreach from=$categories_pro item=cat name=categories_pro}-->
+            	<li {if $smarty.foreach.categories_pro.index mod 2 eq 0}class="GreenBj"{/if}>
+                	<h2 class="leftNav_p0{$smarty.foreach.categories_pro.iteration}"><a href="{$cat.url}" title="{$cat.name|escape:html}">{$cat.name|escape:html}</a></h2>
+                    <!--{foreach from=$cat.cat_id item=child}-->
+                	<!--{foreach from=$child.cat_id item=childer}-->
+                    <p><a href="{$childer.url}" target="_blank">{$childer.name|escape:html}</a></p>
+                    <!--{/foreach}-->
+                	<!--{/foreach}-->
+                </li>
+            	<!-- {/foreach} -->
+            </ul>
+          </div>
+        </div>
+        <div class="subNav">
+          <ul>
+            <li class="home"><a class="ie6png" href="/"></a></li>
+            <!-- {foreach name=nav_middle_list from=$navigator_list.middle item=nav} -->
+            <li {if $nav.active eq 1} class="current"{/if}><a href="{$nav.url}" {if $nav.opennew eq 1}target="_blank" {/if}>{$nav.name}</a></li>
+            <!-- {/foreach} -->
+          </ul>
+        </div>
+      </div>
+      <div class="RightNav f_r">
+        {insert_scripts files='jquery-1.9.1.min.js,jquery.json.js,jquery.SuperSlide.js'}
+        {insert_scripts files='transport_jquery.js,utils.js,ecmoban_common.js'}
+        {* ECSHOP 提醒您：根据用户id来调用member_info.lbi显示不同的界面  *}{insert name='member_info'}
+        <div class="Carta" id="ECS_CARTINFO">{insert name='cart_info'}</div>
+        <div class="Settlement"><a href="flow.php"><em class="arrow-right"></em>去结算</a></div>
+      </div>
+    </div>
+    </div>
+  </div>
+<script type="text/javascript">            
+    $(".All").hover(
+        function () {                    
+            $(this).children('.AllCon').fadeIn(0);
+			$(".All").addClass("hover");
+        },
+		
+        function () {
+            $(this).children('.AllCon').fadeOut(0);
+			$(".All").removeClass("hover");
+        }
+    );
+</script>
+</div>

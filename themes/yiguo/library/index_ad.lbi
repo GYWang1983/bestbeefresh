@@ -1,0 +1,38 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ 
+<div id="slideBox" class="slideBox">
+  <div class="hd">
+    <ul>
+      <li><b>·</b>易果微信 超值楼配</li>
+      <li><b>·</b>江西赣南脐橙 特惠</li>
+      <li><b>·</b>新疆香梨  特惠</li>
+      <li><b>·</b>阿拉斯加鳕鱼块 特惠</li>
+      <li><b>·</b>当日蛋系列 一日直达</li>
+      <li><b>·</b>try me蛋糕 五折特惠</li>
+    </ul>
+  </div>
+  <div class="bd">
+    <ul>
+    <!--{foreach from=$flash name=myflash item=flash}-->
+  <li><A href="{$flash.url}" target=_blank><IMG height=265 alt="" src="{$flash.src}" width=725></A> </li>
+ <!--{/foreach}-->
+      
+    </ul>
+  </div>
+  <!-- 下面是前/后按钮代码-->
+  
+
+</div>
+<div class="shadow-big"></div>
+
+<script type="text/javascript">
+		jQuery(".slideBox").slide({mainCell:".bd ul",effect:"fold",autoPlay:true});
+		</script> 
+
+<div class="banner-ad">
+	<ul>
+		<li>{insert name='ads' id=49 num=5}</li>
+    </ul>
+</div>
+
+<div class="mt10">{insert name='ads' id=14 num=1}</div>

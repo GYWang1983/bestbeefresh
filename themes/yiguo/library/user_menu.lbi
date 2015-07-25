@@ -1,0 +1,44 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<div class="accountSideTop"> <a href="user.php"> {$lang.label_welcome}</a></div>
+<dl class="accountSideOption1 OrderCenter">
+  <dt class="transaction_manage">订单中心</dt>
+  <dd>
+    <ul>
+      <li {if $action eq 'order_list'|| $action eq 'order_detail'}class="curs"{/if}> <a href="user.php?act=order_list"> {$lang.label_order}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'address_list'}class="curs"{/if}> <a href="user.php?act=address_list">{$lang.label_address}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'booking_list'}class="curs"{/if}> <a href="user.php?act=booking_list"> {$lang.label_booking}</a><span>&gt;&gt;</span></li>
+    </ul>
+  </dd>
+</dl>
+<dl class="accountSideOption1">
+  <dt class="transaction_manage">会员中心</dt>
+  <dd>
+    <ul>
+      <li {if $action eq 'profile'}class="curs"{/if}> <a href="user.php?act=profile"> {$lang.label_profile}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'collection_list'}class="curs"{/if}> <a href="user.php?act=collection_list"> {$lang.label_collection}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'message_list'}class="curs"{/if}> <a href="user.php?act=message_list"> {$lang.label_message}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'tag_list'}class="curs"{/if}> <a href="user.php?act=tag_list">{$lang.label_tag}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'affiliate'}class="curs"{/if}> <!-- {if $affiliate.on eq 1} --><a href="user.php?act=affiliate"> {$lang.label_affiliate}</a><!-- {/if} --><span>&gt;&gt;</span></li>
+      <li {if $action eq 'comment_list'}class="curs"{/if}><a href="user.php?act=comment_list"> {$lang.label_comment}</a><span>&gt;&gt;</span></li>
+    </ul>
+  </dd>
+</dl>
+<dl class="accountSideOption1 AccountCenter">
+  <dt class="transaction_manage">账户中心</dt>
+  <dd>
+    <ul>
+      <li {if $action eq 'bonus'}class="curs"{/if}> <a href="user.php?act=bonus">{$lang.label_bonus}</a><span>&gt;&gt;</span></li>
+     <!--<a href="user.php?act=group_buy">{$lang.label_group_buy}</a>-->
+      <li {if $action eq 'track_packages'}class="curs"{/if}> <a href="user.php?act=track_packages"> {$lang.label_track_packages}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'account_log'}class="curs"{/if}> <a href="user.php?act=account_log"> {$lang.label_user_surplus}</a><span>&gt;&gt;</span></li>
+      <li {if $action eq 'transform_points'}class="curs"{/if}> <!--{if $show_transform_points}--> 
+        <a href="user.php?act=transform_points">{$lang.label_transform_points}</a> 
+        <!--{/if}--> 
+        <span>&gt;&gt;</span>
+      </li>
+    </ul>
+  </dd>
+</dl>
+<script type="text/javascript">
+				$(".AccountCenter li:last").css("border-bottom", "0");
+			</script>

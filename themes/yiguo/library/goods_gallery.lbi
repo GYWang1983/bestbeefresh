@@ -1,0 +1,31 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<div class="mod_picfold clearfix">
+  <div id="detail_main_img" class="imgbox">
+    <div id="slideBox" class="slideBox CpBigImgBox">
+			<div class="hd">
+				<ul>
+                	<!-- {if $pictures}--> 
+              		<!-- {foreach from=$pictures item=picture name=foo}-->
+                	<li><img src="{if $picture.img_url}{$picture.img_url}{else}{$picture.thumb_url}{/if}" width="60" height="60"></li>
+                    <!--{/foreach}--> 
+              		<!-- {/if}-->
+                </ul>
+			</div>
+			<div class="bd">
+				<ul>
+                	<!-- {if $pictures}--> 
+              		<!-- {foreach from=$pictures item=picture name=foo}-->
+					<li {if $smarty.foreach.foo.first}class="on"{/if}><img src="{if $picture.img_url}{$picture.img_url}{else}{$picture.thumb_url}{/if}" width="470" height="470" /></li>
+                    <!--{/foreach}--> 
+              		<!-- {/if}-->
+				</ul>
+			</div>
+		</div>
+  </div>
+  <script type="text/javascript">
+		jQuery(".slideBox").slide({mainCell:".bd ul",delayTime:1000});
+		</script>
+</div>
+
+		
