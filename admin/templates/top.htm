@@ -17,23 +17,6 @@
   float: left;
 }
 
-#license-div {
-  height: 50px;
-  float: left;
-  text-align:center;
-  vertical-align:middle;
-  line-height:50px;
-}
-
-#license-div a:visited, #license-div a:link {
-  color: #EB8A3D;
-}
-
-#license-div a:hover {
-  text-decoration: none;
-  color: #EB8A3D;
-}
-
 #submenu-div {
   height: 50px;
 }
@@ -105,10 +88,6 @@
 </style>
 {insert_scripts files="../js/transport.js"}
 <script type="text/javascript">
-onload = function()
-{
-  Ajax.call('index.php?is_ajax=1&act=license','', start_sendmail_Response, 'GET', 'JSON');
-}
 /**
  * 帮助系统调用
  */
@@ -119,30 +98,6 @@ function web_address()
   ne_list.replace('-', '');
   var arr = ne_list.split('-');
   window.open('help.php?al='+arr[arr.length - 1],'_blank');
-}
-
-
-/**
- * 授权检测回调处理
- */
-function start_sendmail_Response(result)
-{
-  // 运行正常
-  if (result.error == 0)
-  {
-    var str = '';
-		if (result['content']['auth_str'])
-		{
-			str = '<a href="javascript:void(0);" target="_blank">' + result['content']['auth_str'];
-			if (result['content']['auth_type'])
-			{
-				str += '[' + result['content']['auth_type'] + ']';
-			}
-			str += '</a> ';
-		}
-
-    document.getElementById('license-div').innerHTML = str;
-  }
 }
 
 function modalDialog(url, name, width, height)
@@ -188,7 +143,6 @@ var adminId = "{$admin_id}";
 <body>
 <div id="header-div">
   <div id="logo-div" style="bgcolor:#000000;"><img src="images/ecshop_logo.gif" alt="ECSHOP - power for e-commerce" /></div>
-  <div id="license-div" style="bgcolor:#000000;"></div>
   <div id="submenu-div">
     <ul>
       <li><a href="index.php?act=about_us" target="main-frame">{$lang.about}</a></li>
