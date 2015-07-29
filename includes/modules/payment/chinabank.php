@@ -78,13 +78,8 @@ class chinabank
      *
      * @return void
      */
-    function chinabank()
-    {
-    }
-
     function __construct()
     {
-        $this->chinabank();
     }
 
     /**

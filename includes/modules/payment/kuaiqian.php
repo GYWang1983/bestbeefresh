@@ -75,14 +75,8 @@ class kuaiqian
      *
      * @return void
      */
-
-    function kuaiqian()
-    {
-    }
-
     function __construct()
     {
-        $this->kuaiqian();
     }
 
    /**
