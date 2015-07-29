@@ -193,6 +193,7 @@ class integrate
             return false;
         }
         /* 检查email是否重复 */
+        if (!empty($email)) {
         $sql = "SELECT " . $this->field_id .
                " FROM " . $this->table($this->user_table).
                " WHERE " . $this->field_email . " = '$email'";
@@ -202,6 +203,7 @@ class integrate
 
             return false;
         }
+      	}
 
         $post_username = $username;
 

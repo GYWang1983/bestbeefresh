@@ -55,6 +55,7 @@ define('ERR_NOT_ON_SALE',           3); // 商品已下架
 define('ERR_CANNT_ALONE_SALE',      4); // 商品不能单独销售
 define('ERR_NO_BASIC_GOODS',        5); // 没有基本件
 define('ERR_NEED_SELECT_ATTR',      6); // 需要用户选择属性
+define('ERR_PRODUCT_OUT_OF_STOCK',  7); // 货品缺货
 
 /* 购物车商品类型 */
 define('CART_GENERAL_GOODS',        0); // 普通商品
@@ -114,6 +115,7 @@ define('SEND_BY_USER',              0); // 按用户发放
 define('SEND_BY_GOODS',             1); // 按商品发放
 define('SEND_BY_ORDER',             2); // 按订单发放
 define('SEND_BY_PRINT',             3); // 线下发放
+define('SEND_BY_REGISTER',	    4); // 注册用户送红包
 
 /* 广告的类型 */
 define('IMG_AD',                    0); // 图片广告

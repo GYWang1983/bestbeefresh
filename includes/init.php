@@ -304,9 +304,6 @@ else
 {
     ob_start();
 }
-if ( real_ip() != '180.113.201.101') {
-	//header("Location:http://www.baidu.com");		   
-}
 
 /**
  * 通过类型与传入的ID获取广告内容

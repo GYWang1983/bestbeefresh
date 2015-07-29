@@ -134,7 +134,6 @@ while ($row = $db->fetchRow($res))
 $smarty->assign('list',             $list);
 
 $smarty->assign('helps',            get_shop_help());       // 网店帮助
-
 $smarty->assign('lang',             $_LANG);
 
 $smarty->assign('feed_url',         ($_CFG['rewrite'] == 1) ? "feed-typeactivity.xml" : 'feed.php?type=activity'); // RSS URL

@@ -2989,6 +2989,7 @@ function send_order_bonus($order_id)
         }
 
         /* 如果有红包，发送邮件 */
+        /*
         if ($count > 0)
         {
             $tpl = get_mail_template('send_bonus');
@@ -3000,7 +3001,7 @@ function send_order_bonus($order_id)
             $GLOBALS['smarty']->assign('sent_date', local_date($GLOBALS['_CFG']['date_format']));
             $content = $GLOBALS['smarty']->fetch('str:' . $tpl['template_content']);
             send_mail($user['user_name'], $user['email'], $tpl['template_subject'], $content, $tpl['is_html']);
-        }
+        }*/
     }
 
     return true;

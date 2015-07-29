@@ -47,12 +47,11 @@ if (empty($brand_id))
         $smarty->assign('ur_here',         $position['ur_here']);  // 当前位置
 
         $smarty->assign('categories',      get_categories_tree()); // 分类树
-		$smarty->assign('categories_pro',  get_categories_tree_pro()); // 分类树加强版
+	$smarty->assign('categories_pro',  get_categories_tree_pro()); // 分类树加强版
         $smarty->assign('helps',           get_shop_help());       // 网店帮助
         $smarty->assign('top_goods',       get_top10());           // 销售排行
 
         $smarty->assign('brand_list', get_brands());
-
     }
     $smarty->display('brand_list.dwt', $cache_id);
     exit();
@@ -104,7 +103,7 @@ if (!$smarty->is_cached('brand.dwt', $cache_id))
     $smarty->assign('category',       $cate);
 
     $smarty->assign('categories',     get_categories_tree());        // 分类树
-	$smarty->assign('categories_pro',  get_categories_tree_pro()); // 分类树加强版
+    $smarty->assign('categories_pro', get_categories_tree_pro()); // 分类树加强版
     $smarty->assign('helps',          get_shop_help());              // 网店帮助
     $smarty->assign('top_goods',      get_top10());                  // 销售排行
     $smarty->assign('show_marketprice', $_CFG['show_marketprice']);

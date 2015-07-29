@@ -66,7 +66,7 @@ if (!$smarty->is_cached('article_cat.dwt', $cache_id))
     $smarty->assign('ur_here',              $position['ur_here']);   // 当前位置
 
     $smarty->assign('categories',           get_categories_tree(0)); // 分类树
-		$GLOBALS['smarty']->assign('categories_pro',  get_categories_tree_pro()); // 分类树加强版/* 周改 */
+    $smarty->assign('categories_pro',       get_categories_tree_pro()); // 分类树加强版/* 周改 */
     $smarty->assign('article_categories',   article_categories_tree($cat_id)); //文章分类树
     $smarty->assign('helps',                get_shop_help());        // 网店帮助
     $smarty->assign('top_goods',            get_top10());            // 销售排行
@@ -75,9 +75,8 @@ if (!$smarty->is_cached('article_cat.dwt', $cache_id))
     $smarty->assign('new_goods',            get_recommend_goods('new'));
     $smarty->assign('hot_goods',            get_recommend_goods('hot'));
     $smarty->assign('promotion_goods',      get_promote_goods());
-    $smarty->assign('promotion_info', get_promotion_info());
-	
-	$smarty->assign('cat_id', $cat_id);
+    $smarty->assign('promotion_info',       get_promotion_info());	
+    $smarty->assign('cat_id', $cat_id);
 
     /* Meta */
     $meta = $db->getRow("SELECT keywords, cat_desc FROM " . $ecs->table('article_cat') . " WHERE cat_id = '$cat_id'");
