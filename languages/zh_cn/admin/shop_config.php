@@ -12,7 +12,7 @@
  * $Id: shop_config.php 17217 2011-01-19 06:29:08Z liubo $
  */
 
-require(ROOT_PATH.ADMIN_PATH.'/sms_url.php');
+//require(ROOT_PATH.ADMIN_PATH.'/sms_url.php');
 $_LANG['cfg_name']['basic'] = '基本设置';
 $_LANG['cfg_name']['display'] = '显示设置';
 $_LANG['cfg_name']['shop_info'] = '网店信息';
@@ -445,5 +445,5 @@ $_LANG['back_shop_config'] = '返回商店设置';
 $_LANG['back_mail_settings'] = '返回邮件服务器设置';
 $_LANG['mail_settings'] = '邮件服务器设置';
 
-$_LANG['sms_url'] = '<a href="'.$url.'" target="_blank">点此注册手机短信服务</a>';
+//$_LANG['sms_url'] = '<a href="'.$url.'" target="_blank">点此注册手机短信服务</a>';
 ?>
