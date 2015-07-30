@@ -419,7 +419,7 @@ class cls_template
         }
         else
         {
-        		$tmp_arr = explode(' ', $tag);
+            $tmp_arr = explode(' ', $tag);
             $tag_sel = array_shift($tmp_arr);
             switch ($tag_sel)
             {
@@ -556,7 +556,7 @@ class cls_template
         {
             //$val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
             $val = preg_replace_callback("/\[([^\[\]]*)\]/is", function ($match) {
-                return '.' . str_replace('$', '\$', $match[1]);
+                return '.' . $match[1];
             }, $val);
         }
 
