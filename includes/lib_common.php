@@ -70,21 +70,23 @@ function db_create_in($item_list, $field_name = '')
 function is_email($user_email)
 {
     $chars = "/^([a-z0-9+_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,6}\$/i";
-    if (strpos($user_email, '@') !== false && strpos($user_email, '.') !== false)
-    {
-        if (preg_match($chars, $user_email))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    else
-    {
-        return false;
-    }
+    return strpos($user_email, '@') !== false 
+    			&& strpos($user_email, '.') !== false 
+    			&& preg_match($chars, $user_email);
+}
+
+/**
+ * 验证输入的手机号是否合法
+ *
+ * @access  public
+ * @param   string      $mobile      需要验证的手机号
+ *
+ * @return bool
+ */
+function is_mobile($mobile)
+{
+	$pattern = "/^1\d{10}$/";
+	return preg_match($pattern, $mobile);
 }
 
 /**
