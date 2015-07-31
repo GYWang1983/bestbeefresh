@@ -140,7 +140,8 @@ if (!defined('IN_ECS'))
     $purview['04_sms_charge']        = 'sms_charge';
     $purview['05_sms_send_history']  = 'send_history';
     $purview['06_sms_charge_history']= 'charge_history';
-
+    $purview['07_sms_verifycode']    = 'sms_verifycode';
+    
 //推荐管理
     $purview['affiliate']            = 'affiliate';
     $purview['affiliate_ck']         = 'affiliate_ck';

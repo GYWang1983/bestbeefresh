@@ -137,6 +137,7 @@ $modules['14_sms']['03_sms_send']                   = 'sms.php?act=display_send_
 //$modules['14_sms']['04_sms_charge']                 = 'sms.php?act=display_charge_ui';
 //$modules['14_sms']['05_sms_send_history']           = 'sms.php?act=display_send_history_ui';
 //$modules['14_sms']['06_sms_charge_history']         = 'sms.php?act=display_charge_history_ui';
+$modules['14_sms']['07_sms_verifycode']             = 'sms.php?act=verifycode';
 
 $modules['15_rec']['affiliate']                     = 'affiliate.php?act=list';
 $modules['15_rec']['affiliate_ck']                  = 'affiliate_ck.php?act=list';
