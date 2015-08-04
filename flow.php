@@ -861,15 +861,14 @@ elseif ($_REQUEST['step'] == 'checkout')
         exit;
     }
 
-    $consignee = get_consignee($_SESSION['user_id']);
-
     /* 检查收货人信息是否完整 */
+    /*$consignee = get_consignee($_SESSION['user_id']);
     if (!check_consignee_info($consignee, $flow_type))
     {
-        /* 如果不完整则转向到收货人信息填写界面 */
+        // 如果不完整则转向到收货人信息填写界面
         ecs_header("Location: flow.php?step=consignee\n");
         exit;
-    }
+    }*/
 
     $_SESSION['flow_consignee'] = $consignee;
     $smarty->assign('consignee', $consignee);
@@ -917,7 +916,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     $smarty->assign('market_price_desc', sprintf($_LANG['than_market_price'], $total['formated_market_price'], $total['formated_saving'], $total['save_rate']));
 
     /* 取得配送列表 */
-    $region            = array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']);
+    /*$region            = array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']);
     $shipping_list     = available_shipping_list($region);
     $cart_weight_price = cart_weight_price($flow_type);
     $insure_disabled   = true;
@@ -939,7 +938,7 @@ elseif ($_REQUEST['step'] == 'checkout')
         $shipping_list[$key]['insure_formated']     = strpos($val['insure'], '%') === false ?
             price_format($val['insure'], false) : $val['insure'];
 
-        /* 当前的配送方式是否支持保价 */
+        // 当前的配送方式是否支持保价
         if ($val['shipping_id'] == $order['shipping_id'])
         {
             $insure_disabled = ($val['insure'] == 0);
@@ -949,7 +948,7 @@ elseif ($_REQUEST['step'] == 'checkout')
 
     $smarty->assign('shipping_list',   $shipping_list);
     $smarty->assign('insure_disabled', $insure_disabled);
-    $smarty->assign('cod_disabled',    $cod_disabled);
+    $smarty->assign('cod_disabled',    $cod_disabled);*/
 
     /* 取得支付列表 */
     if ($order['shipping_id'] == 0)
@@ -1745,15 +1744,14 @@ elseif ($_REQUEST['step'] == 'done')
         exit;
     }
 
-    $consignee = get_consignee($_SESSION['user_id']);
-
     /* 检查收货人信息是否完整 */
+    /*$consignee = get_consignee($_SESSION['user_id']);
     if (!check_consignee_info($consignee, $flow_type))
     {
-        /* 如果不完整则转向到收货人信息填写界面 */
+        // 如果不完整则转向到收货人信息填写界面
         ecs_header("Location: flow.php?step=consignee\n");
         exit;
-    }
+    }*/
 
     $_POST['how_oos'] = isset($_POST['how_oos']) ? intval($_POST['how_oos']) : 0;
     $_POST['card_message'] = isset($_POST['card_message']) ? compile_str($_POST['card_message']) : '';
@@ -1763,7 +1761,7 @@ elseif ($_REQUEST['step'] == 'done')
     $_POST['postscript'] = isset($_POST['postscript']) ? compile_str($_POST['postscript']) : '';
 
     $order = array(
-        'shipping_id'     => intval($_POST['shipping']),
+        'shipping_id'     => 1, //intval($_POST['shipping']),
         'pay_id'          => intval($_POST['payment']),
         'pack_id'         => isset($_POST['pack']) ? intval($_POST['pack']) : 0,
         'card_id'         => isset($_POST['card']) ? intval($_POST['card']) : 0,
@@ -1871,10 +1869,10 @@ elseif ($_REQUEST['step'] == 'done')
     }
 
     /* 收货人信息 */
-    foreach ($consignee as $key => $value)
+    /*foreach ($consignee as $key => $value)
     {
         $order[$key] = addslashes($value);
-    }
+    }*/
 
    /* 判断是不是实体商品 */
     foreach ($cart_goods AS $val)
@@ -1911,13 +1909,13 @@ elseif ($_REQUEST['step'] == 'done')
     }
 
     /* 配送方式 */
-    if ($order['shipping_id'] > 0)
+    /*if ($order['shipping_id'] > 0)
     {
         $shipping = shipping_info($order['shipping_id']);
         $order['shipping_name'] = addslashes($shipping['shipping_name']);
     }
     $order['shipping_fee'] = $total['shipping_fee'];
-    $order['insure_fee']   = $total['shipping_insure'];
+    $order['insure_fee']   = $total['shipping_insure'];*/
 
     /* 支付方式 */
     if ($order['pay_id'] > 0)
