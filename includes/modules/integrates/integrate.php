@@ -59,6 +59,9 @@ class integrate
     /* 会员邮箱的字段名 */
     var $field_email    = '';
 
+    /* 会员手机号的字段名 */
+    var $field_mobile    = '';
+    
     /* 会员性别 */
     var $field_gender = '';
 
@@ -542,6 +545,29 @@ class integrate
         }
     }
 
+    /**
+     *  检查指定手机号是否存在
+     *
+     * @access  public
+     * @param   string  $mobile  手机号
+     *
+     * @return  boolean
+     */
+    function check_mobile_phone($mobile)
+    {
+    	if (!empty($mobile))
+    	{
+    		$sql = "SELECT " . $this->field_id .
+    		" FROM " . $this->table($this->user_table).
+    		" WHERE " . $this->field_mobile . " = '$mobile' ";
+    		if ($this->db->getOne($sql, true) > 0)
+    		{
+    			$this->error = ERR_MOBILE_EXISTS;
+    			return true;
+    		}
+    		return false;
+    	}
+    }
 
     /**
      *  检查cookie是正确，返回用户名
@@ -606,7 +632,7 @@ class integrate
         }
         else
         {
-            $sql = "SELECT user_id, password, email FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
+            $sql = "SELECT user_id, password, email, mobile_phone FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
             $row = $GLOBALS['db']->getRow($sql);
 
             if ($row)
@@ -614,6 +640,7 @@ class integrate
                 $_SESSION['user_id']   = $row['user_id'];
                 $_SESSION['user_name'] = $username;
                 $_SESSION['email']     = $row['email'];
+                $_SESSION['mobile']    = $row['mobile_phone'];
             }
         }
     }

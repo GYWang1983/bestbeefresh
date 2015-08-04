@@ -47,6 +47,7 @@ define('ERR_INVALID_PASSWORD',      5); // 密码错误
 define('ERR_INVALID_EMAIL',         6); // email错误
 define('ERR_USERNAME_NOT_ALLOW',    7); // 用户名不允许注册
 define('ERR_EMAIL_NOT_ALLOW',       8); // EMAIL不允许注册
+define('ERR_MOBILE_EXISTS',         9); // 手机号已经存在
 
 /* 加入购物车失败的错误代码 */
 define('ERR_NOT_EXISTS',            1); // 商品不存在
@@ -240,4 +241,8 @@ define('LICENSE_VERSION', '1.0');
 /* 配送方式 */
 define('SHIP_LIST', 'cac|city_express|ems|flat|fpd|post_express|post_mail|presswork|sf_express|sto_express|yto|zto');
 
+/* 手机验证码 */
+define('SMS_REGISTER',  'register');
+define('SMS_REBIND',    'rebind');
+define('SMS_RESETPASS', 'resetpass');
 ?>

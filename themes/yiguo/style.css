@@ -215,6 +215,9 @@ transition: .3s;}
 .language a{ clear:both; float:none; color:#fff;}
 .language a.select{ color:#BBA56B;}
 
+button{background-color:#b18147;font:bold 15px/28px Microsoft Yahei;cursor:pointer;border:none;color:#fff;padding:0 10px;box-shadow:1px 1px 2px #333;border-radius:3px;display:inline-block;}
+button:disabled{background-color:#aaa!important;cursor:default;}
+button:hover{background-color:#c9a060;}
 
  /*搜索*/
 .headSearch{ margin-left:5px; width:184px; float:right; background:url(./images/search.png) no-repeat; height:26px;}
@@ -262,8 +265,11 @@ transition: .3s;}
 .LoginCon p.lh18,.LoginCon p.lh18 a{ line-height:18px;}
 .LoginCon p a:hover{color:#9FA939;}
 .LoginCon p label{ float:left; line-height:22px;}
-.LoginCon .LoginInput{background:url(images/inp_txtBg.gif) no-repeat; height:28px; margin-bottom:5px;}
-.LoginCon .LoginInput input{border:none; width:140px; margin:0 5px; font-family:Arial; height:26px; overflow:hidden; line-height:26px; background:none;}
+.LoginCon .LoginInput,
+.sms_verifycode_dialog .verifycode_input{background:url(images/inp_txtBg.gif) no-repeat; height:28px; margin-bottom:5px;}
+.sms_verifycode_dialog .verifycode_input{margin-top:10px;}
+.LoginCon .LoginInput input,
+.sms_verifycode_dialog input{border:none; width:140px; margin:0 5px; font-family:Arial; height:26px; overflow:hidden; line-height:26px; background:none;}
 .LoginCon .smLoginBtn{float:right; background:url(images/settleup.png) no-repeat; color:#333; width:56px; height:22px; line-height:22px; border-radius:3px; cursor:pointer; border:none; text-align:center;}
 .LoginCon .smLoginBtn:hover{background-position:0 -22px;}
 
@@ -561,7 +567,8 @@ a.settleup:hover{text-decoration:none; color:#333; background-position:0 bottom;
 .picScroll-left .bd ul li .pic a:hover img {border-color:#999;}
 .picScroll-left .bd ul li .title {line-height:24px;}
 /*加入购物袋成功弹出框*/
-.sucess_joinCart{width:210px; height:118px; padding:25px 50px 25px 110px; display:none; position:fixed; z-index:999; background:#f7f7f7 url(images/right-ico-s.png) 45px 23px no-repeat; left:54%; top:34%; margin-left:-250px; box-shadow:0 0 10px #333; border:2px solid #666; border-radius:5px;}
+.sucess_joinCart,
+.sms_verifycode_dialog{width:210px; height:118px; padding:25px 50px 25px 110px; display:none; position:fixed; z-index:999; background:#f7f7f7 url(images/right-ico-s.png) 45px 23px no-repeat; left:54%; top:34%; margin-left:-250px; box-shadow:0 0 10px #333; border:2px solid #666; border-radius:5px;}
 .sucess_joinCart{ _position:absolute;}
 .addSucess_tip{ font-size:15px; font-weight:bold; height:20px; line-height:18px;}
 .cart_num{ color:#808080; height:20px; line-height:20px; }

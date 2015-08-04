@@ -389,7 +389,7 @@ $_LANG['other_msn'] = 'MSN';
 $_LANG['other_qq'] = 'QQ';
 $_LANG['other_office_phone'] = '办公电话';
 $_LANG['other_home_phone'] = '家庭电话';
-$_LANG['other_mobile_phone'] = '手机';
+$_LANG['other_mobile_phone'] = '手机号';
 $_LANG['remember'] = '请保存我这次的登录信息。';
 
 $_LANG['msg_un_blank'] = '用户名不能为空';
@@ -432,7 +432,7 @@ $_LANG['register_success'] = '用户名 %s 注册成功';
 $_LANG['passwd_question'] = '密码提示问题';
 $_LANG['sel_question'] = '请选择密码提示问题';
 $_LANG['passwd_answer'] = '密码问题答案';
-$_LANG['passwd_balnk'] = '密码中不能包含空格';
+$_LANG['passwd_blank'] = '密码中不能包含空格';
 
 /* 用户中心默认页面 */
 $_LANG['welcome_to'] = "欢迎您回到";
@@ -486,25 +486,28 @@ $_LANG['passport_js']['username_invalid'] = '- 用户名只能是由字母数字
 $_LANG['passport_js']['password_empty'] = '- 登录密码不能为空。';
 $_LANG['passport_js']['password_shorter'] = '- 登录密码不能少于 6 个字符。';
 $_LANG['passport_js']['confirm_password_invalid'] = '- 两次输入密码不一致';
-$_LANG['passport_js']['email_empty'] = '- Email 为空';
-$_LANG['passport_js']['email_invalid'] = '- Email 不是合法的地址';
+//$_LANG['passport_js']['email_empty'] = '- Email 为空';
+//$_LANG['passport_js']['email_invalid'] = '- Email 不是合法的地址';
 $_LANG['passport_js']['agreement'] = '- 您没有接受协议';
 $_LANG['passport_js']['msn_invalid'] = '- msn地址不是一个有效的邮件地址';
 $_LANG['passport_js']['qq_invalid'] = '- QQ号码不是一个有效的号码';
 $_LANG['passport_js']['home_phone_invalid'] = '- 家庭电话不是一个有效号码';
 $_LANG['passport_js']['office_phone_invalid'] = '- 办公电话不是一个有效号码';
-$_LANG['passport_js']['mobile_phone_invalid'] = '- 手机号码不是一个有效号码';
+$_LANG['passport_js']['mobile_phone_blank'] = '* 手机号不能为空';
+$_LANG['passport_js']['mobile_phone_invalid'] = '- 无效的手机号';
+$_LANG['passport_js']['mobile_phone_registered'] = '- 手机号已被注册';
 $_LANG['passport_js']['msg_un_blank'] = '* 用户名不能为空';
-$_LANG['passport_js']['msg_un_length'] = '* 用户名最长不得超过7个汉字';
-$_LANG['passport_js']['msg_un_format'] = '* 用户名含有非法字符';
-$_LANG['passport_js']['msg_un_registered'] = '* 用户名已经存在,请重新输入';
+$_LANG['passport_js']['msg_un_length'] = '- 用户名最长不得超过20个字符';
+$_LANG['passport_js']['msg_un_format'] = '- 用户名含有非法字符';
+$_LANG['passport_js']['msg_un_registered'] = '- 用户名已经存在,请重新输入';
 $_LANG['passport_js']['msg_can_rg'] = '* 可以注册';
-$_LANG['passport_js']['msg_email_blank'] = '* 邮件地址不能为空';
-$_LANG['passport_js']['msg_email_registered'] = '* 邮箱已存在,请重新输入';
-$_LANG['passport_js']['msg_email_format'] = '* 邮件地址不合法';
+//$_LANG['passport_js']['msg_email_blank'] = '* 邮件地址不能为空';
+//$_LANG['passport_js']['msg_email_registered'] = '* 邮箱已存在,请重新输入';
+//$_LANG['passport_js']['msg_email_format'] = '* 邮件地址不合法';
+$_LANG['passport_js']['msg_captcha_blank'] = '* 验证码不能为空';
 $_LANG['passport_js']['msg_blank'] = '不能为空';
 $_LANG['passport_js']['no_select_question'] = '- 您没有完成密码提示问题的操作';
-$_LANG['passport_js']['passwd_balnk'] = '- 密码中不能包含空格';
+$_LANG['passport_js']['passwd_blank'] = '- 密码中不能包含空格';
 
 
 /* user_clips.dwt js 语言文件 */

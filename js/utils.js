@@ -78,6 +78,13 @@ Utils.isTel = function ( tel )
   return reg.test( tel );
 }
 
+Utils.isMobile = function ( mobile )
+{
+  var reg = /^1\d{10}$/; //只允许使用数字-空格等
+
+  return reg.test( mobile );
+}
+
 Utils.fixEvent = function(e)
 {
   var evt = (typeof e == "undefined") ? window.event : e;

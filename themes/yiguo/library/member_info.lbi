@@ -45,17 +45,6 @@
                 <input type="hidden" name="back_act" value="{$back_act}" />
                 <input type="submit" name="submit" value="登录" class="smLoginBtn" />
               </p>
-              <!-- 判断是否启用验证码{if $enabled_captcha} -->
-              <div class="coLogin_one">
-                <p>{$lang.comment_captcha}：</p>
-                <div class="coLoginTxt_2">
-                  <div class="coLogin_txt_2_all">
-                    <input type="text" size="17" name="captcha" class="coLogin_txt_2"  />
-                  </div>
-                  <div class="coLoginTxt_2_img"> <img src="captcha.php?is_login=1&{$rand}" alt="captcha" style="vertical-align: middle;cursor: pointer;" onClick="this.src='captcha.php?is_login=1&'+Math.random()" /></div>
-                </div>
-              </div>
-              <!--{/if}-->
               <p class="lh18"><a href="user.php?act=qpassword_name" >忘记密码？</a></p>
             </form>
           </div>

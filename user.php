@@ -30,7 +30,7 @@ $back_act='';
 
 // 不需要登录的操作或自己验证是否登录（如ajax处理）的act
 $not_login_arr =
-array('login','act_login','register','act_register','act_edit_password','get_password','send_pwd_email','password', 'signin', 'add_tag', 'collect', 'return_to_cart', 'logout', 'email_list', 'validate_email', 'send_hash_mail', 'order_query', 'is_registered', 'check_email','clear_history','qpassword_name', 'get_passwd_question', 'check_answer', 'oath' , 'oath_login', 'other_login');
+array('login','act_login','register','act_register','act_edit_password','get_password','send_pwd_email','password', 'signin', 'add_tag', 'collect', 'return_to_cart', 'logout', 'email_list', 'validate_email', 'send_hash_mail', 'order_query', 'is_registered', 'check_email','check_mobile','clear_history','qpassword_name', 'get_passwd_question', 'check_answer', 'oath' , 'oath_login', 'other_login');
 
 /* 显示页面的action列表 */
 $ui_arr = array('register', 'login', 'profile', 'order_list', 'order_detail', 'address_list', 'collection_list',
@@ -74,7 +74,7 @@ if (in_array($action, $ui_arr))
     assign_template();
     $position = assign_ur_here(0, $_LANG['user_center']);
     $smarty->assign('page_title', $position['title']); // 页面标题
-	$smarty->assign('categories_pro',  get_categories_tree_pro()); // 分类树加强版
+    $smarty->assign('categories_pro',  get_categories_tree_pro()); // 分类树加强版
     $smarty->assign('ur_here',    $position['ur_here']);
     $sql = "SELECT value FROM " . $ecs->table('shop_config') . " WHERE id = 419";
     $row = $db->getRow($sql);
@@ -134,7 +134,7 @@ if ($action == 'register')
 
     /* 增加是否关闭注册 */
     $smarty->assign('shop_reg_closed', $_CFG['shop_reg_closed']);
-//    $smarty->assign('back_act', $back_act);
+    
     $smarty->display('user_passport.dwt');
 }
 
@@ -155,14 +155,13 @@ elseif ($action == 'act_register')
         $username = isset($_POST['username']) ? trim($_POST['username']) : '';
         $password = isset($_POST['password']) ? trim($_POST['password']) : '';
         $email    = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $mobile   = isset($_POST['mobile_phone']) ? trim($_POST['mobile_phone']) : '';
         $other['msn'] = isset($_POST['extend_field1']) ? $_POST['extend_field1'] : '';
         $other['qq'] = isset($_POST['extend_field2']) ? $_POST['extend_field2'] : '';
         $other['office_phone'] = isset($_POST['extend_field3']) ? $_POST['extend_field3'] : '';
         $other['home_phone'] = isset($_POST['extend_field4']) ? $_POST['extend_field4'] : '';
-        $other['mobile_phone'] = isset($_POST['extend_field5']) ? $_POST['extend_field5'] : '';
         $sel_question = empty($_POST['sel_question']) ? '' : compile_str($_POST['sel_question']);
         $passwd_answer = isset($_POST['passwd_answer']) ? compile_str(trim($_POST['passwd_answer'])) : '';
-
 
         $back_act = isset($_POST['back_act']) ? trim($_POST['back_act']) : '';
 
@@ -182,7 +181,21 @@ elseif ($action == 'act_register')
 
         if (strpos($password, ' ') > 0)
         {
-            show_message($_LANG['passwd_balnk']);
+            show_message($_LANG['passwd_blank']);
+        }
+        
+        /* 检查注册手机号 */
+        if (empty($mobile))
+        {
+        	show_message($_LANG['passport_js']['mobile_phone_blank']);
+        }
+        else if (!is_mobile($mobile))
+        {
+        	show_message($_LANG['passport_js']['mobile_phone_invalid']);
+        }
+        else if ($user->check_mobile_phone($mobile))
+        {
+        	show_message($_LANG['passport_js']['mobile_phone_registered']);
         }
 
         /* 验证码检查 */
@@ -203,8 +216,26 @@ elseif ($action == 'act_register')
             }
         }
 
+        /* 检查手机验证码 */
+        if ($_CFG['ecsdxt_mobile_reg'] == '1')
+        {
+        	require_once(ROOT_PATH . 'includes/lib_sms.php');
+        	require_once(ROOT_PATH . 'languages/' .$_CFG['lang']. '/sms.php');
+        	
+        	$smscode = isset($_POST['smscode']) ? trim($_POST['smscode']) : '';
+        	if (empty($smscode))
+        	{
+        		show_message($_LANG['verifycode_empty']);
+        	}
+        	else if (!check_sms_verifycode($mobile, $smscode))
+        	{
+        		show_message($_LANG['verifycode_mobile_phone_notmatch']);
+        	}
+        }
+        
         if (register($username, $password, $email, $other) !== false)
         {
+        	
             /*把新注册用户的扩展信息插入数据库*/
             $sql = 'SELECT id FROM ' . $ecs->table('reg_fields') . ' WHERE type = 0 AND display = 1 ORDER BY dis_order, id';   //读出所有自定义扩展字段的id
             $fields_arr = $db->getAll($sql);
@@ -233,6 +264,17 @@ elseif ($action == 'act_register')
                 $sql = 'UPDATE ' . $ecs->table('users') . " SET `passwd_question`='$sel_question', `passwd_answer`='$passwd_answer'  WHERE `user_id`='" . $_SESSION['user_id'] . "'";
                 $db->query($sql);
             }
+            
+            /* 判断是否需要绑定手机号 */
+            if ($_CFG['ecsdxt_mobile_reg'] == '1')
+            {
+            	if (!bind_mobile($username, $mobile, $smscode))
+            	{
+            		/* 绑定手机失败 */
+            		show_message($_LANG['bind_mobile_failed']);
+            	}
+            }
+            
             /* 判断是否需要自动发送注册邮件 */
             if ($GLOBALS['_CFG']['member_email_validate'] && $GLOBALS['_CFG']['send_verify_email'])
             {
@@ -472,9 +514,8 @@ elseif ($action == 'is_registered')
         echo 'true';
     }
 }
-
 /* 验证用户邮箱地址是否被注册 */
-elseif($action == 'check_email')
+elseif ($action == 'check_email')
 {
     $email = trim($_GET['email']);
     if ($user->check_email($email))
@@ -483,8 +524,22 @@ elseif($action == 'check_email')
     }
     else
     {
-        echo 'ok';
+        echo 'true';
     }
+}
+/* 验证手机号是否被注册 */
+elseif ($action == 'check_mobile')
+{
+	$mobile = trim($_GET['mobile']);
+	if ($user->check_mobile_phone($mobile))
+	{
+		echo 'false';
+	}
+	else
+	{
+		echo 'true';
+	}
+	
 }
 /* 用户登录界面 */
 elseif ($action == 'login')

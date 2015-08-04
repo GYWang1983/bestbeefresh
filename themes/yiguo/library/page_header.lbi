@@ -19,8 +19,9 @@ catch (e) {
 }
 </script>
 <div class="header ">
-  <div class="headBody"> {insert_scripts files='jquery-1.9.1.min.js,jquery.json.js,jquery.SuperSlide.js'}
-    {insert_scripts files='transport_jquery.js,utils.js,ecmoban_common.js,default.js'}
+  <div class="headBody">
+  {insert_scripts files='jquery-1.9.1.min.js,jquery.json.js,jquery.SuperSlide.js'}
+  {insert_scripts files='transport_jquery.js,utils.js,ecmoban_common.js,default.js'}
     <div class="headBox">
       <div class="logo"><a href="../index.php" name="top"><img src="../images/logo.gif" /></a></div>
       <div class="HeadRight">
@@ -72,9 +73,8 @@ catch (e) {
         </div>
       </div>
       <div class="RightNav f_r">
-        {insert_scripts files='jquery-1.9.1.min.js,jquery.json.js,jquery.SuperSlide.js'}
-        {insert_scripts files='transport_jquery.js,utils.js,ecmoban_common.js'}
-        {* ECSHOP 提醒您：根据用户id来调用member_info.lbi显示不同的界面  *}{insert name='member_info'}
+        {* ECSHOP 提醒您：根据用户id来调用member_info.lbi显示不同的界面  *}
+        {insert name='member_info'}
         <div class="Carta" id="ECS_CARTINFO">{insert name='cart_info'}</div>
         <div class="Settlement"><a href="flow.php"><em class="arrow-right"></em>去结算</a></div>
       </div>

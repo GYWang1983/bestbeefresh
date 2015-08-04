@@ -353,10 +353,12 @@ function check_password( password )
     if ( password.length < 6 )
     {
         document.getElementById('password_notice').innerHTML = password_shorter;
+        return false;
     }
     else
     {
         document.getElementById('password_notice').innerHTML = msg_can_rg;
+        return true;
     }
 }
 
@@ -372,48 +374,52 @@ function check_conform_password( conform_password )
     if ( conform_password != password )
     {
         document.getElementById('conform_password_notice').innerHTML = confirm_password_invalid;
+        return false;
     }
     else
     {
         document.getElementById('conform_password_notice').innerHTML = msg_can_rg;
+        return true;
     }
 }
 
-function is_registered( username )
+function check_username( username )
 {
-    var submit_disabled = false;
-	var unlen = username.replace(/[^\x00-\xff]/g, "**").length;
+	var unlen = username.length;
 
     if ( username == '' )
     {
-        document.getElementById('username_notice').innerHTML = msg_un_blank;
-        var submit_disabled = true;
+        $('#username_notice').text(msg_un_blank);
+        return false;
     }
 
     if ( !chkstr( username ) )
     {
-        document.getElementById('username_notice').innerHTML = msg_un_format;
-        var submit_disabled = true;
+    	$('#username_notice').text(msg_un_format);
+        return false;
     }
     if ( unlen < 3 )
     { 
-        document.getElementById('username_notice').innerHTML = username_shorter;
-        var submit_disabled = true;
+    	$('#username_notice').text(username_shorter);
+        return false;
     }
-    if ( unlen > 14 )
+    if ( unlen > 20 )
     {
-        document.getElementById('username_notice').innerHTML = msg_un_length;
-        var submit_disabled = true;
+    	$('#username_notice').text(msg_un_length);
+        return false;
     }
-    if ( submit_disabled )
+    
+    return true;
+}
+
+function is_registered( username )
+{	
+    if ( !check_username(username) )
     {
-        document.forms['formUser'].elements['Submit'].disabled = 'disabled';
         return false;
     }
     Ajax.call( 'user.php?act=is_registered', 'username=' + username, registed_callback , 'GET', 'TEXT', true, true );
 }
-
-
 
 function registed_callback(result)
 {
@@ -429,41 +435,51 @@ function registed_callback(result)
   }
 }
 
-function checkEmail(email)
+function check_mobile(mobile)
 {
-  var submit_disabled = false;
-  
-  if (email == '')
-  {
-    document.getElementById('email_notice').innerHTML = msg_email_blank;
-    submit_disabled = true;
-  }
-  else if (!Utils.isEmail(email))
-  {
-    document.getElementById('email_notice').innerHTML = msg_email_format;
-    submit_disabled = true;
-  }
- 
-  if( submit_disabled )
-  {
-    document.forms['formUser'].elements['Submit'].disabled = 'disabled';
-    return false;
-  }
-  Ajax.call( 'user.php?act=check_email', 'email=' + email, check_email_callback , 'GET', 'TEXT', true, true );
+	if ( Utils.isEmpty(mobile) )
+	{
+		$('#mobile_phone_notice').text(mobile_phone_blank);
+		return false;
+	}
+	else if ( !Utils.isMobile(mobile) )
+	{
+		$('#mobile_phone_notice').text(mobile_phone_invalid);
+		return false;
+	}
+	
+	return true;
 }
 
-function check_email_callback(result)
+function is_mobile_registered( mobile )
 {
-  if ( result == 'ok' )
-  {
-    document.getElementById('email_notice').innerHTML = msg_can_rg;
-    document.forms['formUser'].elements['Submit'].disabled = '';
-  }
-  else
-  {
-    document.getElementById('email_notice').innerHTML = msg_email_registered;
-    document.forms['formUser'].elements['Submit'].disabled = 'disabled';
-  }
+	if ( !check_mobile(mobile) )
+    {
+        return false;
+    }
+	
+	Ajax.call( 'user.php?act=check_mobile', 'mobile=' + mobile, function (result) {
+		if ( result == "true" )
+		{
+		    $('#mobile_phone_notice').text(msg_can_rg);
+		}
+		else
+		{
+			$('#mobile_phone_notice').text(mobile_phone_registered);
+		}
+	}, 'GET', 'TEXT', true, true );
+	
+}
+
+function check_captcha( captcha )
+{
+	if ( Utils.isEmpty(captcha) )
+	{
+		$('#captcha_notice').text(msg_captcha_blank);
+		return false;
+	}
+	
+	return true;
 }
 
 /* *
@@ -471,128 +487,75 @@ function check_email_callback(result)
  */
 function register()
 {
-  var frm  = document.forms['formUser'];
-  var username  = Utils.trim(frm.elements['username'].value);
-  var email  = frm.elements['email'].value;
-  var password  = Utils.trim(frm.elements['password'].value);
-  var confirm_password = Utils.trim(frm.elements['confirm_password'].value);
-  var checked_agreement = frm.elements['agreement'].checked;
-  var msn = frm.elements['extend_field1'] ? Utils.trim(frm.elements['extend_field1'].value) : '';
-  var qq = frm.elements['extend_field2'] ? Utils.trim(frm.elements['extend_field2'].value) : '';
-  var home_phone = frm.elements['extend_field4'] ? Utils.trim(frm.elements['extend_field4'].value) : '';
-  var office_phone = frm.elements['extend_field3'] ? Utils.trim(frm.elements['extend_field3'].value) : '';
-  var mobile_phone = frm.elements['extend_field5'] ? Utils.trim(frm.elements['extend_field5'].value) : '';
-  var passwd_answer = frm.elements['passwd_answer'] ? Utils.trim(frm.elements['passwd_answer'].value) : '';
-  var sel_question =  frm.elements['sel_question'] ? Utils.trim(frm.elements['sel_question'].value) : '';
-
-
-  var msg = "";
-  // 检查输入
-  var msg = '';
-  if (username.length == 0)
-  {
-    msg += username_empty + '\n';
-  }
-  else if (username.match(/^\s*$|^c:\\con\\con$|[%,\'\*\"\s\t\<\>\&\\]/))
-  {
-    msg += username_invalid + '\n';
-  }
-  else if (username.length < 3)
-  {
-    //msg += username_shorter + '\n';
-  }
-
-  if (email.length == 0)
-  {
-    msg += email_empty + '\n';
-  }
-  else
-  {
-    if ( ! (Utils.isEmail(email)))
-    {
-      msg += email_invalid + '\n';
+    var frm  = document.forms['formUser'];
+    var username  = $('#username').val();
+    var password  = $('#password1').val();
+    var confirm_password = $('#conform_password').val();
+    var mobile_phone = $('#mobile_phone').val();
+    var captcha = $('#captcha').val();
+    var checked_agreement = $('input[name=agreement]').is(':checked');
+  
+    if ( !check_username(username) 
+    		|| !check_mobile(mobile_phone)
+    		|| !check_password(password) 
+    		|| !check_conform_password(confirm_password)
+    		|| !check_captcha(captcha)
+    		|| !checked_agreement) {
+    	return false;
     }
-  }
-  if (password.length == 0)
-  {
-    msg += password_empty + '\n';
-  }
-  else if (password.length < 6)
-  {
-    msg += password_shorter + '\n';
-  }
-  if (/ /.test(password) == true)
-  {
-	msg += passwd_balnk + '\n';
-  }
-  if (confirm_password != password )
-  {
-    msg += confirm_password_invalid + '\n';
-  }
-  if(checked_agreement != true)
-  {
-    msg += agreement + '\n';
-  }
 
-  if (msn.length > 0 && (!Utils.isEmail(msn)))
-  {
-    msg += msn_invalid + '\n';
-  }
+    //Check pass, send mobile vertfiy code
+    var param = 'mobile=' + mobile_phone + '&captcha=' + captcha;
+    Ajax.call('sms.php?step=register&r=' + Math.random(), param, function(result) {
+    	console.log(result);
+    	switch(result.error)
+    	{
+    	case 0:
+    	case 4:
+    		openVerifycodeDialog();
+    		break;
+    	case 1:
+    		break;
+    	case 2:
+    	case 3:
+    		$('#mobile_phone_notice').text(result.message);
+    		break;
+    	case 5:
+    	case 6:
+    		alert('error');
+    		break;
+    	case 7:
+    		$('#captcha_notice').text(result.message);
+    	}
+    }, 'POST', 'JSON');
+}
 
-  if (qq.length > 0 && (!Utils.isNumber(qq)))
-  {
-    msg += qq_invalid + '\n';
-  }
-
-  if (office_phone.length>0)
-  {
-    var reg = /^[\d|\-|\s]+$/;
-    if (!reg.test(office_phone))
-    {
-      msg += office_phone_invalid + '\n';
-    }
-  }
-  if (home_phone.length>0)
-  {
-    var reg = /^[\d|\-|\s]+$/;
-
-    if (!reg.test(home_phone))
-    {
-      msg += home_phone_invalid + '\n';
-    }
-  }
-  if (mobile_phone.length>0)
-  {
-    var reg = /^[\d|\-|\s]+$/;
-    if (!reg.test(mobile_phone))
-    {
-      msg += mobile_phone_invalid + '\n';
-    }
-  }
-  if (passwd_answer.length > 0 && sel_question == 0 || document.getElementById('passwd_quesetion') && passwd_answer.length == 0)
-  {
-    msg += no_select_question + '\n';
-  }
-
-  for (i = 4; i < frm.elements.length - 4; i++)	// 从第五项开始循环检查是否为必填项
-  {
-	needinput = document.getElementById(frm.elements[i].name + 'i') ? document.getElementById(frm.elements[i].name + 'i') : '';
-
-	if (needinput != '' && frm.elements[i].value.length == 0)
+function act_register()
+{
+	var verifycode = Utils.trim($('#smscode').val());
+	if (verifycode == '')
 	{
-	  msg += '- ' + needinput.innerHTML + msg_blank + '\n';
+		return;
 	}
-  }
+	
+	$('#formRegister').submit();
+}
 
-  if (msg.length > 0)
-  {
-    alert(msg);
-    return false;
-  }
-  else
-  {
-    return true;
-  }
+/* *
+ * 打开验证码对话框
+ */
+function openVerifycodeDialog()
+{
+	$('#smscode').val('');
+	$('.sms_verifycode_dialog').show();
+}
+
+/* *
+ * 关闭验证码对话框
+ */
+function closeVerifycodeDialog()
+{
+	$('.sms_verifycode_dialog:visible').hide();
 }
 
 /* *
