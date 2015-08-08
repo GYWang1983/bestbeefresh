@@ -33,10 +33,10 @@
           <div class="LoginCon">
             <form name="formLogin" action="user.php" method="post" onSubmit="return userLogin()">
               <p class="LoginInput">
-                <input name="username" onfocus="if(this.value=='用户名'){this.value='';this.style.color='#000';}" onblur="if(this.value==''){this.value='用户名';this.style.color='#999';}" autocomplete="false" value="用户名" type="text" size="17"/>
+                <input name="username" autocomplete="false" placeholder="用户名/手机号" value="" type="text" size="17"/>
               </p>
               <p class="LoginInput">
-                <input name="password" type="password" size="17" />
+                <input name="password" type="password" placeholder="密码" value="" size="17" />
               </p>
               <p>
                 <input type="checkbox" checked="true" name="remember" id="remember" style="margin:2px 3px 0 0; width: 13px; float: left; clear: left;">

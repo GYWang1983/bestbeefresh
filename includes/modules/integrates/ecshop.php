@@ -72,6 +72,7 @@ class ecshop extends integrate
         $this->field_gender = 'sex';
         $this->field_bday = 'birthday';
         $this->field_reg_date = 'reg_time';
+        $this->field_status = 'is_validated';
         $this->need_sync = false;
         $this->is_ecshop = 1;
     }
@@ -85,7 +86,7 @@ class ecshop extends integrate
      *
      * @return  int
      */
-    function check_user($username, $password = null)
+    /*function check_user($username, $password = null)
     {
         if ($this->charset != 'UTF8')
         {
@@ -138,18 +139,18 @@ class ecshop extends integrate
             }
             else
             {
-                /* 如果salt存在，使用salt方式加密验证，验证通过洗白用户密码 */
+                // 如果salt存在，使用salt方式加密验证，验证通过洗白用户密码 
                 $encrypt_type = substr($row['salt'], 0, 1);
                 $encrypt_salt = substr($row['salt'], 1);
 
-                /* 计算加密后密码 */
+                // 计算加密后密码
                 $encrypt_password = '';
                 switch ($encrypt_type)
                 {
                     case ENCRYPT_ZC :
                         $encrypt_password = md5($encrypt_salt.$password);
                         break;
-                    /* 如果还有其他加密方式添加到这里  */
+                    // 如果还有其他加密方式添加到这里 
                     //case other :
                     //  ----------------------------------
                     //  break;
@@ -175,9 +176,93 @@ class ecshop extends integrate
                 return $row['user_id'];
             }
         }
+    }*/
+
+    /**
+     * (non-PHPdoc)
+     * @see integrate::get_profile_sql()
+     */
+    protected function get_profile_sql()
+    {
+    	return "SELECT " . $this->field_id . " AS user_id," . $this->field_name . " AS user_name," .
+    			$this->field_mobile . " AS mobile_phone," . $this->field_gender ." AS sex,".
+    			$this->field_bday . " AS birthday," . $this->field_reg_date . " AS reg_time, ".
+    			$this->ec_salt . " AS ec_salt, salt, " .
+    			$this->field_status . " AS status," .
+    			$this->field_pass . " AS password ".
+    			" FROM " . $this->table($this->user_table);
     }
+    
+    /**
+     *  检查指定用户是否存在及密码是否正确
+     *
+     * @access  public
+     * @param   array $user_info   用户信息
+     * @param   array $post_password 密码
+     *
+     * @return  boolean
+     */
+    function check_password($user_info, $post_password)
+    {
+    	$cfg = array(
+    	    'password' => $post_password,
+    		'ec_salt'  => $user_info['ec_salt'],
+    	);
+    	
+    	if (empty($user_info['salt']))
+        {
+        	if ($user_info['password'] != $this->compile_password($cfg))
+            {
+                return false;
+            }
+            else
+            {
+				if(empty($user_info['ec_salt']))
+				{
+				    $cfg['ec_salt'] = rand(1,9999);
+				    $new_password = $this->compile_password($cfg);
+				    $sql = "UPDATE ".$this->table($this->user_table)."SET password= '" .$new_password."',ec_salt='{$cfg[ec_salt]}'".
+                           " WHERE user_id={$user_info[user_id]}";
+                    $this->db->query($sql);
 
+				}
+				
+                return true;
+            }
+        }
+        else
+        {
+            // 如果salt存在，使用salt方式加密验证，验证通过洗白用户密码 
+            $encrypt_type = substr($user_info['salt'], 0, 1);
+            $encrypt_salt = substr($user_info['salt'], 1);
 
+            // 计算加密后密码
+            $encrypt_password = '';
+            switch ($encrypt_type)
+            {
+                case ENCRYPT_ZC :
+                    $encrypt_password = md5($encrypt_salt . $post_password);
+                    break; 
+                case ENCRYPT_UC :
+                    $encrypt_password = md5(md5($post_password) . $encrypt_salt);
+                    break;
+                default:
+                    $encrypt_password = '';
+
+            }
+
+            if ($user_info['password'] != $encrypt_password)
+            {
+                return false;
+            }
+
+            $sql = "UPDATE " . $this->table($this->user_table) .
+                       " SET password = '".  $this->compile_password($cfg) . "', salt=''".
+                       " WHERE user_id = '$row[user_id]'";
+            $this->db->query($sql);
+            return true;
+        }
+    }
 }
 
 ?>

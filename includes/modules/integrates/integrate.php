@@ -71,6 +71,9 @@ class integrate
     /* 注册日期的字段名 */
     var $field_reg_date = '';
 
+    /* 用户状态 */
+    var $field_status = '';
+    
     /* 是否需要同步数据到商城 */
     var $need_sync = true;
 
@@ -147,21 +150,38 @@ class integrate
      */
     function login($username, $password, $remember = null)
     {
-        if ($this->check_user($username, $password) > 0)
-        {
-            if ($this->need_sync)
-            {
-                $this->sync($username,$password);
-            }
-            $this->set_session($username);
-            $this->set_cookie($username, $remember);
+    	// login by mobile
+    	if (is_mobile($username))
+    	{
+    		$user_info = $this->get_profile_by_mobile($username);
+    	}
+    	else
+    	{
+    		$user_info = $this->get_profile_by_name($username);
+    	}
+    	
+    	//if ($this->check_user($username, $password) > 0)
+    	if (!empty($user_info))
+    	{
+	    	if ($user_info['status'] == 1 && $this->check_password($user_info, $password))
+	        {
+	            if ($this->need_sync)
+	            {
+	                $this->sync($username,$password);
+	            }
+	            $this->set_session($user_info);
+	            $this->set_cookie($user_info, $remember);
+	
+	            return true;
+	        }
+	        else
+	        {
+	        	return false;
+	        }
+    	}
 
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
+        
     }
 
     /**
@@ -186,7 +206,7 @@ class integrate
      *
      * @return int
      */
-    function add_user($username, $password, $email, $gender = -1, $bday = 0, $reg_date=0, $md5password='')
+    function add_user($username, $password, $email = '', $gender = -1, $bday = 0, $reg_date=0, $md5password='')
     {
         /* 将用户添加到整合方 */
         if ($this->check_user($username) > 0)
@@ -196,17 +216,10 @@ class integrate
             return false;
         }
         /* 检查email是否重复 */
-        if (!empty($email)) {
-        $sql = "SELECT " . $this->field_id .
-               " FROM " . $this->table($this->user_table).
-               " WHERE " . $this->field_email . " = '$email'";
-        if ($this->db->getOne($sql, true) > 0)
+        if ($this->check_email($email))
         {
-            $this->error = ERR_EMAIL_EXISTS;
-
-            return false;
+        	return false;
         }
-      	}
 
         $post_username = $username;
 
@@ -282,9 +295,9 @@ class integrate
             $values[] = $this->field_pass . "='" . $this->compile_password(array('md5password'=>$cfg['md5password'])) . "'";
         }
 
-        if ((!empty($cfg['email'])) && $this->field_email != 'NULL')
+        /*if ((!empty($cfg['email'])) && $this->field_email != 'NULL')
         {
-            /* 检查email是否重复 */
+            // 检查email是否重复 
             $sql = "SELECT " . $this->field_id .
                    " FROM " . $this->table($this->user_table).
                    " WHERE " . $this->field_email . " = '$cfg[email]' ".
@@ -306,7 +319,7 @@ class integrate
                 $this->db->query($sql);
             }
             $values[] = $this->field_email . "='". $cfg['email'] . "'";
-        }
+        }*/
 
         if (isset($cfg['gender']) && $this->field_gender != 'NULL')
         {
@@ -418,23 +431,33 @@ class integrate
     }
 
     /**
+     * 取用户信息SQL
+     * 
+     * @return string
+     */
+    protected function get_profile_sql()
+    {
+        return "SELECT " . $this->field_id . " AS user_id," . $this->field_name . " AS user_name," .
+                    $this->field_mobile . " AS mobile_phone," . $this->field_gender ." AS sex,".
+                    $this->field_bday . " AS birthday," . $this->field_reg_date . " AS reg_time, ".
+                    $this->field_status . " AS status," .
+                    $this->field_pass . " AS password ".
+               " FROM " . $this->table($this->user_table);
+    }
+    
+    /**
      *  获取指定用户的信息
      *
      * @access  public
      * @param
      *
-     * @return void
+     * @return array
      */
     function get_profile_by_name($username)
     {
         $post_username = $username;
 
-        $sql = "SELECT " . $this->field_id . " AS user_id," . $this->field_name . " AS user_name," .
-                    $this->field_email . " AS email," . $this->field_gender ." AS sex,".
-                    $this->field_bday . " AS birthday," . $this->field_reg_date . " AS reg_time, ".
-                    $this->field_pass . " AS password ".
-               " FROM " . $this->table($this->user_table) .
-               " WHERE " .$this->field_name . "='$post_username'";
+        $sql = $this->get_profile_sql() . " WHERE " .$this->field_name . "='$post_username'";
         $row = $this->db->getRow($sql);
 
         return $row;
@@ -446,19 +469,30 @@ class integrate
      * @access  public
      * @param
      *
-     * @return void
+     * @return array
      */
     function get_profile_by_id($id)
     {
-        $sql = "SELECT " . $this->field_id . " AS user_id," . $this->field_name . " AS user_name," .
-                    $this->field_email . " AS email," . $this->field_gender ." AS sex,".
-                    $this->field_bday . " AS birthday," . $this->field_reg_date . " AS reg_time, ".
-                    $this->field_pass . " AS password ".
-               " FROM " . $this->table($this->user_table) .
-               " WHERE " .$this->field_id . "='$id'";
+        $sql = $this->get_profile_sql() . " WHERE " .$this->field_id . "='$id'";
         $row = $this->db->getRow($sql);
 
         return $row;
+    }
+    
+    /**
+     *  获取指定用户的信息
+     *
+     * @access  public
+     * @param string $mobile
+     *
+     * @return array
+     */
+    function get_profile_by_mobile($mobile)
+    {
+    	$sql = $this->get_profile_sql() . " WHERE " .$this->field_mobile . "='$mobile'";
+    	$row = $this->db->getRow($sql);
+    	
+    	return $row;
     }
 
     /**
@@ -498,28 +532,38 @@ class integrate
      */
     function check_user($username, $password = null)
     {
-
-        $post_username = $username;
-
-        /* 如果没有定义密码则只检查用户名 */
-        if ($password === null)
+    	
+        $user_info = $this->get_profile_by_name($username);
+        
+        if (empty($user_info))
         {
-            $sql = "SELECT " . $this->field_id .
-                   " FROM " . $this->table($this->user_table).
-                   " WHERE " . $this->field_name . "='" . $post_username . "'";
-
-            return $this->db->getOne($sql);
+        	return 0;
+        }
+        else if ($password === null)
+        {
+        	/* 如果没有定义密码则只检查用户名 */
+            return $user_info['user_id'];
         }
         else
-        {
-            $sql = "SELECT " . $this->field_id .
-                   " FROM " . $this->table($this->user_table).
-                   " WHERE " . $this->field_name . "='" . $post_username . "' AND " . $this->field_pass . " ='" . $this->compile_password(array('password'=>$password)) . "'";
-
-            return  $this->db->getOne($sql);
+        {            
+            return $this->check_password($user_info, $password) ? $user_info['user_id'] : 0;
         }
     }
 
+    /**
+     *  检查指定用户是否存在及密码是否正确
+     *
+     * @access  public
+     * @param   array $user_info   用户信息
+     * @param   array $post_password 密码
+     *
+     * @return  boolean
+     */
+    function check_password($user_info, $post_password)
+    {
+    	return $user_info['password'] == $this->compile_password(array('password'=>$post_password));
+    }
+    
     /**
      *  检查指定邮箱是否存在
      *
@@ -532,17 +576,18 @@ class integrate
     {
         if (!empty($email))
         {
-          /* 检查email是否重复 */
+          	/* 检查email是否重复 */
             $sql = "SELECT " . $this->field_id .
-                       " FROM " . $this->table($this->user_table).
-                       " WHERE " . $this->field_email . " = '$email' ";
+                   " FROM " . $this->table($this->user_table).
+                   " WHERE " . $this->field_email . " = '$email' ";
             if ($this->db->getOne($sql, true) > 0)
             {
                 $this->error = ERR_EMAIL_EXISTS;
                 return true;
             }
-            return false;
         }
+        
+        return false;
     }
 
     /**
@@ -558,15 +603,17 @@ class integrate
     	if (!empty($mobile))
     	{
     		$sql = "SELECT " . $this->field_id .
-    		" FROM " . $this->table($this->user_table).
-    		" WHERE " . $this->field_mobile . " = '$mobile' ";
+    			   " FROM " . $this->table($this->user_table).
+    			   " WHERE " . $this->field_mobile . " = '$mobile' ";
     		if ($this->db->getOne($sql, true) > 0)
     		{
     			$this->error = ERR_MOBILE_EXISTS;
     			return true;
     		}
-    		return false;
+    		
     	}
+    	
+    	return false;
     }
 
     /**
@@ -602,16 +649,25 @@ class integrate
         }
         elseif ($remember)
         {
-            /* 设置cookie */
+            // 设置cookie   
             $time = time() + 3600 * 24 * 15;
 
-            setcookie("ECS[username]", $username, $time, $this->cookie_path, $this->cookie_domain);
-            $sql = "SELECT user_id, password FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
-            $row = $GLOBALS['db']->getRow($sql);
-            if ($row)
+            if (is_array($username))
             {
-                setcookie("ECS[user_id]", $row['user_id'], $time, $this->cookie_path, $this->cookie_domain);
-                setcookie("ECS[password]", $row['password'], $time, $this->cookie_path, $this->cookie_domain);
+            	setcookie("ECS[username]", $username['user_name'], $time, $this->cookie_path, $this->cookie_domain);
+            	setcookie("ECS[user_id]",  $username['user_id'], $time, $this->cookie_path, $this->cookie_domain);
+            	setcookie("ECS[password]", $username['password'], $time, $this->cookie_path, $this->cookie_domain);
+            }
+            else 
+            {
+	            setcookie("ECS[username]", $username, $time, $this->cookie_path, $this->cookie_domain);
+	            $sql = "SELECT user_id, password FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
+	            $row = $GLOBALS['db']->getRow($sql);
+	            if ($row)
+	            {
+	                setcookie("ECS[user_id]", $row['user_id'], $time, $this->cookie_path, $this->cookie_domain);
+	                setcookie("ECS[password]", $row['password'], $time, $this->cookie_path, $this->cookie_domain);
+	            }
             }
         }
     }
@@ -630,7 +686,13 @@ class integrate
         {
             $GLOBALS['sess']->destroy_session();
         }
-        else
+        else if (is_array($username))
+        {
+        	$_SESSION['user_id']   = $username['user_id'];
+        	$_SESSION['user_name'] = $username['user_name'];
+        	$_SESSION['mobile']    = $username['mobile_phone'];
+        }
+        else 
         {
             $sql = "SELECT user_id, password, email, mobile_phone FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
             $row = $GLOBALS['db']->getRow($sql);
@@ -639,7 +701,6 @@ class integrate
             {
                 $_SESSION['user_id']   = $row['user_id'];
                 $_SESSION['user_name'] = $username;
-                $_SESSION['email']     = $row['email'];
                 $_SESSION['mobile']    = $row['mobile_phone'];
             }
         }

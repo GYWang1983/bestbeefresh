@@ -31,7 +31,7 @@
    <form name="formLogin" action="user.php" method="post" onSubmit="return xs_userLogin()">
        
           <div class="coLogin_one">
-            <p>{$lang.label_username}：</p>
+            <p>{$lang.label_username}/手机号：</p>
             <div class="coLoginTxt">
             <div class="coLogin_txt_all">
             <input name="username" id="xs_username" type="text" size="17" class="coLogin_txt"/>
