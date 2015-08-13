@@ -542,7 +542,7 @@ function order_weight_price($order_id)
  * @param   bool    $is_gb_deposit  是否团购保证金（如果是，应付款金额只计算商品总额和支付费用，可以获得的积分取 $gift_integral）
  * @return  array
  */
-function order_fee($order, $goods, $consignee)
+function order_fee($order, $goods, $consignee = NULL)
 {
     /* 初始化订单的扩展code */
     if (!isset($order['extension_code']))
@@ -655,12 +655,10 @@ function order_fee($order, $goods, $consignee)
         $total['bonus_kill_formated'] = price_format($total['bonus_kill'], false);
     }
 
-
-
     /* 配送费用 */
     $shipping_cod_fee = NULL;
 
-    if ($order['shipping_id'] > 0 && $total['real_goods_count'] > 0)
+    if (isset($consignee) && $order['shipping_id'] > 0 && $total['real_goods_count'] > 0)
     {
         $region['country']  = $consignee['country'];
         $region['province'] = $consignee['province'];

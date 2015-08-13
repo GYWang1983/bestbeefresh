@@ -1255,12 +1255,12 @@ elseif ($_REQUEST['step'] == 'select_payment')
     $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
 
     /* 获得收货人信息 */
-    $consignee = get_consignee($_SESSION['user_id']);
+    //$consignee = get_consignee($_SESSION['user_id']);
 
     /* 对商品信息赋值 */
     $cart_goods = cart_goods($flow_type); // 取得商品列表，计算合计
 
-    if (empty($cart_goods) || !check_consignee_info($consignee, $flow_type))
+    if (empty($cart_goods) /*|| !check_consignee_info($consignee, $flow_type)*/)
     {
         $result['error'] = $_LANG['no_goods_in_cart'];
     }
