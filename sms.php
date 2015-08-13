@@ -18,7 +18,7 @@
  * 0 - 发送成功
  * 1 - 未开启手机验证码
  * 2 - 手机号不正确
- * 3 - 手机号已被占用
+ * 3 - 手机号已被占用/手机号未注册
  * 4 - 间隔时间内已获取过验证码
  * 5 - 短信发送失败
  * 6 - ip地址已被屏蔽
@@ -34,7 +34,7 @@ require(ROOT_PATH . 'includes/lib_sms.php');
 require_once(ROOT_PATH . 'languages/' .$_CFG['lang']. '/sms.php');
 
 
-$step_allow = array('register', 'rebind', 'resetpasswd');
+$step_allow = array('register', 'rebind', 'getpassword');
 
 $step = empty($_REQUEST['step']) ? "" : trim($_REQUEST['step']);
 if (!in_array($step, $step_allow))
@@ -46,9 +46,9 @@ $result = array('error' => 0, 'message' => '');
 $json = new JSON;
 
 /* 检查图片验证码 */
-$captcha_enable = (intval($_CFG['captcha']) & CAPTCHA_REGISTER) && $step == 'register';
-$captcha_enable |= ($step == 'rebind');
-$captcha_enable |= ($step == 'resetpasswd');
+$captcha_enable =  $step == 'register'    && (intval($_CFG['captcha']) & CAPTCHA_REGISTER);
+$captcha_enable |= $step == 'rebind'      && (intval($_CFG['captcha']) & CAPTCHA_REBIND);
+$captcha_enable |= $step == 'getpassword' && (intval($_CFG['captcha']) & CAPTCHA_GET_PASSWORD);
 
 if ($captcha_enable && gd_version() > 0)
 {
@@ -94,7 +94,15 @@ if(in_array(real_ip(), $ip_array)) {
 	die($json->encode($result));
 }
 
-$count = $db->getOne("SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE getip='" . real_ip() . "' AND dateline>" . gmtime() ."-60");
+/* 提交的手机号是否正确 */
+if (!ismobile($mobile))
+{
+	$result['error'] = 2;
+	$result['message'] = $_LANG['invalid_mobile_phone'];
+	die($json->encode($result));
+}
+
+$count = $db->getOne("SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE getip='" . real_ip() . "' AND dateline>" . gmtime() ."-60 AND status=1");
 if ($count > 50 && !stristr($denied_log, $_G['clientip']))
 {
 	$log = real_ip().",";
@@ -106,6 +114,14 @@ if ($count > 50 && !stristr($denied_log, $_G['clientip']))
 	die($json->encode($result));
 }
 
+/* 获取验证码请求是否获取过 */
+$sql = "SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE mobile='$mobile' AND status=1 AND getip='" . real_ip() . "' AND dateline>" . gmtime() ."-".$_CFG['ecsdxt_smsgap'];
+if ($db->getOne($sql) > 0)
+{
+	$result['error'] = 4;
+	$result['message'] = sprintf($_LANG['get_verifycode_excessived'], $_CFG['ecsdxt_smsgap']);
+	die($json->encode($result));
+}
 
 
 if ($step == 'register')
@@ -116,31 +132,12 @@ if ($step == 'register')
 		$result['message'] = $_LANG['ecsdxt_mobile_reg_closed'];
         die($json->encode($result));
 	}
-	
-	/* 提交的手机号是否正确 */
-	if (!ismobile($mobile))
-	{
-		$result['error'] = 2;
-		$result['message'] = $_LANG['invalid_mobile_phone'];
-        die($json->encode($result));
-	}
 
 	/* 提交的手机号是否已经注册帐号 */
-    $sql = "SELECT COUNT(user_id) FROM " . $ecs->table('users') ." WHERE mobile_phone = '$mobile'";
-    if ($db->getOne($sql) > 0)
+    if ($user->check_mobile_phone($mobile))
     {
         $result['error'] = 3;
 		$result['message'] = $_LANG['mobile_phone_registered'];
-        die($json->encode($result));
-    }
-
-	/* 获取验证码请求是否获取过 */
-	$sql = "SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE mobile='$mobile' AND status=1 AND getip='" . real_ip() . "' AND dateline>" . gmtime() ."-".$_CFG['ecsdxt_smsgap'];
-
-    if ($db->getOne($sql) > 0)
-    {
-        $result['error'] = 4;
-		$result['message'] = sprintf($_LANG['get_verifycode_excessived'], $_CFG['ecsdxt_smsgap']);
         die($json->encode($result));
     }
 
@@ -158,11 +155,52 @@ if ($step == 'register')
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
-		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."')";
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 1)";
 		$db->query($sql);
 
 		$result['error'] = 0;
 		$result['message'] = $_LANG['send_mobile_verifycode_successed'];
+		die($json->encode($result));
+	}
+	else
+	{
+		$result['error'] = 5;
+		$result['message'] = $_LANG['send_mobile_verifycode_failured'] . $ret;
+		die($json->encode($result));
+	}
+}
+elseif ($step == 'getpassword')
+{
+	/* 检查手机号是否已注册 */
+	$user_info = $user->get_profile_by_mobile($mobile);
+	if (empty($user_info))
+	{
+		$result['error'] = 3;
+		$result['message'] = $_LANG['mobile_phone_not_registered'];
+		die($json->encode($result));
+	}
+	
+	$verifycode = getverifycode();
+	
+	$smarty->assign('shop_name',	$_CFG['shop_name']);
+	$smarty->assign('user_mobile',	$mobile);
+	$smarty->assign('verify_code',  $verifycode);
+	
+	$content = $smarty->fetch('str:' . $_CFG['ecsdxt_mobile_changepwd_value']);
+	
+	/* 发送注册手机短信验证 */
+	$ret = sendsms($mobile, $content);
+	
+	if($ret === true)
+	{
+		//插入获取验证码数据记录
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 2)";
+		$db->query($sql);
+		
+		$result['error'] = 0;
+		$result['message'] = $_LANG['send_mobile_verifycode_successed'];
+		$result['uid'] = $user_info['user_id'];
+
 		die($json->encode($result));
 	}
 	else
@@ -223,7 +261,7 @@ elseif ($step == 'rebind')
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
-		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, status) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 4)";
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 3)";
 		$db->query($sql);
 
 		$result['error'] = 0;
@@ -237,5 +275,7 @@ elseif ($step == 'rebind')
 		die($json->encode($result));
 	}
 }
+
+
 
 ?>

@@ -448,6 +448,7 @@ function check_mobile(mobile)
 		return false;
 	}
 	
+	$('#mobile_phone_notice').text('');
 	return true;
 }
 
@@ -487,7 +488,6 @@ function check_captcha( captcha )
  */
 function register()
 {
-    var frm  = document.forms['formUser'];
     var username  = $('#username').val();
     var password  = $('#password1').val();
     var confirm_password = $('#conform_password').val();
@@ -507,7 +507,6 @@ function register()
     //Check pass, send mobile vertfiy code
     var param = 'mobile=' + mobile_phone + '&captcha=' + captcha;
     Ajax.call('sms.php?step=register&r=' + Math.random(), param, function(result) {
-    	console.log(result);
     	switch(result.error)
     	{
     	case 0:
@@ -539,6 +538,52 @@ function act_register()
 	}
 	
 	$('#formRegister').submit();
+}
+
+/* *
+ * 根据手机号取回密码
+ */
+function get_password()
+{
+
+    var mobile_phone = $('#mobile_phone').val();
+    var captcha = $('#captcha').val();
+
+	if ( !check_mobile(mobile_phone)
+    		|| !check_captcha(captcha)) {
+    	return false;
+    }
+	
+	var param = 'mobile=' + mobile_phone + '&captcha=' + captcha;
+    Ajax.call('sms.php?step=getpassword&r=' + Math.random(), param, function(result) {
+    	console.log(result);
+    	switch(result.error)
+    	{
+    	case 0:
+    		$('#mobile_phone_notice').text('');
+    		$('#captcha_notice').text('');
+    		$('#uid').val(result.uid);
+    		openVerifycodeDialog();
+    		break;
+    	case 1:
+    	case 3:
+    		$('#mobile_phone_notice').text(result.message);
+    		break;
+    	case 7:
+    		$('#captcha_notice').text(result.message);
+    	}
+    }, 'POST', 'JSON');
+}
+
+function act_get_password()
+{
+	var verifycode = Utils.trim($('#smscode').val());
+	if (verifycode == '')
+	{
+		return;
+	}
+	
+	$('#getPassword').submit();
 }
 
 /* *

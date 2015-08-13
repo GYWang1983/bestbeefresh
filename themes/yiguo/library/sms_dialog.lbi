@@ -1,0 +1,15 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<div class="sms_verifycode_dialog" style="width:195px;">
+    <p class="addSucess_tip">验证码已发生到手机</p>
+    <p class="verifycode_input">
+        <input name="smscode" id="smscode" autocomplete="false" type="text" size="6" placeholder="请填写验证码">
+    </p>
+    <p style="margin-top:20px;">
+        <!-- {if $action eq 'register'} -->
+        <button type="button" id="btn_register" onclick="act_register()">确&nbsp;&nbsp;定</button>
+        <!-- {elseif $action eq 'get_password'} -->
+        <button type="button" id="btn_get_password" onclick="act_get_password()">确&nbsp;&nbsp;定</button>
+        <!-- {/if} -->
+        <button type="button" id="btn_cancel" style="margin-left:28px;" onclick="closeVerifycodeDialog()">关&nbsp;&nbsp;闭</button>
+    <p>
+</div>

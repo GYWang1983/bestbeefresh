@@ -43,7 +43,7 @@
             <div class="coLoginTxt">
             <div class="coLogin_txt_all">
             <input name="password" id="xs_password" type="password" size="17" class="coLogin_txt" />
-            <span style="padding:0 0 0 5px;"><a href="user.php?act=qpassword_name">忘记密码了？</a></span>
+            <span style="padding:0 0 0 5px;"><a href="user.php?act=get_password">忘记密码了？</a></span>
             </div>
             </div>
           </div>
@@ -166,16 +166,7 @@
                     <p style="width:40px;"></p>
                     <a href="user.php?act=login">{$lang.want_login}</a>&nbsp;&nbsp;&nbsp;<a href="user.php?act=get_password">{$lang.forgot_password}</a>
                 </div>
-                <div class="sms_verifycode_dialog" style="width:195px;">
-                    <p class="addSucess_tip">验证码已发生到手机</p>
-                    <p class="verifycode_input">
-                        <input name="smscode" id="smscode" autocomplete="false" type="text" size="6" placeholder="请填写验证码">
-                    </p>
-                    <p style="margin-top:20px;">
-                        <button type="button" id="btn_register" onclick="act_register()">确&nbsp;&nbsp;定</button>
-                        <button type="button" id="btn_cancel" style="margin-left:28px;" onclick="closeVerifycodeDialog()">关&nbsp;&nbsp;闭</button>
-                    <p>
-                </div>
+                <!-- #BeginLibraryItem "/library/sms_dialog.lbi" --><!-- #EndLibraryItem -->
             </form>
         </div>
     </div>
@@ -203,101 +194,42 @@
     </script>
 <div class="usBox">
   <div class="usBox_2 clearfix">
-    <form action="user.php" method="post" name="getPassword" onsubmit="return submitPwdInfo();">
+    <form action="user.php" method="post" name="getPassword" id="getPassword">
         <br />
         <table width="70%" border="0" align="center">
           <tr>
-            <td colspan="2" align="center"><strong>{$lang.username_and_email}</strong></td>
-          </tr>
-          <tr>
-            <td width="35%" align="right">{$lang.username}</td>
-            <td width="61%"><input name="user_name" type="text" size="30" class="inputBg" /></td>
-          </tr>
-          <tr>
-            <td align="right">{$lang.email}</td>
-            <td><input name="email" type="text" size="30" class="inputBg" /></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td><input type="hidden" name="act" value="send_pwd_email" />
-              <input type="submit" name="submit" value="{$lang.submit}" class="bnt_blue" style="border:none;" />
-              <input name="button" type="button" onclick="history.back()" value="{$lang.back_page_up}" style="border:none;" class="bnt_blue_1" />
-	    </td>
-          </tr>
-        </table>
-        <br />
-      </form>
-  </div>
-</div>
-<!--{/if}-->
-
-<!--*通过问题找回密码的确认找回账号界面 -->
-    <!--{if $action eq 'qpassword_name'} -->
-<div class="usBox">
-  <div class="usBox_2 clearfix">
-    <form action="user.php" method="post">
-        <br />
-        <table width="70%" border="0" align="center">
-          <tr>
-            <td colspan="2" align="center"><strong>{$lang.get_question_username}</strong></td>
-          </tr>
-          <tr>
-            <td width="35%" align="right">{$lang.username}</td>
-            <td width="61%"><input name="user_name" type="text" size="30" class="inputBg" /></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td><input type="hidden" name="act" value="get_passwd_question" />
-              <input type="submit" name="submit" value="{$lang.submit}" class="bnt_blue" style="border:none;" />
-              <input name="button" type="button" onclick="history.back()" value="{$lang.back_page_up}" style="border:none;" class="bnt_blue_1" />
-	    </td>
-          </tr>
-        </table>
-        <br />
-      </form>
-  </div>
-</div>
-<!--{/if}-->
-
-<!--*根据输入账号显示密码问题界面 -->
-    <!--{if $action eq 'get_passwd_question'} -->
-<div class="usBox">
-  <div class="usBox_2 clearfix">
-    <form action="user.php" method="post">
-        <br />
-        <table width="70%" border="0" align="center">
-          <tr>
-            <td colspan="2" align="center"><strong>{$lang.input_answer}</strong></td>
-          </tr>
-          <tr>
-            <td width="29%" align="right">{$lang.passwd_question}：</td>
-            <td width="61%">{$passwd_question}</td>
-          </tr>
-          <tr>
-            <td align="right">{$lang.passwd_answer}：</td>
-            <td><input name="passwd_answer" type="text" size="20" class="inputBg" /></td>
+            <td width="35%" align="right">请填写注册时的手机号</td>
+            <td width="61%">
+              <input id="mobile_phone" name="mobile_phone" type="text" size="15" class="coLogin_txt" onblur="check_mobile(this.value);" />
+              <span id="mobile_phone_notice" style="color:#FF0000; padding:0 0 0 5px;"></span>
+            </td>
           </tr>
           <!-- 判断是否启用验证码{if $enabled_captcha} -->
           <tr>
-            <td align="right">{$lang.comment_captcha}</td>
-            <td><input type="text" size="8" name="captcha" class="inputBg" />
-            <img src="captcha.php?is_login=1&{$rand}" alt="captcha" style="vertical-align: middle;cursor: pointer;" onClick="this.src='captcha.php?is_login=1&'+Math.random()" /> </td>
+            <td width="35%" align="right">{$lang.comment_captcha}：</td>
+            <td width="61%">
+              <input type="text" size="8" id="captcha" name="captcha" class="coLogin_txt_2" onblur="check_captcha(this.value);" />
+              <div class="coLoginTxt_2_img"><img src="captcha.php?{$rand}" alt="captcha" style="vertical-align: middle;cursor: pointer;" onClick="this.src='captcha.php?'+Math.random()" /></div>
+              <span style="color:#FF0000; padding:0 0 0 5px;" id="captcha_notice"></span>
+            </td>
           </tr>
           <!--{/if}-->
           <tr>
             <td></td>
-            <td><input type="hidden" name="act" value="check_answer" />
-              <input type="submit" name="submit" value="{$lang.submit}" class="bnt_blue" style="border:none;" />
-              <input name="button" type="button" onclick="history.back()" value="{$lang.back_page_up}" style="border:none;" class="bnt_blue_1" />
-	    </td>
+            <td>
+              <input type="hidden" name="act" value="get_password" />
+              <input type="hidden" name="uid" id="uid" />
+              <button type="button" id="btn_sms" onclick="get_password()">提&nbsp;&nbsp;交</button>
+              <button type="button" id="btn_cancel" style="margin-left:28px;" onclick="history.back()">返&nbsp;&nbsp;回</button>
+	        </td>
           </tr>
         </table>
+        <!-- #BeginLibraryItem "/library/sms_dialog.lbi" --><!-- #EndLibraryItem -->
         <br />
       </form>
   </div>
 </div>
 <!--{/if}-->
-
 <!-- {if $action eq 'reset_password'} -->
     <script type="text/javascript">
     {foreach from=$lang.password_js item=item key=key}

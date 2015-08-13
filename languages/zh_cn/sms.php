@@ -4,6 +4,7 @@ $_LANG['ecsdxt_mobile_reg_closed'] = '手机短信验证注册未开启。';
 $_LANG['invalid_mobile_phone'] = '手机号不正确。';
 $_LANG['invalid_captcha'] = '图片验证码不正确。';
 $_LANG['mobile_phone_registered'] = '手机号已经注册过帐号。';
+$_LANG['mobile_phone_not_registered'] = '手机号未注册。';
 $_LANG['get_verifycode_excessived'] = '每IP每手机号每%s秒只能获取一次验证码。';
 $_LANG['send_mobile_verifycode_successed'] = '手机短信验证码发送成功。';
 $_LANG['send_mobile_verifycode_failured'] = '手机短信验证码发送失败：';

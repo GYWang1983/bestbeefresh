@@ -208,12 +208,8 @@ function bind_mobile($username, $mobile, $verifycode, $act = SMS_REGISTER)
 		
 		$ip = real_ip();
 		$time = gmtime() - intval($_CFG['ecsdxt_sms_validtime']);
-		if ($act == SMS_REGISTER)
-		{
-			$status = 1;
-		}
 		
-		$SQL = "UPDATE " . $ecs->table('verifycode') . " SET status=2 WHERE mobile='$mobile' AND getip='$ip' AND verifycode='$verifycode' AND status=$status AND dateline>=$time";
+		$SQL = "UPDATE " . $ecs->table('verifycode') . " SET status=2 WHERE mobile='$mobile' AND getip='$ip' AND verifycode='$verifycode' AND status=1 AND `type`=$act AND dateline>=$time";
 		$db->query($SQL);
 		
 		return true;

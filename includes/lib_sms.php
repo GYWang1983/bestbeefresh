@@ -156,12 +156,8 @@ function check_sms_verifycode($mobile, $verifycode, $act = SMS_REGISTER)
 	
 	$ip = real_ip();
 	$expire = gmtime() - intval($_CFG['ecsdxt_sms_validtime']); //验证码10分钟内有效
-	if ($act == SMS_REGISTER)
-	{
-		$status = 1;
-	}
 	
-	$SQL = "SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE mobile='$mobile' AND verifycode='$verifycode' AND getip='$ip' AND status=$status AND dateline>=$expire";
+	$SQL = "SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE mobile='$mobile' AND verifycode='$verifycode' AND getip='$ip' AND status=1 AND `type`=$act AND dateline>=$expire";
 	return $db->getOne($SQL) > 0;
 }
 

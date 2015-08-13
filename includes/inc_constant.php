@@ -187,6 +187,8 @@ define('CAPTCHA_COMMENT',           4); //评论时使用验证码
 define('CAPTCHA_ADMIN',             8); //后台登录时使用验证码
 define('CAPTCHA_LOGIN_FAIL',       16); //登录失败后显示验证码
 define('CAPTCHA_MESSAGE',          32); //留言时使用验证码
+define('CAPTCHA_GET_PASSWORD',     64); //找回密码验证码
+define('CAPTCHA_REBIND',          128); //重新绑定手机号
 
 /* 优惠活动的优惠范围 */
 define('FAR_ALL',                   0); // 全部商品
@@ -242,7 +244,8 @@ define('LICENSE_VERSION', '1.0');
 define('SHIP_LIST', 'cac|city_express|ems|flat|fpd|post_express|post_mail|presswork|sf_express|sto_express|yto|zto');
 
 /* 手机验证码 */
-define('SMS_REGISTER',  'register');
-define('SMS_REBIND',    'rebind');
-define('SMS_RESETPASS', 'resetpass');
+define('SMS_REGISTER',    1);
+define('SMS_GETPASSWORD', 2);
+define('SMS_REBIND',      3);
+
 ?>
