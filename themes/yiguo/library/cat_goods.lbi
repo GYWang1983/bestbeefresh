@@ -18,7 +18,7 @@
       <li {if $smarty.foreach.nocat.index mod 5 eq 4} style="margin-right:0px"{/if} >
       <div class="brand_list">
         <div class="brand_img">
-        	<a href="javascript:quickView({$goods.id});"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" width="170" height="170" /></a>
+        	<a href="javascript:quickView({$goods.id});"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}"/></a>
             <div class="p-quick">
             	<!--<a href="javascript:;" onClick="quickView({$goods.id})" class="quick-view"></a>-->
                 <a href="javascript:addToCartShowDiv({$goods.id},1,'promotion')" class="addcart"></a>

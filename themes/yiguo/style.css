@@ -726,10 +726,10 @@ a.settleup:hover{text-decoration:none; color:#333; background-position:0 bottom;
 .slideBox1 .bd img{ width:248px; height:465px; display:block;  }
 
 .brand_list_out{ height:auto; overflow:hidden;}
-.brand_list_out li{background:url(images/shadow.png) bottom center no-repeat;  width:218px; height:226px; float:left; padding-bottom:4px; margin:0 10px 10px 0; display:inline;}
-.brand_list{border:1px solid #d0d0d0; padding:4px; background:#fff; height:216px; overflow:hidden; position:relative;}
+.brand_list_out li{background:url(images/shadow.png) bottom center no-repeat;  width:218px; height:232px; float:left; padding-bottom:4px; margin:0 10px 10px 0; display:inline;}
+.brand_list{border:1px solid #d0d0d0; padding:4px; background:#fff; height:228px; overflow:hidden; position:relative;}
 .brand_img{height:170px;position:relative;}
-.brand_img a img{margin:0 18px;}
+.brand_img a img{margin:0 18px;width:170px;heigth:170px;}
 .p-quick{ width:100%; position:absolute; bottom:0px; left:0;}
 .p-quick a{background: url(images/quick_view_icon.png) no-repeat; float: left; display:inline;}
 .p-quick a.quick-view{width: 71px; height: 22px; margin-left:3px; float:left; display:inline;}
@@ -739,7 +739,7 @@ a.settleup:hover{text-decoration:none; color:#333; background-position:0 bottom;
 .brand_img_on .p-quick{ display:block;}
 
 .brand_txt{ height:auto; overflow:hidden;}
-.brand_txt b{ height:15px; line-height:15px; overflow:hidden;font-weight:normal; display:block; margin:5px 0;}
+.brand_txt b{ height:28px;line-height:15px;font-size:15px;font-weight:normal; display:block; margin:5px 0;}
 .brand_txt b a{color:#4c4c4c;}
 .brand_txt b a:hover{color:#EABC57;}
 .brand_txt p{ height:auto; overflow:hidden;}
