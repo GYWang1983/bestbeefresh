@@ -262,7 +262,7 @@ elseif ($_REQUEST['act'] == 'add' || $_REQUEST['act'] == 'edit' || $_REQUEST['ac
             $goods['goods_weight_by_unit'] = ($goods['goods_weight'] >= 1) ? $goods['goods_weight'] : ($goods['goods_weight'] / 0.001);
         }
 
-        if (!empty($goods['goods_brief']))
+        /*if (!empty($goods['goods_brief']))
         {
             //$goods['goods_brief'] = trim_right($goods['goods_brief']);
             $goods['goods_brief'] = $goods['goods_brief'];
@@ -271,7 +271,7 @@ elseif ($_REQUEST['act'] == 'add' || $_REQUEST['act'] == 'edit' || $_REQUEST['ac
         {
             //$goods['keywords']    = trim_right($goods['keywords']);
             $goods['keywords']    = $goods['keywords'];
-        }
+        }*/
 
         /* 如果不是促销，处理促销日期 */
         if (isset($goods['is_promote']) && $goods['is_promote'] == '0')
@@ -818,6 +818,8 @@ elseif ($_REQUEST['act'] == 'insert' || $_REQUEST['act'] == 'update')
     $give_integral = isset($_POST['give_integral']) ? intval($_POST['give_integral']) : '-1';
     $rank_integral = isset($_POST['rank_integral']) ? intval($_POST['rank_integral']) : '-1';
     $suppliers_id = isset($_POST['suppliers_id']) ? intval($_POST['suppliers_id']) : '0';
+    $free_more = $_POST['free_more'];
+    $amount_desc = $_POST['amount_desc'];
 
     $goods_name_style = $_POST['goods_name_color'] . '+' . $_POST['goods_name_style'];
 
@@ -836,13 +838,13 @@ elseif ($_REQUEST['act'] == 'insert' || $_REQUEST['act'] == 'update')
                     "cat_id, brand_id, shop_price, market_price, is_promote, promote_price, " .
                     "promote_start_date, promote_end_date, goods_img, goods_thumb, original_img, keywords, goods_brief, " .
                     "seller_note, goods_weight, goods_number, warn_number, integral, give_integral, is_best, is_new, is_hot, " .
-                    "is_on_sale, is_alone_sale, is_shipping, goods_desc, add_time, last_update, goods_type, rank_integral, suppliers_id )" .
+                    "is_on_sale, is_alone_sale, is_shipping, goods_desc, add_time, last_update, goods_type, rank_integral, suppliers_id, free_more, amount_desc )" .
                 "VALUES ('$_POST[goods_name]', '$goods_name_style', '$goods_sn', '$catgory_id', " .
                     "'$brand_id', '$shop_price', '$market_price', '$is_promote','$promote_price', ".
                     "'$promote_start_date', '$promote_end_date', '$goods_img', '$goods_thumb', '$original_img', ".
                     "'$_POST[keywords]', '$_POST[goods_brief]', '$_POST[seller_note]', '$goods_weight', '$goods_number',".
                     " '$warn_number', '$_POST[integral]', '$give_integral', '$is_best', '$is_new', '$is_hot', '$is_on_sale', '$is_alone_sale', $is_shipping, ".
-                    " '$_POST[goods_desc]', '" . gmtime() . "', '". gmtime() ."', '$goods_type', '$rank_integral', '$suppliers_id')";
+                    " '$_POST[goods_desc]', '" . gmtime() . "', '". gmtime() ."', '$goods_type', '$rank_integral', '$suppliers_id', '$free_more', '$amount_desc')";
         }
         else
         {
@@ -850,13 +852,13 @@ elseif ($_REQUEST['act'] == 'insert' || $_REQUEST['act'] == 'update')
                     "cat_id, brand_id, shop_price, market_price, is_promote, promote_price, " .
                     "promote_start_date, promote_end_date, goods_img, goods_thumb, original_img, keywords, goods_brief, " .
                     "seller_note, goods_weight, goods_number, warn_number, integral, give_integral, is_best, is_new, is_hot, is_real, " .
-                    "is_on_sale, is_alone_sale, is_shipping, goods_desc, add_time, last_update, goods_type, extension_code, rank_integral )" .
+                    "is_on_sale, is_alone_sale, is_shipping, goods_desc, add_time, last_update, goods_type, extension_code, rank_integral, free_more, amount_desc )" .
                 "VALUES ('$_POST[goods_name]', '$goods_name_style', '$goods_sn', '$catgory_id', " .
                     "'$brand_id', '$shop_price', '$market_price', '$is_promote','$promote_price', ".
                     "'$promote_start_date', '$promote_end_date', '$goods_img', '$goods_thumb', '$original_img', ".
                     "'$_POST[keywords]', '$_POST[goods_brief]', '$_POST[seller_note]', '$goods_weight', '$goods_number',".
                     " '$warn_number', '$_POST[integral]', '$give_integral', '$is_best', '$is_new', '$is_hot', 0, '$is_on_sale', '$is_alone_sale', $is_shipping, ".
-                    " '$_POST[goods_desc]', '" . gmtime() . "', '". gmtime() ."', '$goods_type', '$code', '$rank_integral')";
+                    " '$_POST[goods_desc]', '" . gmtime() . "', '". gmtime() ."', '$goods_type', '$code', '$rank_integral', '$free_more', '$amount_desc')";
         }
     }
     else
@@ -919,6 +921,8 @@ elseif ($_REQUEST['act'] == 'insert' || $_REQUEST['act'] == 'update')
                 "is_on_sale = '$is_on_sale', " .
                 "is_alone_sale = '$is_alone_sale', " .
                 "is_shipping = '$is_shipping', " .
+                "free_more = '$free_more', " .
+                "amount_desc = '$amount_desc', " .
                 "goods_desc = '$_POST[goods_desc]', " .
 			
                 "last_update = '". gmtime() ."', ".

@@ -114,8 +114,6 @@
             </td>
           </tr>
           {/if}
-
-          <!--鍟嗗搧浼樻儬浠锋牸-->
           <tr>
             <td class="label"><a href="javascript:showNotice('volumePrice');" title="{$lang.form_notice}"><img src="images/notice.gif" width="16" height="16" border="0" alt="{$lang.form_notice}"></a>{$lang.lab_volume_price}</td>
             <td>
@@ -137,12 +135,15 @@
               <span class="notice-span" {if $help_open}style="display:block" {else} style="display:none" {/if} id="volumePrice">{$lang.notice_volume_price}</span>
             </td>
           </tr>
-          <!--鍟嗗搧浼樻儬浠锋牸 end -->
-
           <tr>
             <td class="label">{$lang.lab_market_price}</td>
             <td><input type="text" name="market_price" value="{$goods.market_price}" size="20" />
               <input type="button" value="{$lang.integral_market_price}" onclick="integral_market_price()" />
+            </td>
+          </tr>
+          <tr>
+            <td class="label">分量描述：</td>
+            <td><input type="text" name="amount_desc" value="{$goods.amount_desc}" size="50" />
             </td>
           </tr>
           <tr>
@@ -169,6 +170,12 @@
             <td class="label" id="promote_5">{$lang.lab_promote_date}</td>
             <td id="promote_6">
               <input name="promote_start_date" type="text" id="promote_start_date" size="12" value='{$goods.promote_start_date}' readonly /><input name="selbtn1" type="button" id="selbtn1" onclick="return showCalendar('promote_start_date', '%Y-%m-%d', false, false, 'selbtn1');" value="{$lang.btn_select}" class="button"/> - <input name="promote_end_date" type="text" id="promote_end_date" size="12" value='{$goods.promote_end_date}' readonly /><input name="selbtn2" type="button" id="selbtn2" onclick="return showCalendar('promote_end_date', '%Y-%m-%d', false, false, 'selbtn2');" value="{$lang.btn_select}" class="button"/>
+            </td>
+          </tr>
+          <tr>
+            <td class="label">买X送Y（X:Y）</td>
+            <td>
+              <input name="free_more" type="text" id="free_more" size="12" value='{$goods.free_more}' />
             </td>
           </tr>
           <tr>
