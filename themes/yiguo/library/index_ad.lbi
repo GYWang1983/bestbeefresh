@@ -24,15 +24,14 @@
 
 </div>
 <div class="shadow-big"></div>
-
 <script type="text/javascript">
-		jQuery(".slideBox").slide({mainCell:".bd ul",effect:"fold",autoPlay:true});
-		</script> 
-
+jQuery(".slideBox").slide({mainCell:".bd ul",effect:"fold",autoPlay:true});
+</script> 
+<!--
 <div class="banner-ad">
 	<ul>
 		<li>{insert name='ads' id=49 num=5}</li>
     </ul>
 </div>
-
 <div class="mt10">{insert name='ads' id=14 num=1}</div>
+-->

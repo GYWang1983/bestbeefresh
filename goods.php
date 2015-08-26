@@ -90,11 +90,9 @@ if (!empty($_REQUEST['act']) && $_REQUEST['act'] == 'quickView')
 		
 		$properties = get_goods_properties($goods_id);  // 获得商品的规格和属性
 		$smarty->assign('properties',          $properties['pro']);                              // 商品属性
-		/*echo "<pre>";
-        print_r($properties['pro']);
-		echo "</pre>";*/
+
 		$smarty->assign('goods',         get_goods_info($goods_id));         
-		$smarty->assign('comment_percent',     comment_percent($goods_id)); 
+		//$smarty->assign('comment_percent',     comment_percent($goods_id)); 
 		
 		$res['content'] = $GLOBALS['smarty']->fetch('library/quick_view.lbi');
 

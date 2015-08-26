@@ -726,10 +726,11 @@ a.settleup:hover{text-decoration:none; color:#333; background-position:0 bottom;
 .slideBox1 .bd img{ width:248px; height:465px; display:block;  }
 
 .brand_list_out{ height:auto; overflow:hidden;}
-.brand_list_out li{background:url(images/shadow.png) bottom center no-repeat;  width:180px; height:226px; float:left; padding-bottom:4px; margin:0 10px 10px 0; display:inline;}
+.brand_list_out li{background:url(images/shadow.png) bottom center no-repeat;  width:218px; height:226px; float:left; padding-bottom:4px; margin:0 10px 10px 0; display:inline;}
 .brand_list{border:1px solid #d0d0d0; padding:4px; background:#fff; height:216px; overflow:hidden; position:relative;}
-.brand_img{width:170px;height:170px;margin:0; position:relative;}
-.p-quick{ width:100%; position:absolute; top:5px; left:0; display:none;}
+.brand_img{height:170px;position:relative;}
+.brand_img a img{margin:0 18px;}
+.p-quick{ width:100%; position:absolute; bottom:0px; left:0;}
 .p-quick a{background: url(images/quick_view_icon.png) no-repeat; float: left; display:inline;}
 .p-quick a.quick-view{width: 71px; height: 22px; margin-left:3px; float:left; display:inline;}
 .p-quick a.quick-view:hover{background-position: 0 -23px;}
@@ -742,8 +743,8 @@ a.settleup:hover{text-decoration:none; color:#333; background-position:0 bottom;
 .brand_txt b a{color:#4c4c4c;}
 .brand_txt b a:hover{color:#EABC57;}
 .brand_txt p{ height:auto; overflow:hidden;}
-.brand_txt p .shop_s{color: #CF5926; font:bold 16px Arial; height:20px; float:left; line-height:20px;}
-.brand_txt p .shop_s span{ font-size:16px; font-weight:bold;}
+.brand_txt p .shop_s{color: #CF5926; font:bold 24px Arial; height:20px; float:left; line-height:20px;float:right;}
+.brand_txt p .shop_s span{ font-size:24px; font-weight:bold;}
 .brand_txt p .shop_s span.shop_d{ font-size:12px; position:relative; top:-2px; padding-left:15px;}
 .brand_txt p .marker_s {text-decoration: line-through;font-size: 12px;color: #333; float:right;}
 

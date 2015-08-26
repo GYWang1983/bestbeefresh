@@ -140,26 +140,54 @@ $(function(){
     
 	<script type="text/javascript">
 			
-			function quickView(goodsId)
-			{	
-				quickViewAjax(goodsId);
-				$("#displayBox").show(300);
-			}
-			
-			function quickViewAjax(goodsId)
+		function quickView(goodsId)
+		{	
+			quickViewAjax(goodsId);
+		}
+		
+		function quickViewAjax(goodsId)
+		{
+			Ajax.call('goods.php', 'act=quickView&id=' + goodsId, quickViewAjaxResponse, 'GET', 'JSON');
+		}
+		
+		function quickViewAjaxResponse(result)
+		{
+			if(result.error > 0)
 			{
-				Ajax.call('goods.php', 'act=quickView&id=' + goodsId, quickViewAjaxResponse, 'GET', 'JSON');
+				
 			}
-			
-			function quickViewAjaxResponse(result)
+			else
 			{
-				if(result.error > 0)
-				{
-					
-				}
-				else
-				{
-					$("#displayBox").html(result.content);
-				}
+				$("#displayBox").html(result.content);
+				$("#displayBox .hd a").click(function(){
+                    $("#displayBox").hide(300);
+                });
+				$("#displayBox").show(200);
 			}
+		}
+			
+        //关闭隐藏盒子
+        $(document).bind("click",function(e){
+            if (!$("#displayBox").is(":hidden")) {
+                var target = $(e.target); 
+                if(target.closest("#displayBox").length == 0) { 
+                    $("#displayBox").hide();
+                }
+            }
+        });
+        
+        var isIE6 = !!window.ActiveXObject&&!window.XMLHttpRequest;
+        if(isIE6){
+            $(window).scroll(function(){ 
+                $("#displayBox").css("top", $(document).scrollTop()+100); 
+            });
+        }
+                
+        var isIE6 = !!window.ActiveXObject&&!window.XMLHttpRequest;
+        if(isIE6){
+            $(window).scroll(function(){ 
+                $(".sucess_joinCart").css("top", $(document).scrollTop()+10); 
+            });
+        }
+
 	</script>
