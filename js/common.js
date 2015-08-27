@@ -1,8 +1,9 @@
 /* $Id : common.js 4865 2007-01-31 14:04:10Z paulgao $ */
+
 /* *
  * 添加商品到购物车 并且停留当前页 显示出DIV
  */
-function addToCartShowDiv(goodsId, script_name,goods_recommend,parentId)
+function addToCartShowDiv(goodsId, script_name, goods_recommend, parentId, amount)
 {
  
   if(!script_name)
@@ -28,6 +29,8 @@ function addToCartShowDiv(goodsId, script_name,goods_recommend,parentId)
     }
 
 	quick = 1;
+  } else if (amount) {
+	  number = amount;
   }
 
   goods.quick    = quick;
@@ -35,9 +38,9 @@ function addToCartShowDiv(goodsId, script_name,goods_recommend,parentId)
   goods.goods_id = goodsId;
   goods.number   = number;
  
-  goods.script_name   = (typeof(script_name) == "undefined") ? 0 : parseInt(script_name);
-  goods.goods_recommend   = (typeof(goods_recommend) == "undefined") ? '' : goods_recommend;
-  goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
+  goods.script_name   = (!script_name) ? 0 : parseInt(script_name);
+  goods.goods_recommend   = (!goods_recommend) ? '' : goods_recommend;
+  goods.parent   = (!parentId) ? 0 : parseInt(parentId);
 
   Ajax.call('flow.php?step=add_to_cart_showDiv', 'goods=' + $.toJSON(goods), addToCartShowDivResponse, 'POST', 'JSON');
   
@@ -87,22 +90,22 @@ function addToCartShowDivResponse(result)
 		goods_recommend = "";
 	}
 	
-	if(result.script_name == 1)
-	{
+	if(result.script_name == 1) {
 		$("#addtocartdialog_retui_"+result.goods_id+goods_recommend).html(result.show_info);
-		
 		$("#addtocartdialog_retui_"+result.goods_id+goods_recommend).show();
-	}
-	else
-	{
+	} else {
 		$("#addtocartdialog .center_pop_txt").html(result.show_info);
 		$("#addtocartdialog").show();	
+	}
+	
+	if (!$("#displayBox").is(":hidden")) {
+		$("#displayBox").hide();
 	}
   }
 }
 
 //生成属性选择层
-function openSpeDivShowDiv(message, goods_id, parent,script_name ,goods_recommend) 
+function openSpeDivShowDiv(message, goods_id, parent, script_name, goods_recommend) 
 {
 
   var _id = "speDiv";

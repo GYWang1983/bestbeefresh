@@ -27,7 +27,7 @@
     <div class="pop_num"> <a href="javascript:void(0)" onclick="decrementAll();">-</a>
       <input class="shuzik" name="product_amount" id="product_amount" onchange="buyButtonNumChange('product_amount')" type="text" onkeyup="inputOnlyNum(this, 1, 999);" value="1">
       <a href="javascript:void(0)" onclick="incrementAll();">+</a> </div>
-    <div class="pop_addcart"> <a href="javascript:addToCartShowDiv({$goods.goods_id},1,'promotion')"></a>
+    <div class="pop_addcart"> <a href="javascript:addToCartShowDiv({$goods.goods_id},1,'promotion',null,$('#product_amount').val())"></a>
       <input type="hidden" value="" id="MjsCommodityId">
       <input type="hidden" value="1" id="MjsAssignCommodityAmount">
     </div>
