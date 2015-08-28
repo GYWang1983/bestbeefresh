@@ -27,6 +27,7 @@
         
         <div class="brand_txt"> <b><a href="javascript:quickView({$goods.id});" title="{$goods.name|escape:html}">{$goods.short_name|escape:html}</a></b>
           <p> 
+            <font class="free_more">{$goods.free_more_desc}</font>
             <!-- {if $goods.promote_price neq ""} --> 
             <font class="shop_s">{$goods.promote_price}</font> 
             <!-- {else}--> 

@@ -58,13 +58,14 @@
            <table width="100%" border="0" cellspacing="0" >
             <tr>
               <th colspan="2">{$lang.goods_name}</th>
-      <!-- {if $show_goods_attribute eq 1} 显示商品属性 -->
+              <!-- {if $show_goods_attribute eq 1} 显示商品属性 -->
               <th>{$lang.goods_attr}</th>
               <!-- {/if} -->
               <!-- {if $show_marketprice} 显示市场价 -->
               <th>{$lang.market_prices}</th>
               <!-- {/if} -->
               <th>{$lang.shop_prices}</th>
+              <th>优惠活动</th>
               <th>{$lang.number}</th>
               <th>{$lang.subtotal}</th>
               <th>{$lang.handle}</th>
@@ -108,6 +109,7 @@
               <td align="center" bgcolor="#ffffff"><s>{$goods.market_price}</s></td>
               <!-- {/if} -->
               <td align="center" bgcolor="#ffffff"><b>{$goods.goods_price}</b></td>
+              <td align="center" bgcolor="#ffffff"><b>{$goods.free_more_desc}</b></td>
               <td align="center" bgcolor="#ffffff">
               
                 <!-- {if $goods.goods_id gt 0 && $goods.is_gift eq 0 && $goods.parent_id eq 0} 普通商品可修改数量 -->

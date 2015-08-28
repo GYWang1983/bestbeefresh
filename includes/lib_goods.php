@@ -901,6 +901,7 @@ function assign_cat_goods($cat_id, $num = 0, $from = 'web', $order_rule = '')
         $goods[$idx]['url']          = build_uri('goods', array('gid' => $row['goods_id']), $row['goods_name']);
         
         $goods[$idx]['free_more']    = $row['free_more'];
+        $goods[$idx]['free_more_desc'] = get_free_more_desc($row['free_more']);
         $goods[$idx]['amount_desc']  = $row['amount_desc'];
     }
 
@@ -1928,4 +1929,5 @@ function get_child_tree_goods($tree_id = 0,$limit = 6)
     }
     return $three_arr;
 }
+
 ?>

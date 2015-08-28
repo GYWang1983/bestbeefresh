@@ -2855,4 +2855,17 @@ function get_related_cat($cat_id)
 	return $arr;
 }
 
+function get_free_more_desc($free_more) {
+
+	if (empty($free_more)) {
+		return '';
+	}
+
+	$arr = explode(':', $free_more);
+	if (count($arr) < 2) {
+		return '';
+	}
+
+	return '买' . $arr[0] . '送' . $arr[1];
+}
 ?>
