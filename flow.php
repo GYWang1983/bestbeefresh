@@ -1873,7 +1873,8 @@ elseif ($_REQUEST['step'] == 'done')
     {
         $order[$key] = addslashes($value);
     }*/
-
+    $order['mobile'] = $_SESSION['mobile'];
+    
    /* 判断是不是实体商品 */
     foreach ($cart_goods AS $val)
     {

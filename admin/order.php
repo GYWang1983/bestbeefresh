@@ -4873,6 +4873,7 @@ function order_list()
             //$_REQUEST['address'] = json_str_iconv($_REQUEST['address']);
         }
         $filter['consignee'] = empty($_REQUEST['consignee']) ? '' : trim($_REQUEST['consignee']);
+        $filter['mobile'] = empty($_REQUEST['mobile']) ? '' : trim($_REQUEST['mobile']);
         $filter['email'] = empty($_REQUEST['email']) ? '' : trim($_REQUEST['email']);
         $filter['address'] = empty($_REQUEST['address']) ? '' : trim($_REQUEST['address']);
         $filter['zipcode'] = empty($_REQUEST['zipcode']) ? '' : trim($_REQUEST['zipcode']);
@@ -4906,6 +4907,10 @@ function order_list()
         if ($filter['consignee'])
         {
             $where .= " AND o.consignee LIKE '%" . mysql_like_quote($filter['consignee']) . "%'";
+        }
+        if ($filter['mobile'])
+        {
+        	$where .= " AND o.mobile LIKE '%" . mysql_like_quote($filter['mobile']) . "'";
         }
         if ($filter['email'])
         {
@@ -5060,7 +5065,7 @@ function order_list()
 
         /* 查询 */
         $sql = "SELECT o.order_id, o.order_sn, o.add_time, o.order_status, o.shipping_status, o.order_amount, o.money_paid," .
-                    "o.pay_status, o.consignee, o.address, o.email, o.tel, o.extension_code, o.extension_id, " .
+                    "o.pay_status, o.consignee, o.address, o.mobile, o.extension_code, o.extension_id, " .
                     "(" . order_amount_field('o.') . ") AS total_fee, " .
                     "IFNULL(u.user_name, '" .$GLOBALS['_LANG']['anonymous']. "') AS buyer ".
                 " FROM " . $GLOBALS['ecs']->table('order_info') . " AS o " .
