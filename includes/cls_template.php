@@ -644,7 +644,17 @@ class cls_template
                     case 'strip_tags':
                         $p = 'strip_tags(' . $p . ')';
                         break;
-
+                        
+                    case 'timestamp':
+                    	if (count($s) > 2) {
+                    		$arr = array_slice($s, 1);
+                    		$f = implode(':', $arr);
+                    	} else {
+                    		$f = $s[1];
+                    	}
+                    	$p = 'date(' . $f . ',' . $p . ')';
+                    	break;
+                    	
                     default:
                         # code...
                         break;
