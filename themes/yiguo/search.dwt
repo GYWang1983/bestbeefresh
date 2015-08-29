@@ -17,17 +17,6 @@
 <body>
 <!-- #BeginLibraryItem "/library/page_header.lbi" --><!-- #EndLibraryItem -->
 
-<div class="block">
-	<div class="contentBody pt10">
-    	<div class="mainBody">
-        	<div class="right_banner"><!-- #BeginLibraryItem "/library/classification_ad_search.lbi" --><!-- #EndLibraryItem --></div>
-      	</div>
-        <div class="mainBody">
-        <!-- #BeginLibraryItem "/library/ad_four.lbi" --><!-- #EndLibraryItem -->
-        </div>
-    </div>
-</div>
-
 <div class="content_c">
   <div class="searchBody block"> 
 <!--当前位置 start-->

@@ -22,26 +22,6 @@
 <body>
 <!-- #BeginLibraryItem "/library/page_header.lbi" --><!-- #EndLibraryItem -->
 
-<div class="block">
-	<div class="contentBody pt10">
-    	<div class="mainBody">
-        	<div class="right_banner">
-				<div id="slideBox" class="slideBox slideBox02">
-                	<div class="hd"><!-- #BeginLibraryItem "/library/classification_ad_text.lbi" --><!-- #EndLibraryItem --></div>
-                    <div class="bd"><!-- #BeginLibraryItem "/library/classification_ad.lbi" --><!-- #EndLibraryItem --></div>
-                </div>
-                <div class="shadow-big"></div>
-				<script type="text/javascript">
-					jQuery(".slideBox02").slide({mainCell:".bd ul",effect:"fold",autoPlay:true});
-				</script> 
-            </div>
-      	</div>
-        <div class="mainBody">
-        <!-- #BeginLibraryItem "/library/ad_four.lbi" --><!-- #EndLibraryItem -->
-        </div>
-    </div>
-</div>
-
 <div class="content_c">
   <div class="searchBody block"> 
     <!--当前位置 start-->

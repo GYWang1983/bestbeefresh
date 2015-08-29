@@ -68,7 +68,6 @@ function reg(str){
         <div id="goodsInfo" class="clearfix"> <!-- #BeginLibraryItem "/library/goods_gallery.lbi" --><!-- #EndLibraryItem -->
           <div class="textInfo">
             <form action="javascript:addToCart({$goods.goods_id})" method="post" name="ECS_FORMBUY" id="ECS_FORMBUY" >
-              <div class="cxxxx">含有丰富的不饱和脂肪酸。</div>
               <div class="center_title"><a>{$goods.goods_style_name}</a></div>
               <div class="detail_center">
                 <div class="Review" onmouseover="this.className='Review Review_on'" onmouseout="this.className='Review'"> 商品评分：<strong>{$comment_percent.haoping_percent}%</strong> <a href="#">（已有{$comment_percent.comment_count}个用户评论）</a> 
@@ -345,58 +344,41 @@ function reg(str){
     <div class="detail_middle ">
       <div class="block clearfix"> 
         <!--left start-->
-        <div class="AreaL" style=" width:181px"> <!-- #BeginLibraryItem "/library/goods_left_ad.lbi" --><!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/goods_left_related.lbi" --><!-- #EndLibraryItem --> <!-- TemplateBeginEditable name="可能喜欢" --> <!-- #BeginLibraryItem "/library/goods_related.lbi" --> 
-          
-          <!-- {if $related_goods} -->
-          <div class="user_loves lshadow">
-            <h2 class="mall_leftTitle c333">{$lang.releate_goods}</h2>
-            <ul class="pro_list">
-              
-              <!--{foreach from=$related_goods item=releated_goods_data}-->
-              
-              <li > <a href="{$releated_goods_data.url}" class="pro_pic"><img src="{$releated_goods_data.goods_thumb}" alt="{$releated_goods_data.goods_name}"  width="120" height="120"/></a> <a href="{$releated_goods_data.url}" title="{$releated_goods_data.goods_name}" class="pro_title">{$releated_goods_data.short_name}</a>
-                <p class="already_sold">已售出 9 件</p>
-                <p class="pro_price"> <a> 
-                  <!-- {if $releated_goods_data.promote_price neq 0} --> 
-                  <font class="f1">{$releated_goods_data.formated_promote_price}</font> 
-                  <!-- {else} --> 
-                  <font class="f1">{$releated_goods_data.shop_price}</font> 
-                  <!-- {/if} --> 
-                  </a> </p>
-              </li>
-              
-              <!--{/foreach}-->
-            </ul>
-          </div>
-          <div class="blank5"></div>
-          <!-- {/if} --> <!-- #EndLibraryItem --> <!-- TemplateEndEditable --> <!-- TemplateBeginEditable name="浏览历史" --> <!-- #BeginLibraryItem "/library/history.lbi" -->
-          <div class="sidelist" id='history_div'>
-            <h3>{$lang.view_history}</h3>
-            <div class="search_history_out" id='history_list'>
-              <ul class="search_historyList">
-                {insert name='history'}
-              </ul>
-            </div>
-          </div>
-          <div class="blank5"></div>
-          <script type="text/javascript">
-if (document.getElementById('history_list').innerHTML.replace(/\s/g,'').length<1)
-{
-    document.getElementById('history_div').style.display='none';
-}
-else
-{
-    document.getElementById('history_div').style.display='block';
-}
-function clear_history()
-{
-Ajax.call('user.php', 'act=clear_history',clear_history_Response, 'GET', 'TEXT',1,1);
-}
-function clear_history_Response(res)
-{
-document.getElementById('history_list').innerHTML = '{$lang.no_history}';
-}
-</script> <!-- #EndLibraryItem --> <!-- TemplateEndEditable --> </div>
+        <div class="AreaL" style=" width:181px">
+        <!-- TemplateBeginEditable name="可能喜欢" -->
+<!-- #BeginLibraryItem "/library/goods_related.lbi" -->
+
+<!-- {if $related_goods} -->
+<div class="user_loves lshadow sidelist">
+<h3>{$lang.releate_goods}</h3>
+ <ul class="pro_list">
+     
+      <!--{foreach from=$related_goods item=releated_goods_data}-->
+       
+          <li >
+          <a href="{$releated_goods_data.url}" class="pro_pic"><img src="{$releated_goods_data.goods_thumb}" alt="{$releated_goods_data.goods_name}"  width="120" height="120"/></a>
+ 
+        <a href="{$releated_goods_data.url}" title="{$releated_goods_data.goods_name}" class="pro_title">{$releated_goods_data.short_name}</a>
+        <p class="already_sold" style="display:none;">已售出 {$goods.sales_volume} 件</p>
+        <p class="pro_price">
+        <!-- {if $releated_goods_data.promote_price neq 0} -->
+        <font class="f1">{$releated_goods_data.formated_promote_price}/箱</font>
+        <!-- {else} -->
+       <font class="f1">{$releated_goods_data.shop_price}/箱</font>
+        <!-- {/if} -->
+        </p>
+        </p>
+          </li>
+       
+        <!--{/foreach}-->
+    </ul>
+     </div>
+<div class="blank5"></div>
+<!-- {/if} -->
+
+ <!-- #EndLibraryItem -->
+<!-- TemplateEndEditable --> <!-- TemplateBeginEditable name="浏览历史" -->
+<!-- TemplateEndEditable --> </div>
         <!--left end--> 
         
         <!--right start-->
