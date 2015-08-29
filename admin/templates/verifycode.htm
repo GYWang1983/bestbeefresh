@@ -1,0 +1,85 @@
+{if $full_page}
+<!-- $Id: users_list.htm 17053 2010-03-15 06:50:26Z sxc_shop $ -->
+{include file="pageheader.htm"}
+{insert_scripts files="../js/utils.js,listtable.js"}
+
+<div class="form-div">
+  <form action="javascript:searchUser()" name="searchForm">
+    <img src="images/icon_search.gif" width="26" height="22" border="0" alt="SEARCH" />
+    &nbsp;手机号&nbsp;<input type="text" name="mobile" size="11" />
+    &nbsp;类型 &nbsp;<select name="type"><option value="0">全部</option><option value="1">注册</option><option value="2">找回密码</option><option value="3">更换手机</option></select>
+    &nbsp;状态 &nbsp;<select name="status"><option value="0">全部</option><option value="1">有效</option><option value="2">已使用</option><option value="3">过期</option></select>
+    &nbsp;{$lang.label_user_name} &nbsp;<input type="text" name="keyword" /> <input type="submit" value="{$lang.button_search}" />
+  </form>
+</div>
+
+<form method="POST" action="" name="listForm">
+
+<!-- start users list -->
+<div class="list-div" id="listDiv">
+{/if}
+<!--用户列表部分-->
+<table cellpadding="3" cellspacing="1">
+  <tr>
+    <th><a href="javascript:listTable.sort('mobile'); ">手机号</a>{$sort_mobile}</th>
+    <th><a href="javascript:listTable.sort('getip'); ">IP地址</a>{$sort_getip}</th>
+    <th><a href="javascript:listTable.sort('type'); ">类型</a>{$sort_type}</th>
+    <th><a href="javascript:listTable.sort('dateline'); ">发送时间</a>{$sort_dateline}</th>
+    <th>验证码</th>
+    <th><a href="javascript:listTable.sort('status'); ">状态</a>{$sort_status}</th>
+  <tr>
+  {foreach from=$list item=verifycode}
+  <tr>
+    <td class="first-cell">{$verifycode.mobile}</td>
+    <td align="center">{$verifycode.getip}</td>
+    <td align="center">{if $verifycode.type eq 1}注册{elseif $verifycode.type eq 2}找回密码{elseif $verifycode.type eq 3}更改手机{/if}</td>
+    <td align="center">{$verifycode.dateline|timestamp:'Y-m-d H:i:s'}</td>
+    <td align="center">{$verifycode.verifycode}</td>
+    <td align="center">{if $verifycode.status eq 1}有效{elseif $verifycode.status eq 2}已使用{elseif $verifycode.status eq 0}过期{/if}</td>
+  </tr>
+  {foreachelse}
+  <tr><td class="no-records" colspan="10">{$lang.no_records}</td></tr>
+  {/foreach}
+  <tr>
+      <td align="right" nowrap="true" colspan="6">
+      {include file="page.htm"}
+      </td>
+  </tr>
+</table>
+
+{if $full_page}
+</div>
+<!-- end users list -->
+</form>
+<script type="text/javascript" language="JavaScript">
+<!--
+listTable.recordCount = {$record_count};
+listTable.pageCount = {$page_count};
+
+{foreach from=$filter item=item key=key}
+listTable.filter.{$key} = '{$item}';
+{/foreach}
+
+{literal}
+onload = function()
+{
+    document.forms['searchForm'].elements['mobile'].focus();
+}
+
+/**
+ * 搜索用户
+ */
+function searchUser()
+{
+    listTable.filter['mobile'] = Utils.trim(document.forms['searchForm'].elements['mobile'].value);
+    listTable.filter['type'] = document.forms['searchForm'].elements['type'].value;
+    listTable.filter['status'] = document.forms['searchForm'].elements['status'].value;
+    listTable.filter['page'] = 1;
+    listTable.loadList();
+}
+
+//-->
+</script>
+{/literal}
+{include file="pagefooter.htm"}
+{/if}

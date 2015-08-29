@@ -120,6 +120,51 @@ switch ($action)
 
         break;
 
+    /* 短信验证码管理 */
+    case 'verifycode':
+    case 'query':
+    	
+    	admin_priv('sms_verifycode');
+    	
+		$cond = '';
+		if (!empty($_REQUEST['mobile'])) {
+			$cond .= " AND mobile LIKE '%" . trim($_REQUEST['mobile']) . "'";
+		}
+		if (!empty($_REQUEST['type'])) {
+			$cond .= " AND type = " . intval($_REQUEST['type']);
+		}
+		if (!empty($_REQUEST['status'])) {
+			$cond .= " AND status = " . intval($_REQUEST['status']);
+		}
+
+		$sort['sort_by']    = empty($_REQUEST['sort_by']) ? 'dateline' : trim($_REQUEST['sort_by']);
+		$sort['sort_order'] = empty($_REQUEST['sort_order']) ? 'DESC' : trim($_REQUEST['sort_order']);
+		
+		$SQL = "SELECT * FROM " . $ecs->table('verifycode') . " WHERE 1 = 1 $cond";
+		$page['record_count'] = $db->getOne($SQL);
+		$page = page_and_size($page);
+		
+		$SQL = "SELECT * FROM " . $ecs->table('verifycode') . " WHERE 1 = 1 $cond ORDER BY $sort[sort_by] $sort[sort_order] LIMIT $page[start], $page[page_size]";
+    	$rs  = $db->getAll($SQL);
+    	
+    	$smarty->assign('list',   		$rs);
+    	$smarty->assign('filter',       $_REQUEST);
+    	$smarty->assign('record_count', $page['record_count']);
+    	$smarty->assign('page_count',   $page['page_count']);
+    	
+    	$sort_flag  = sort_flag($sort);
+    	$smarty->assign($sort_flag['tag'], $sort_flag['img']);
+    	
+    	if ($_REQUEST['is_ajax'] == 1) {
+    		make_json_result($smarty->fetch('verifycode.htm'), '',
+    				array('filter' => $_REQUEST, 'page_count' => $page['page_count']));
+    	} else {
+    		$smarty->assign('full_page',    1);
+    		$smarty->display('verifycode.htm');
+    	}
+    	
+    	break;
+    	
     /* 发送短信 */
     case 'send_sms' :
         $send_num = isset($_POST['send_num'])   ? $_POST['send_num']    : '';
