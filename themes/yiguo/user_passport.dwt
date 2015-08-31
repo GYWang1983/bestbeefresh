@@ -75,14 +75,16 @@
    
     </form>
     </div>
+    <!--
     <div class="coLogin_bottom">
-                    <p>您也可以使用合作网站账号登录</p>
-                    <ul  style=" width:360px;">
-                        <li class="sina_ico"><a href="user.php?act=oath&type=weibo">新浪微博登录</a></li>
-					    <li class="qq_ico"><a href="user.php?act=oath&type=qq"><span class="arial">QQ</span>登录</a></li>
-                        <li class="alipay_ico"><a href="user.php?act=oath&type=alipay">支付宝登录</a></li>
-                    </ul>
-                </div>
+      <p>您也可以使用合作网站账号登录</p>
+       <ul  style=" width:360px;">
+         <li class="sina_ico"><a href="user.php?act=oath&type=weibo">新浪微博登录</a></li>
+		 <li class="qq_ico"><a href="user.php?act=oath&type=qq"><span class="arial">QQ</span>登录</a></li>
+         <li class="alipay_ico"><a href="user.php?act=oath&type=alipay">支付宝登录</a></li>
+       </ul>
+    </div>
+    -->
 </div>
 </div>
 <!-- #BeginLibraryItem "/library/ad_user_login.lbi" --><!-- #EndLibraryItem -->
