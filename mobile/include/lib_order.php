@@ -549,7 +549,7 @@ function order_weight_price($order_id)
  * @param   bool    $is_gb_deposit  是否团购保证金（如果是，应付款金额只计算商品总额和支付费用，可以获得的积分取 $gift_integral）
  * @return  array
  */
-function order_fee($order, $goods, $consignee)
+function order_fee($order, $goods, $consignee = NULL)
 {
     /* 初始化订单的扩展code */
     if (!isset($order['extension_code']))
@@ -662,12 +662,10 @@ function order_fee($order, $goods, $consignee)
         $total['bonus_kill_formated'] = price_format($total['bonus_kill'], false);
     }
 
-
-
     /* 配送费用 */
     $shipping_cod_fee = NULL;
 
-    if ($order['shipping_id'] > 0 && $total['real_goods_count'] > 0)
+    if (isset($consignee) && $order['shipping_id'] > 0 && $total['real_goods_count'] > 0)
     {
         $region['country']  = $consignee['country'];
         $region['province'] = $consignee['province'];
@@ -865,11 +863,12 @@ function get_order_sn()
  */
 function cart_goods($type = CART_GENERAL_GOODS)
 {
-    $sql = "SELECT rec_id, user_id, goods_id, goods_name, goods_sn, goods_number, " .
-            "market_price, goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, is_shipping, " .
-            "goods_price * goods_number AS subtotal " .
+    $sql = "SELECT c.rec_id, c.user_id, c.goods_id, c.goods_name, g.goods_thumb, c.goods_sn, c.goods_number, " .
+            "c.market_price, c.goods_price, c.goods_attr, c.is_real, c.extension_code, c.parent_id, c.is_gift, c.is_shipping, " .
+            "c.goods_price * c.goods_number AS subtotal " .
             "FROM " . $GLOBALS['ecs']->table('cart') .
-            " WHERE session_id = '" . SESS_ID . "' " .
+			" AS c LEFT JOIN ".$GLOBALS['ecs']->table('goods').
+            " AS g ON c.goods_id = g.goods_id WHERE session_id = '" . SESS_ID . "' " .
             "AND rec_type = '$type'";
 
     $arr = $GLOBALS['db']->getAll($sql);
@@ -1025,7 +1024,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     $sql = "SELECT g.goods_name, g.goods_sn, g.is_on_sale, g.is_real, ".
                 "g.market_price, g.shop_price AS org_price, g.promote_price, g.promote_start_date, ".
                 "g.promote_end_date, g.goods_weight, g.integral, g.extension_code, ".
-                "g.goods_number, g.is_alone_sale, g.is_shipping,".
+                "g.goods_number, g.is_alone_sale, g.is_shipping, g.free_more, ".
                 "IFNULL(mp.user_price, g.shop_price * '$_SESSION[discount]') AS shop_price ".
             " FROM " .$GLOBALS['ecs']->table('goods'). " AS g ".
             " LEFT JOIN " . $GLOBALS['ecs']->table('member_price') . " AS mp ".
@@ -1126,6 +1125,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         'product_id'    => $product_info['product_id'],
         'goods_name'    => addslashes($goods['goods_name']),
         'market_price'  => $goods['market_price'],
+    	'free_more'     => $goods['free_more'],
         'goods_attr'    => addslashes($goods_attr),
         'goods_attr_id' => $goods_attr_id,
         'is_real'       => $goods['is_real'],
@@ -1228,7 +1228,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                 " WHERE session_id = '" .SESS_ID. "' AND goods_id = '$goods_id' ".
                 " AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
                 " AND extension_code <> 'package_buy' " .
-                " AND rec_type = 'CART_GENERAL_GOODS'";
+                " AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";//by mike add
 
         $row = $GLOBALS['db']->getRow($sql);
 
@@ -1251,7 +1251,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                        " WHERE session_id = '" .SESS_ID. "' AND goods_id = '$goods_id' ".
                        " AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
                        " AND extension_code <> 'package_buy' " .
-                       "AND rec_type = 'CART_GENERAL_GOODS'";
+                       "AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";
                 $GLOBALS['db']->query($sql);
             }
             else
@@ -1434,6 +1434,7 @@ function bonus_info($bonus_id, $bonus_sn = '')
     {
         $sql .= "AND b.bonus_sn = '$bonus_sn'";
     }
+
     return $GLOBALS['db']->getRow($sql);
 }
 
@@ -1620,6 +1621,8 @@ function get_cart_goods()
         $row['goods_price']  = price_format($row['goods_price'], false);
         $row['market_price'] = price_format($row['market_price'], false);
 
+        $row['free_more_desc'] = get_free_more_desc($row['free_more']);
+        
         /* 统计实体商品和虚拟商品的个数 */
         if ($row['is_real'])
         {

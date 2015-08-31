@@ -70,21 +70,23 @@ function db_create_in($item_list, $field_name = '')
 function is_email($user_email)
 {
     $chars = "/^([a-z0-9+_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,6}\$/i";
-    if (strpos($user_email, '@') !== false && strpos($user_email, '.') !== false)
-    {
-        if (preg_match($chars, $user_email))
-        {
-            return true;
+    return strpos($user_email, '@') !== false 
+    			&& strpos($user_email, '.') !== false 
+    			&& preg_match($chars, $user_email);
         }
-        else
-        {
-            return false;
-        }
-    }
-    else
+
+/**
+ * 验证输入的手机号是否合法
+ *
+ * @access  public
+ * @param   string      $mobile      需要验证的手机号
+ *
+ * @return bool
+ */
+function is_mobile($mobile)
     {
-        return false;
-    }
+	$pattern = "/^1\d{10}$/";
+	return preg_match($pattern, $mobile);
 }
 
 /**
@@ -2779,14 +2781,17 @@ if (!function_exists('array_combine')) {
     }
 }
 
-//正则匹配手机格式 by wang
-function is_mobile($mobile){
-    $chars = "/^13[0-9]{1}[0-9]{8}$|15[0-9]{1}[0-9]{8}$|18[0-9]{1}[0-9]{8}$/";
-    if (preg_match($chars, $mobile)){
-        return true;
-    }else{
-        return false;
-    }
-}
+function get_free_more_desc($free_more) {
 
+	if (empty($free_more)) {
+		return '';
+	}
+
+	$arr = explode(':', $free_more);
+	if (count($arr) < 2) {
+		return '';
+	}
+
+	return '买' . $arr[0] . '送' . $arr[1];
+}
 ?>

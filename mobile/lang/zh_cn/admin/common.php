@@ -34,6 +34,7 @@ $_LANG['username_rule'] = '用户名应为汉字、英文字符、数字组合�
 $_LANG['plugins_not_found'] = '插件 %s 无法定位';
 $_LANG['no_records'] = '没有找到任何记录';
 $_LANG['role_describe'] = '角色描述';
+$_LANG['website'] = '第三方登录插件管理';  //名字你可以自己定
 
 $_LANG['require_field'] = '<span class="require-field">*</span>';
 $_LANG['yes'] = '是';
@@ -289,6 +290,7 @@ $_LANG['convert'] = '转换数据';
 /* 短信管理 */
 $_LANG['02_sms_my_info'] = '账号信息';
 $_LANG['03_sms_send'] = '发送短信';
+$_LANG['07_sms_verifycode'] = '短信验证码';
 $_LANG['04_sms_charge'] = '账户充值';
 $_LANG['05_sms_send_history'] = '发送记录';
 $_LANG['06_sms_charge_history'] = '充值记录';

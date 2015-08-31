@@ -263,10 +263,12 @@ class cls_template
         {
             $this->_current_file = $filename;
             $source = $this->fetch_str(file_get_contents($filename));
+
             if (file_put_contents($name, $source, LOCK_EX) === false)
             {
                 trigger_error('can\'t write:' . $name);
             }
+
             $source = $this->_eval($source);
         }
 
@@ -288,7 +290,7 @@ class cls_template
             $source = $this->smarty_prefilter_preCompile($source);
         }
 
-        if(preg_match_all('~(<\?(?:\w+|=)?|\?>|language\s*=\s*[\"\']?php[\"\']?)~is', $source, $sp_match))
+        /*if(preg_match_all('~(<\?(?:\w+|=)?|\?>|language\s*=\s*[\"\']?php[\"\']?)~is', $source, $sp_match))
         {
             $sp_match[1] = array_unique($sp_match[1]);
             for ($curr_sp = 0, $for_max2 = count($sp_match[1]); $curr_sp < $for_max2; $curr_sp++)
@@ -299,8 +301,12 @@ class cls_template
             {
                  $source= str_replace('%%%SMARTYSP'.$curr_sp.'%%%', '<?php echo \''.str_replace("'", "\'", $sp_match[1][$curr_sp]).'\'; ?>'."\n", $source);
             }
-         }
-         return preg_replace("/{([^\}\{\n]*)}/e", "\$this->select('\\1');", $source);
+         }*/
+         //return preg_replace("/{([^\}\{\n]*)}/e", "\$this->select('\\1');", $source);
+         return preg_replace_callback ("/{([^\}\{\n]*)}/", 
+             function ($match) { 
+                 return $this->select($match[1]);
+             }, $source);
     }
 
     /**
@@ -418,8 +424,8 @@ class cls_template
         }
         else
         {
-            $tag_arr = explode(' ', $tag);
-            $tag_sel = array_shift($tag_arr);
+            $tmp_arr = explode(' ', $tag);
+            $tag_sel = array_shift($tmp_arr);
             switch ($tag_sel)
             {
                 case 'if':
@@ -489,8 +495,12 @@ class cls_template
 
                 case 'insert' :
                     $t = $this->get_para(substr($tag, 7), false);
+		    $k = preg_replace_callback("/(\'\\$[^,]+)/" , function ($match) {
+                        return stripslashes(trim($match[1], "'"));
+                    }, var_export($t, true));
 
-                    $out = "<?php \n" . '$k = ' . preg_replace("/(\'\\$[^,]+)/e" , "stripslashes(trim('\\1','\''));", var_export($t, true)) . ";\n";
+                    //$out = "<?php \n" . '$k = ' . preg_replace("/(\'\\$[^,]+)/e" , "stripslashes(trim('\\1','\''));", var_export($t, true)) . ";\n";
+                    $out = "<?php \n" . '$k = ' . $k . ";\n";
                     $out .= 'echo $this->_echash . $k[\'name\'] . \'|\' . serialize($k) . $this->_echash;' . "\n?>";
 
                     return $out;
@@ -549,7 +559,10 @@ class cls_template
     {
         if (strrpos($val, '[') !== false)
         {
-            $val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
+            //$val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
+            $val = preg_replace_callback("/\[([^\[\]]*)\]/is", function ($match) {
+                return '.' . $match[1];
+            }, $val);
         }
 
         if (strrpos($val, '|') !== false)
@@ -637,6 +650,16 @@ class cls_template
                         $p = 'strip_tags(' . $p . ')';
                         break;
 
+                    case 'timestamp':
+                    	if (count($s) > 2) {
+                    		$arr = array_slice($s, 1);
+                    		$f = implode(':', $arr);
+                    	} else {
+                    		$f = $s[1];
+                    	}
+                    	$p = 'date(' . $f . ',' . $p . ')';
+                    	break;
+                    	
                     default:
                         # code...
                         break;
@@ -1066,9 +1089,12 @@ class cls_template
         if ($file_type == '.dwt')
         {
             /* 将模板中所有library替换为链接 */
-            $pattern     = '/<!--\s#BeginLibraryItem\s\"\/(.*?)\"\s-->.*?<!--\s#EndLibraryItem\s-->/se';
-            $replacement = "'{include file='.strtolower('\\1'). '}'";
-            $source      = preg_replace($pattern, $replacement, $source);
+            $pattern     = '/<!--\s#BeginLibraryItem\s\"\/(.*?)\"\s-->.*?<!--\s#EndLibraryItem\s-->/s';
+            //$replacement = "'{include file='.strtolower('\\1'). '}'";
+            //$source      = preg_replace($pattern, $replacement, $source);
+            $source      = preg_replace_callback($pattern, function ($match) {
+                return '{include file=' . strtolower($match[1]) . '}';
+            }, $source);
 
             /* 检查有无动态库文件，如果有为其赋值 */
             $dyna_libs = get_dyna_libs($GLOBALS['_CFG']['template'], $this->_current_file);

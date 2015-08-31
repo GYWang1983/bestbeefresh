@@ -47,6 +47,7 @@ define('ERR_INVALID_PASSWORD',      5); // 密码错误
 define('ERR_INVALID_EMAIL',         6); // email错误
 define('ERR_USERNAME_NOT_ALLOW',    7); // 用户名不允许注册
 define('ERR_EMAIL_NOT_ALLOW',       8); // EMAIL不允许注册
+define('ERR_MOBILE_EXISTS',         9); // 手机号已经存在
 
 /* 加入购物车失败的错误代码 */
 define('ERR_NOT_EXISTS',            1); // 商品不存在
@@ -55,6 +56,7 @@ define('ERR_NOT_ON_SALE',           3); // 商品已下架
 define('ERR_CANNT_ALONE_SALE',      4); // 商品不能单独销售
 define('ERR_NO_BASIC_GOODS',        5); // 没有基本件
 define('ERR_NEED_SELECT_ATTR',      6); // 需要用户选择属性
+define('ERR_PRODUCT_OUT_OF_STOCK',  7); // 货品缺货
 
 /* 购物车商品类型 */
 define('CART_GENERAL_GOODS',        0); // 普通商品
@@ -114,6 +116,7 @@ define('SEND_BY_USER',              0); // 按用户发放
 define('SEND_BY_GOODS',             1); // 按商品发放
 define('SEND_BY_ORDER',             2); // 按订单发放
 define('SEND_BY_PRINT',             3); // 线下发放
+define('SEND_BY_REGISTER',	    4); // 注册用户送红包
 
 /* 广告的类型 */
 define('IMG_AD',                    0); // 图片广告
@@ -184,6 +187,8 @@ define('CAPTCHA_COMMENT',           4); //评论时使用验证码
 define('CAPTCHA_ADMIN',             8); //后台登录时使用验证码
 define('CAPTCHA_LOGIN_FAIL',       16); //登录失败后显示验证码
 define('CAPTCHA_MESSAGE',          32); //留言时使用验证码
+define('CAPTCHA_GET_PASSWORD',     64); //找回密码验证码
+define('CAPTCHA_REBIND',          128); //重新绑定手机号
 
 /* 优惠活动的优惠范围 */
 define('FAR_ALL',                   0); // 全部商品
@@ -237,5 +242,10 @@ define('LICENSE_VERSION', '1.0');
 
 /* 配送方式 */
 define('SHIP_LIST', 'cac|city_express|ems|flat|fpd|post_express|post_mail|presswork|sf_express|sto_express|yto|zto');
+
+/* 手机验证码 */
+define('SMS_REGISTER',    1);
+define('SMS_GETPASSWORD', 2);
+define('SMS_REBIND',      3);
 
 ?>

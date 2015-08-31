@@ -31,7 +31,6 @@ if (!defined('IN_ECTOUCH'))
  */
 function register($username, $password, $email, $other = array())
 {
-    
     /* 检查注册是否关闭 */
     if (!empty($GLOBALS['_CFG']['shop_reg_closed']))
     {
@@ -49,18 +48,13 @@ function register($username, $password, $email, $other = array())
             $GLOBALS['err']->add(sprintf($GLOBALS['_LANG']['username_invalid'], htmlspecialchars($username)));
         }
     }
+
     /* 检查email */
-    if (empty($email))
+    if (!empty($email) && !is_email($email))
     {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['email_empty']);
+        $GLOBALS['err']->add(sprintf($GLOBALS['_LANG']['email_invalid'], htmlspecialchars($email)));
     }
-    else
-    {
-        if (!is_email($email))
-        {
-            $GLOBALS['err']->add(sprintf($GLOBALS['_LANG']['email_invalid'], htmlspecialchars($email)));
-        }
-    }
+
     if ($GLOBALS['err']->error_no > 0)
     {
         return false;
@@ -75,7 +69,6 @@ function register($username, $password, $email, $other = array())
    
     if (!$GLOBALS['user']->add_user($username, $password, $email))
     { 
-        
         if ($GLOBALS['user']->error == ERR_INVALID_USERNAME)
         {
             $GLOBALS['err']->add(sprintf($GLOBALS['_LANG']['username_invalid'], $username));
@@ -181,6 +174,49 @@ function register($username, $password, $email, $other = array())
 
         return true;
     }
+}
+
+/**
+ * 绑定手机号
+ *
+ * @access  public
+ * @param   string       $username        注册用户名
+ * @param   string       $mobile          手机号
+ * @param   string       $verifycode      验证码
+ * @param   string       $act             绑定类型
+ *
+ * @return  bool         $bool
+ */
+function bind_mobile($username, $mobile, $verifycode, $act = SMS_REGISTER)
+{
+	global $db, $ecs, $_CFG;
+
+	if (empty($username) || empty($mobile))
+	{
+		return false;
+	}
+
+	/* 更新用户shoujih*/
+	$SQL = "UPDATE " . $ecs->table('users') . " SET mobile_phone = '$mobile' WHERE user_name = '$username' AND is_validated = 1";
+	$db->query($SQL);
+	
+	$update = $db->affected_rows();
+	if ($update)
+	{
+		$_SESSION['mobile'] = $mobile;
+		
+		$ip = real_ip();
+		$time = gmtime() - intval($_CFG['ecsdxt_sms_validtime']);
+		
+		$SQL = "UPDATE " . $ecs->table('verifycode') . " SET status=2 WHERE mobile='$mobile' AND getip='$ip' AND verifycode='$verifycode' AND status=1 AND `type`=$act AND dateline>=$time";
+		$db->query($SQL);
+		
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
 }
 
 /**
