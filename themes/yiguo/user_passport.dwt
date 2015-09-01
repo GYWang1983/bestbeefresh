@@ -24,7 +24,7 @@
 <!-- {if $action eq 'login'} -->
 <Div class="coLoginBody">
 <div class="coLogin_title">
-                        <p><span>欢迎您，请登录</span>还没有易果生鲜账户？ <a href="user.php?act=register">立即注册</a></p>
+                        <p><span>欢迎您，请登录</span>还没有易果生鲜账户？ <a href="user.php?act=register&next={$next}">立即注册</a></p>
                     </div>
 <div class="coLogin_box">
 	<div style="height:auto; overflow:hidden;">
@@ -65,14 +65,11 @@
           <input type="checkbox" value="1" name="remember" id="remember" class="checkbox_txt" /><label for="remember">{$lang.remember}</label>
           </div>
           <div class="coLogin_three" style="margin-top:22px;">
-           
-      <input type="hidden" name="act" value="act_login" />
+            <input type="hidden" name="act" value="act_login" />
             <input type="hidden" name="back_act" value="{$back_act}" />
+            <input type="hidden" name="next" value="{$next}" />
             <input type="submit" name="submit" value="" class="smLogin_btn" />
-           
           </div>
-	  
-   
     </form>
     </div>
     <!--
@@ -103,7 +100,7 @@
     {insert_scripts files='utils.js'}
     <div class="coLoginBody">
         <div class="coLogin_title">
-            <p><span>欢迎加入易果生鲜</span>如果您已有易果生鲜账号，<a href="user.php?act=login">立即登录</a></p>
+            <p><span>欢迎加入易果生鲜</span>如果您已有易果生鲜账号，<a href="user.php?act=login&next={$next}">立即登录</a></p>
         </div>
         <div class="coLogin_box" style="width: 582px;margin: 0 0 0 40px;">
             <form action="user.php" method="post" name="formUser" id="formRegister">
@@ -162,6 +159,7 @@
                 <div class="coLogin_three" style="margin-top:20px;">
                     <input name="act" type="hidden" value="act_register" >
                     <input type="hidden" name="back_act" value="{$back_act}" />
+                    <input type="hidden" name="next" value="{$next}" />
                     <input name="Submit" type="button" value="已阅读用户协议，确认" style="font-size:15px;" class="biLogin_btn" onclick="register()">
                 </div>
                 <div class="coLogin_one" style="display:none;">

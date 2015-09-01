@@ -390,7 +390,6 @@ elseif ($_REQUEST['step'] == 'login')
         include_once('include/lib_passport.php');
         if (!empty($_POST['act']) && $_POST['act'] == 'signin')
         {
-            /*
             $captcha = intval($_CFG['captcha']);
             if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
             {
@@ -409,26 +408,9 @@ elseif ($_REQUEST['step'] == 'login')
                     show_message($_LANG['invalid_captcha']);
                 }
             }
-            */
             
             $username = isset($_POST['username']) ? trim($_POST['username']) : '';
             $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-
-            //用户名是邮箱格式 by wang
-            if(is_email($username))
-            {
-                $sql ="select user_name from ".$ecs->table('users')." where email='".$username."'";
-                $username_try = $db->getOne($sql);
-                $username = $username_try ? $username_try:$username;
-            }
-
-            //用户名是手机格式 by wang
-            if(is_mobile($username))
-            {
-                $sql ="select user_name from ".$ecs->table('users')." where mobile_phone='".$username."'";
-                $username_try = $db->getOne($sql);
-                $username = $username_try ? $username_try:$username;
-            }
 
             if ($user->login($username, $password, isset($_POST['remember'])))
             {
@@ -675,7 +657,8 @@ elseif ($_REQUEST['step'] == 'checkout')
     if (empty($_SESSION['direct_shopping']) && $_SESSION['user_id'] == 0)
     {
         /* 用户没有登录且没有选定匿名购物，转向到登录页面 */
-        ecs_header("Location: flow.php?step=login\n");
+        //ecs_header("Location: flow.php?step=login\n");
+        ecs_header("Location: user.php?act=login&next=checkout\n");
         exit;
     }
 
@@ -1557,7 +1540,8 @@ elseif ($_REQUEST['step'] == 'done')
     if (empty($_SESSION['direct_shopping']) && $_SESSION['user_id'] == 0)
     {
         /* 用户没有登录且没有选定匿名购物，转向到登录页面 */
-        ecs_header("Location: flow.php?step=login\n");
+        //ecs_header("Location: flow.php?step=login\n");
+    	ecs_header("Location: user.php?act=login&next=checkout\n");
         exit;
     }
 

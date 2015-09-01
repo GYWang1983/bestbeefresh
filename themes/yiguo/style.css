@@ -2139,15 +2139,15 @@ a.hpink:hover {text-decoration: underline;color: #ed145b;}
 .coLogin_title p{font-size:14px;}
 .coLogin_title p span{margin:0 10px 0 0;display:inline;font-size:30px;font-family:"微软雅黑";}
 .coLogin_title p a{margin:0 0 0 5px;display:inline;font-weight:bold;text-decoration:underline;color:#6b9936;}
-.coLogin_box{width:520px;margin:0 0 0 10px;display:inline;float:left;}
-.coLogin_box .coLogin_one{ margin:0; height:60px;}
+.coLogin_box{width:560px;margin:0 0 0 10px;display:inline;float:left;}
+.coLogin_box .coLogin_one{ margin:0; height:50px;}
 .coLogin_one p{width:110px;height:35px;line-height:35px;padding:0 3px 0 0;color:#333;font-size:14px;text-align:right;float:left;}
 .coLoginTxt{height:35px;font-size:14px;position:relative;z-index:100;}
 .coLogin_txt_all{height:35px; z-index:10; float:left;}
 .coLogin_txt_all span a{ text-decoration:underline; font-size:12px;}
 .coLogin_txt_all span a:hover{ text-decoration:none;}
 .coLogin_txt{ width:256px; height:21px; border:2px solid #bfbfbf; font-size:18px; line-height:21px; overflow:hidden; vertical-align:middle; padding:5px; float:left;}
-.coLogin_one span{ line-height:35px; padding:0 0 0 73px; float:left;}
+.coLogin_one span{ line-height:35px; padding:0 0 0 10px; float:left;}
 .coLoginTxt_2{height:35px;font-size:14px;float:left;}
 .coLoginTxt_2_img{width:110px;height:35px;overflow:hidden;float:left;}
 .coLoginTxt_2_img img{ padding:8px 0 0 10px;}

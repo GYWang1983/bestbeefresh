@@ -129,6 +129,10 @@ if ($action == 'register')
         $smarty->assign('rand',            mt_rand());
     }
 
+    if (!empty($_REQUEST['next'])) {
+    	$smarty->assign('next', trim($_REQUEST['next']));
+    }
+    
     /* 密码提示问题 */
     $smarty->assign('passwd_questions', $_LANG['passwd_questions']);
 
@@ -281,10 +285,21 @@ elseif ($action == 'act_register')
                 send_regiter_hash($_SESSION['user_id']);
             }
             $ucdata = empty($user->ucdata)? "" : $user->ucdata;
-            show_message(sprintf($_LANG['register_success'], $username . $ucdata), array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act, 'user.php'), 'info');
+            
+            if (!empty($_POST['next'])) {
+            	ecs_header("Location: flow.php?step={$_POST[next]}\n");
+            } else {
+            	show_message(sprintf($_LANG['register_success'], $username . $ucdata), array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act, 'user.php'), 'info');
+            } 
         }
         else
         {
+        	if (empty($_POST['next'])) {
+        		$url = 'user.php?act=register';
+        	} else {
+        		$url = 'user.php?act=register&next=' . trim($_POST['next']);
+        	}
+        	
             $err->show($_LANG['sign_up'], 'user.php?act=register');
         }
     }
@@ -548,6 +563,10 @@ elseif ($action == 'login')
         $GLOBALS['smarty']->assign('rand', mt_rand());
     }
 
+    if (!empty($_REQUEST['next'])) {
+    	$smarty->assign('next', trim($_REQUEST['next']));
+    }
+    
     $smarty->assign('back_act', $back_act);
     $smarty->display('user_passport.dwt');
 }
@@ -583,13 +602,23 @@ elseif ($action == 'act_login')
         update_user_info();
         recalculate_price();
 
-        $ucdata = isset($user->ucdata)? $user->ucdata : '';
-        show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+        if (!empty($_POST['next'])) {
+        	ecs_header("Location: flow.php?step={$_POST[next]}\n");
+        } else {
+        	$ucdata = isset($user->ucdata)? $user->ucdata : '';
+        	show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+        }
     }
     else
     {
+    	if (empty($_POST['next'])) {
+    		$url = 'user.php';
+    	} else {
+    		$url = 'user.php?next=' . trim($_POST['next']);
+    	}
+    	
         $_SESSION['login_fail'] ++ ;
-        show_message($_LANG['login_failure'], $_LANG['relogin_lnk'], 'user.php', 'error');
+        show_message($_LANG['login_failure'], $_LANG['relogin_lnk'], $url, 'error');
     }
 }
 /* 处理 ajax 的登录请求 */
