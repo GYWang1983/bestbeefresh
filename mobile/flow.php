@@ -146,6 +146,8 @@ if ($_REQUEST['step'] == 'add_to_cart')
 
             $result['content'] = insert_cart_info();
             $result['one_step_buy'] = $_CFG['one_step_buy'];
+            $result['goods_id'] = stripslashes($goods->goods_id);
+            $result['goods_number']  = insert_cart_goods_number($goods->goods_id);
 			$result['cart_number'] = insert_cart_info_number();
         }
         else
@@ -167,6 +169,65 @@ if ($_REQUEST['step'] == 'add_to_cart')
     $result['confirm_type'] = !empty($_CFG['cart_confirm']) ? $_CFG['cart_confirm'] : 2;
     die($json->encode($result));
 }
+elseif ($_REQUEST['step'] == 'dec_from_cart')
+{
+	include_once('include/cls_json.php');
+	$_POST['goods']=strip_tags(urldecode($_POST['goods']));
+	$_POST['goods'] = json_str_iconv($_POST['goods']);
+	
+	$result = array('error' => 0, 'message' => '', 'content' => '', 'goods_id' => '', 'goods_num' => 0);
+    $json  = new JSON;
+    $goods = $json->decode($_POST['goods']);
+    
+    if (empty($goods) || intval($goods->goods_id) <= 0)
+    {
+        $result['error'] = 1;
+        $result['message'] = 'invalid_goods';
+        die($json->encode($result));
+    }
+	else
+	{
+		$result['goods_id'] = $goods->goods_id;
+	}
+    
+	/* 检查：商品数量是否合法 */
+	if (!is_numeric($goods->number) || intval($goods->number) <= 0)
+	{
+		$result['error']   = 1;
+		$result['message'] = $_LANG['invalid_number'];
+	}
+	
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$cond = "user_id = " . $_SESSION['user_id'];
+	} else {
+		$cond = "session_id = '" . SESS_ID . "'";
+	}
+	
+	$sql = 'SELECT rec_id, goods_number FROM ' . $GLOBALS['ecs']->table('cart') .
+	" WHERE $cond AND rec_type = '" . CART_GENERAL_GOODS . "' AND goods_id = " . $goods->goods_id;
+	$rec = $GLOBALS['db']->getRow($sql);
+	
+	if (!empty($rec)) {
+		
+		$num = intval($rec['goods_number']) - intval($goods->number);
+		if ($num <= 0)
+		{
+			flow_drop_cart_goods($rec['rec_id']);
+		}
+		else
+		{
+			
+			$arr = array();
+			$arr[$rec['rec_id']] = $num;
+			flow_update_cart($arr);
+			
+		}
+	}
+	
+	$result['cart_number']   = insert_cart_info_number();
+	$result['goods_number']  = insert_cart_goods_number($goods->goods_id);
+	die($json->encode($result));
+}
 /**
   * by Leah
   */
@@ -176,7 +237,7 @@ elseif ($_REQUEST['step']== 'ajax_update_cart')
     $json = new JSON();
     $result = array('error' => 0, 'message'=> '');
  
-    if (isset($_POST['rec_id']) &&isset($_POST['goods_number']))
+    if (isset($_POST['rec_id']) && isset($_POST['goods_number']))
     {
         $key = $_POST['rec_id'];
         $val = $_POST['goods_number'];
@@ -2388,7 +2449,7 @@ function flow_update_cart($arr)
     foreach ($arr AS $key => $val)
     {
         $val = intval(make_semiangle($val));
-        if ($val <= 0 || !is_numeric($key))
+        if ($val < 0 || !is_numeric($key))
         {
             continue;
         }

@@ -31,7 +31,18 @@ function addToCart(goodsId, parentId)
   goods.number   = number;
   goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
 
-  Ajax.call('flow.php?step=add_to_cart', 'goods=' + goods.toJSONString(), addToCartResponse, 'POST', 'JSON');
+  Ajax.call('flow.php?step=add_to_cart', 'goods=' + $.toJSON(goods), addToCartResponse, 'POST', 'JSON');
+}
+
+
+function decFromCart(goodsId, parentId) {
+	
+  var goods        = new Object();
+  goods.goods_id = goodsId;
+  goods.number   = 1;
+  goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
+
+  Ajax.call('flow.php?step=dec_from_cart', 'goods=' + $.toJSON(goods), decFromCartResponse, 'POST', 'JSON');
 }
 
 /* *
@@ -65,7 +76,7 @@ function addToCart_quick(goodsId, parentId)
   goods.number   = number;
   goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
 
-  Ajax.call('flow.php?step=add_to_cart', 'goods=' + goods.toJSONString(), addToCartResponse_quick, 'POST', 'JSON');
+  Ajax.call('flow.php?step=add_to_cart', 'goods=' + $.toJSON(goods), addToCartResponse_quick, 'POST', 'JSON');
 }
 
 /**
@@ -121,11 +132,17 @@ function addToCartResponse(result)
   else
   {
 	//显示购物车数量
-	document.getElementById('carId').innerHTML = result.cart_number;
-	document.getElementById('globalId').innerHTML = result.cart_number;
-    showDiv();
+	$('#carId').text(result.cart_number);
+	if (cart !== undefined) {
+		var goods_id = result.goods_id;
+		cart[goods_id] = result.goods_number;
+		$('#goods' + goods_id + ' .cart .num').text(result.goods_number);
+	}
+	//document.getElementById('globalId').innerHTML = result.cart_number;
+    //showDiv();
   }
 }
+
 
 /* *
  * 处理添加商品到购物车的反馈信息
@@ -163,6 +180,25 @@ function addToCartResponse_quick(result)
     }
 
     location.href = cart_url;
+  }
+}
+
+function decFromCartResponse(result)
+{
+console.log(result);
+  if (result.error > 0)
+  {
+      alert(result.message);
+  }
+  else
+  {
+	//显示购物车数量
+	$('#carId').text(result.cart_number);
+	if (cart !== undefined) {
+		var goods_id = result.goods_id;
+		cart[goods_id] = result.goods_number;
+		$('#goods' + goods_id + ' .cart .num').text(result.goods_number);
+	}
   }
 }
 
@@ -897,7 +933,7 @@ function addPackageToCart(packageId)
   package_info.package_id = packageId
   package_info.number     = number;
 
-  Ajax.call('flow.php?step=add_package_to_cart', 'package_info=' + package_info.toJSONString(), addPackageToCartResponse, 'POST', 'JSON');
+  Ajax.call('flow.php?step=add_package_to_cart', 'package_info=' + $.toJSON(package_info), addPackageToCartResponse, 'POST', 'JSON');
 }
 
 /* *
@@ -1103,7 +1139,7 @@ function submit_div(goods_id, parentId)
   goods.number   = number;
   goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
 
-  Ajax.call('flow.php?step=add_to_cart', 'goods=' + goods.toJSONString(), addToCartResponse, 'POST', 'JSON');
+  Ajax.call('flow.php?step=add_to_cart', 'goods=' + $.toJSON(goods), addToCartResponse, 'POST', 'JSON');
 
   document.body.removeChild(docEle('speDiv'));
   document.body.removeChild(docEle('mask'));

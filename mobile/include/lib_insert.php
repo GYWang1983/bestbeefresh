@@ -371,10 +371,54 @@ function insert_vote()
 */
 function insert_cart_info_number()
 {
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$cond = "user_id = " . $_SESSION['user_id'];
+	} else {
+		$cond = "session_id = '" . SESS_ID . "'";
+	}
+	
     $sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
-           " WHERE session_id = '" . SESS_ID . "' AND rec_type = '" . CART_GENERAL_GOODS . "'";
+           " WHERE $cond AND rec_type = '" . CART_GENERAL_GOODS . "'";
     $number = $GLOBALS['db']->getOne($sql);
     return intval($number);
 }
 
+
+function insert_cart_detail_number()
+{
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$cond = "user_id = " . $_SESSION['user_id'];
+	} else {
+		$cond = "session_id = '" . SESS_ID . "'";
+	}
+
+	$sql = 'SELECT goods_id, SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
+	" WHERE $cond AND rec_type = '" . CART_GENERAL_GOODS . "' GROUP BY goods_id";
+	$rs = $GLOBALS['db']->getAll($sql);
+	
+	if (empty($rs)) {
+		return '{}';
+	}
+	
+	$cart = array();
+	foreach ($rs as $good) {
+		$cart[$good['goods_id']] = $good['number'];
+	}
+	
+	return json_encode($cart);
+}
+
+function insert_cart_goods_number($goods_id)
+{
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$cond = "user_id = " . $_SESSION['user_id'];
+	} else {
+		$cond = "session_id = '" . SESS_ID . "'";
+	}
+	
+	$sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
+	" WHERE $cond AND rec_type = '" . CART_GENERAL_GOODS . "' AND goods_id = $goods_id";
+	$num = $GLOBALS['db']->getOne($sql);
+	return $num ?: 0;
+}
 ?>
