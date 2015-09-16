@@ -148,7 +148,7 @@ if ($_REQUEST['step'] == 'add_to_cart')
             $result['one_step_buy'] = $_CFG['one_step_buy'];
             $result['goods_id'] = stripslashes($goods->goods_id);
             $result['goods_number']  = insert_cart_goods_number($goods->goods_id);
-			$result['cart_number'] = insert_cart_info_number();
+            $result['cart_number'] = insert_cart_info_number();
         }
         else
         {
@@ -723,18 +723,17 @@ elseif ($_REQUEST['step'] == 'checkout')
         exit;
     }
 
-    $consignee = get_consignee($_SESSION['user_id']);
-
     /* 检查收货人信息是否完整 */
+    /*$consignee = get_consignee($_SESSION['user_id']);
     if (!check_consignee_info($consignee, $flow_type))
     {
-        /* 如果不完整则转向到收货人信息填写界面 */
+        // 如果不完整则转向到收货人信息填写界面
         ecs_header("Location: flow.php?step=consignee\n");
         exit;
     }
 
     $_SESSION['flow_consignee'] = $consignee;
-    $smarty->assign('consignee', $consignee);
+    $smarty->assign('consignee', $consignee);*/
 
     /* 对商品信息赋值 */
     $cart_goods = cart_goods($flow_type); // 取得商品列表，计算合计

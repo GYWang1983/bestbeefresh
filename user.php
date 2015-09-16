@@ -600,6 +600,7 @@ elseif ($action == 'act_login')
     if ($user->login($username, $password,isset($_POST['remember'])))
     {
         update_user_info();
+        update_user_cart();
         recalculate_price();
 
         if (!empty($_POST['next'])) {
@@ -658,6 +659,7 @@ elseif ($action == 'signin')
     if ($user->login($username, $password))
     {
         update_user_info();  //更新用户信息
+        update_user_cart();
         recalculate_price(); // 重新计算购物车中的商品价格
         $smarty->assign('user_info', get_user_info());
         $ucdata = empty($user->ucdata)? "" : $user->ucdata;

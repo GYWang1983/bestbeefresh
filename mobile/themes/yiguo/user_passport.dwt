@@ -39,7 +39,7 @@
           <form name="formLogin" action="user.php" method="post" onSubmit="return userLogin()">
             <dl>
               <dd>
-                <input placeholder="{$lang.username}/{$lang.mobile}/{$lang.email}" name="username" type="text"  class="inputBg" id="username" />
+                <input placeholder="{$lang.username}/{$lang.mobile}" name="username" type="text"  class="inputBg" id="username" />
               </dd>
             </dl>
             <dl>
@@ -56,17 +56,20 @@
               <dd>
                 <input type="hidden" name="act" value="act_login" />
                 <input type="hidden" name="back_act" value="{$back_act}" />
+                <input type="hidden" name="next" value="{$next}" />
                 <input type="submit" name="submit"  value="立即登陆" class="c-btn3" />
               </dd>
             </dl>
           </form>
           <dl>
-            <dd> <a href="user.php?act=get_password" class="f6">忘记密码</a> </dd>
+            <dd><a href="user.php?act=get_password" class="f6">忘记密码</a> </dd>
           </dl>
+          <!--
           <div class="hezuo">
             <p class="t">使用合作账号登录</p>
             <p class="b"><a href="user.php?act=oath&type=qq"><img src="{$ectouch_themes}/images/quicklogin/qq.png"></a> <a href="user.php?act=oath&type=weibo"><img src="{$ectouch_themes}/images/quicklogin/weibo.png"></a> <a href="user.php?act=oath&type=renren"><img src="{$ectouch_themes}/images/quicklogin/renren.png"></a></p>
           </div>
+          -->
         </div>
       </ul>
     </div>
@@ -103,6 +106,7 @@
               <dd>
                 <input name="act" type="hidden" value="act_register" />
                 <input name="enabled_sms" type="hidden" value="1" />
+                <input type="hidden" name="next" value="{$next}" />
                 <input type="hidden" name="back_act" value="{$back_act}" />
                 <input name="Submit" type="submit" value="下一步" class="c-btn3" />
               </dd>

@@ -132,6 +132,19 @@ function get_user_info($id=0)
     return $user;
 }
 /**
+ * 将未登录状态下的购物车商品合并至登录用户
+ *
+ * @access  public
+ * @return  void
+ */
+function update_user_cart()
+{
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('cart') . " SET user_id= {$_SESSION[user_id]} WHERE user_id = 0 AND session_id = '" . SESS_ID . "'";
+		$GLOBALS['db']->query($sql);
+	}
+}
+/**
  * 取得当前位置和页面标题
  *
  * @access  public
@@ -1326,8 +1339,8 @@ function get_tags($goods_id = 0, $user_id = 0)
  */
 function get_dyna_libs($theme, $tmp)
 {
-    $tmp_arr = explode('.', $tmp);
-    $ext = end($tmp_arr);
+    $arr = explode('.', $tmp);
+    $ext = end($arr);
     $tmp = basename($tmp,".$ext");
     $sql = 'SELECT region, library, sort_order, id, number, type' .
             ' FROM ' . $GLOBALS['ecs']->table('touch_template') .
@@ -1665,7 +1678,7 @@ function assign_template($ctype = '', $catlist = array())
     $smarty->assign('navigator_list',get_navigator($ctype, $catlist));  //自定义导航栏
 
     //查询地区 by wang
-    $GLOBALS['_CFG']['shop_country'] = !empty($GLOBALS['_CFG']['shop_country']) ? $GLOBALS['_CFG']['shop_country'] : '0';
+    /*$GLOBALS['_CFG']['shop_country'] = !empty($GLOBALS['_CFG']['shop_country']) ? $GLOBALS['_CFG']['shop_country'] : '0';
     $GLOBALS['_CFG']['shop_province'] = !empty($GLOBALS['_CFG']['shop_province']) ? $GLOBALS['_CFG']['shop_province'] : '0';
     $GLOBALS['_CFG']['shop_city'] = !empty($GLOBALS['_CFG']['shop_city']) ? $GLOBALS['_CFG']['shop_city'] : '0';
     $condition_arr = array($GLOBALS['_CFG']['shop_country'], $GLOBALS['_CFG']['shop_province'], $GLOBALS['_CFG']['shop_city']);
@@ -1678,7 +1691,7 @@ function assign_template($ctype = '', $catlist = array())
             $shop_region .= $value['region_name'];
         }
     }
-    $smarty->assign('shop_region', $shop_region);
+    $smarty->assign('shop_region', $shop_region);*/
     //查询地区 by wang
 
     if (!empty($GLOBALS['_CFG']['search_keywords']))
@@ -1971,7 +1984,7 @@ function get_library_number($library, $template = null)
  */
 function get_navigator($ctype = '', $catlist = array())
 {
-	global $_CFG;
+    global $_CFG;
     $sql = 'SELECT * FROM '. $GLOBALS['ecs']->table('touch_nav') . '
             WHERE ifshow = \'1\' ORDER BY type, vieworder';
     $res = $GLOBALS['db']->query($sql);
@@ -2089,5 +2102,14 @@ function url_domain()
 
     return $root;
 }
+function get_cart_cond($prefix = '')
+{
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$cond = " {$prefix}user_id = {$_SESSION[user_id]} ";
+	} else {
+		$cond = " {$prefix}session_id = '" . SESS_ID . "' ";
+	}
 
+	return $cond;
+}
 ?>

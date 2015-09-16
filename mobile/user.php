@@ -456,6 +456,7 @@ elseif ($action == 'login')
         $GLOBALS['smarty']->assign('rand', mt_rand());
     }
 
+    $smarty->assign('next', $_REQUEST['next']);
     $smarty->assign('back_act', $back_act);
     $smarty->display('user_passport.dwt');
 }
@@ -507,10 +508,16 @@ elseif ($action == 'act_login')
     if ($user->login($username, $password,isset($_POST['remember'])))
     {
         update_user_info();
+        update_user_cart();
         recalculate_price();
 
         $ucdata = isset($user->ucdata)? $user->ucdata : '';
-        show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+        
+        if (!empty($_POST['next'])) {
+        	ecs_header("Location: flow.php?step={$_POST[next]}\n");
+        } else {
+        	show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+        }
     }
     else
     {
@@ -557,6 +564,7 @@ elseif ($action == 'signin')
     if ($user->login($username, $password))
     {
         update_user_info();  //更新用户信息
+        update_user_cart();
         recalculate_price(); // 重新计算购物车中的商品价格
         $smarty->assign('user_info', get_user_info());
         $ucdata = empty($user->ucdata)? "" : $user->ucdata;

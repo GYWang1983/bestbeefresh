@@ -444,12 +444,12 @@ function order_info($order_id, $order_sn = '')
         $order['formated_add_time']       = local_date($GLOBALS['_CFG']['time_format'], $order['add_time']);
     }
 	// 增加地区 by wang
-	$sql = "select region_name from ".$GLOBALS['ecs']->table('region') . " where region_id in(".$order['province'].",". $order['city'].",".$order['district'].")";
+	/*$sql = "select region_name from ".$GLOBALS['ecs']->table('region') . " where region_id in(".$order['province'].",". $order['city'].",".$order['district'].")";
 	$address = $GLOBALS['db']->getAll($sql);
 	foreach($address as $vo){
 		$region .= $vo['region_name'];
 	}
-	$order['address'] = $region.$order['address'];
+	$order['address'] = $region.$order['address'];*/
 	// 增加地区 by wang end
     return $order;
 }
@@ -685,7 +685,7 @@ function order_fee($order, $goods, $consignee = NULL)
             }
 
             // 查看购物车中是否全为免运费商品，若是则把运费赋为零
-            $sql = 'SELECT count(*) FROM ' . $GLOBALS['ecs']->table('cart') . " WHERE  `session_id` = '" . SESS_ID. "' AND `extension_code` != 'package_buy' AND `is_shipping` = 0";
+            $sql = 'SELECT count(*) FROM ' . $GLOBALS['ecs']->table('cart') . " WHERE " . get_cart_cond() . " AND `extension_code` != 'package_buy' AND `is_shipping` = 0";
             $shipping_count = $GLOBALS['db']->getOne($sql);
 
             $total['shipping_fee'] = ($shipping_count == 0 AND $weight_price['free_shipping'] == 1) ?0 :  shipping_fee($shipping_info['shipping_code'],$shipping_info['configure'], $weight_price['weight'], $total['goods_price'], $weight_price['number']);
@@ -821,7 +821,7 @@ function order_fee($order, $goods, $consignee = NULL)
     {
         $sql = 'SELECT SUM(eg.exchange_integral) '.
                'FROM ' . $GLOBALS['ecs']->table('cart') . ' AS c,' . $GLOBALS['ecs']->table('exchange_goods') . 'AS eg '.
-               "WHERE c.goods_id = eg.goods_id AND c.session_id= '" . SESS_ID . "' " .
+               "WHERE c.goods_id = eg.goods_id AND " . get_cart_cond('c.') .
                "  AND c.rec_type = '" . CART_EXCHANGE_GOODS . "' " .
                '  AND c.is_gift = 0 AND c.goods_id > 0 ' .
                'GROUP BY eg.goods_id';
@@ -868,7 +868,7 @@ function cart_goods($type = CART_GENERAL_GOODS)
             "c.goods_price * c.goods_number AS subtotal " .
             "FROM " . $GLOBALS['ecs']->table('cart') .
 			" AS c LEFT JOIN ".$GLOBALS['ecs']->table('goods').
-            " AS g ON c.goods_id = g.goods_id WHERE session_id = '" . SESS_ID . "' " .
+            " AS g ON c.goods_id = g.goods_id WHERE " . get_cart_cond() .
             "AND rec_type = '$type'";
 
     $arr = $GLOBALS['db']->getAll($sql);
@@ -899,7 +899,7 @@ function cart_amount($include_gift = true, $type = CART_GENERAL_GOODS)
 {
     $sql = "SELECT SUM(goods_price * goods_number) " .
             " FROM " . $GLOBALS['ecs']->table('cart') .
-            " WHERE session_id = '" . SESS_ID . "' " .
+            " WHERE " . get_cart_cond() .
             "AND rec_type = '$type' ";
 
     if (!$include_gift)
@@ -923,7 +923,7 @@ function cart_goods_exists($id, $spec, $type = CART_GENERAL_GOODS)
 {
     /* 检查该商品是否已经存在在购物车中 */
     $sql = "SELECT COUNT(*) FROM " .$GLOBALS['ecs']->table('cart').
-            "WHERE session_id = '" .SESS_ID. "' AND goods_id = '$id' ".
+            "WHERE " . get_cart_cond() . " AND goods_id = '$id' ".
             "AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
             "AND rec_type = '$type'";
 
@@ -946,7 +946,7 @@ function cart_weight_price($type = CART_GENERAL_GOODS)
     $packages_row['free_shipping'] = 1;
 
     /* 计算超值礼包内商品的相关配送参数 */
-    $sql = 'SELECT goods_id, goods_number, goods_price FROM ' . $GLOBALS['ecs']->table('cart') . " WHERE extension_code = 'package_buy' AND session_id = '" . SESS_ID . "'";
+    $sql = 'SELECT goods_id, goods_number, goods_price FROM ' . $GLOBALS['ecs']->table('cart') . " WHERE extension_code = 'package_buy' AND " . get_cart_cond();
     $row = $GLOBALS['db']->getAll($sql);
 
     if ($row)
@@ -992,7 +992,7 @@ function cart_weight_price($type = CART_GENERAL_GOODS)
                     'SUM(c.goods_number) AS number '.
                 'FROM ' . $GLOBALS['ecs']->table('cart') . ' AS c '.
                 'LEFT JOIN ' . $GLOBALS['ecs']->table('goods') . ' AS g ON g.goods_id = c.goods_id '.
-                "WHERE c.session_id = '" . SESS_ID . "' " .
+                "WHERE " . get_cart_cond('c.') .
                 "AND rec_type = '$type' AND g.is_shipping = 0 AND c.extension_code != 'package_buy'";
     $row = $GLOBALS['db']->getRow($sql);
 
@@ -1044,7 +1044,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     if ($parent > 0)
     {
         $sql = "SELECT COUNT(*) FROM " . $GLOBALS['ecs']->table('cart') .
-                " WHERE goods_id='$parent' AND session_id='" . SESS_ID . "' AND extension_code <> 'package_buy'";
+                " WHERE goods_id='$parent' AND " . get_cart_cond() . " AND extension_code <> 'package_buy'";
         if ($GLOBALS['db']->getOne($sql) == 0)
         {
             $GLOBALS['err']->add($GLOBALS['_LANG']['no_basic_goods'], ERR_NO_BASIC_GOODS);
@@ -1157,7 +1157,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     {
         $sql = "SELECT goods_id, SUM(goods_number) AS count " .
                 "FROM " . $GLOBALS['ecs']->table('cart') .
-                " WHERE session_id = '" . SESS_ID . "'" .
+                " WHERE " . get_cart_cond() .
                 " AND parent_id = 0" .
                 " AND extension_code <> 'package_buy' " .
                 " AND goods_id " . db_create_in(array_keys($basic_list)) .
@@ -1175,7 +1175,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     {
         $sql = "SELECT parent_id, SUM(goods_number) AS count " .
                 "FROM " . $GLOBALS['ecs']->table('cart') .
-                " WHERE session_id = '" . SESS_ID . "'" .
+                " WHERE " . get_cart_cond() .
                 " AND goods_id = '$goods_id'" .
                 " AND extension_code <> 'package_buy' " .
                 " AND parent_id " . db_create_in(array_keys($basic_count_list)) .
@@ -1225,7 +1225,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     {
         /* 检查该商品是否已经存在在购物车中 */
         $sql = "SELECT goods_number FROM " .$GLOBALS['ecs']->table('cart').
-                " WHERE session_id = '" .SESS_ID. "' AND goods_id = '$goods_id' ".
+                " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
                 " AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
                 " AND extension_code <> 'package_buy' " .
                 " AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";//by mike add
@@ -1248,7 +1248,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                 $goods_price = get_final_price($goods_id, $num, true, $spec);
                 $sql = "UPDATE " . $GLOBALS['ecs']->table('cart') . " SET goods_number = '$num'" .
                        " , goods_price = '$goods_price'".
-                       " WHERE session_id = '" .SESS_ID. "' AND goods_id = '$goods_id' ".
+                       " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
                        " AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
                        " AND extension_code <> 'package_buy' " .
                        "AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";
@@ -1272,7 +1272,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     }
 
     /* 把赠品删除 */
-    $sql = "DELETE FROM " . $GLOBALS['ecs']->table('cart') . " WHERE session_id = '" . SESS_ID . "' AND is_gift <> 0";
+    $sql = "DELETE FROM " . $GLOBALS['ecs']->table('cart') . " WHERE " . get_cart_cond() . " AND is_gift <> 0";
     $GLOBALS['db']->query($sql);
 
     return true;
@@ -1285,7 +1285,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
 function clear_cart($type = CART_GENERAL_GOODS)
 {
     $sql = "DELETE FROM " . $GLOBALS['ecs']->table('cart') .
-            " WHERE session_id = '" . SESS_ID . "' AND rec_type = '$type'";
+            " WHERE " . get_cart_cond() . " AND rec_type = '$type'";
     $GLOBALS['db']->query($sql);
 }
 
@@ -1601,9 +1601,9 @@ function get_cart_goods()
     );
 
     /* 循环、统计 */
-    $sql = "SELECT *, IF(parent_id, parent_id, goods_id) AS pid , goods_number " .
+    $sql = "SELECT *, IF(parent_id, parent_id, goods_id) AS pid " .
             " FROM " . $GLOBALS['ecs']->table('cart') . " " .
-            " WHERE session_id = '" . SESS_ID . "' AND rec_type = '" . CART_GENERAL_GOODS . "'" .
+            " WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "'" .
             " ORDER BY pid, parent_id";
     $res = $GLOBALS['db']->query($sql);
 
@@ -1615,7 +1615,7 @@ function get_cart_goods()
     {
         $total['goods_price']  += $row['goods_price'] * $row['goods_number'];
         $total['market_price'] += $row['market_price'] * $row['goods_number'];
-	    $total['total_number'] += $row['goods_number'];//by Leah	
+	$total['total_number'] += $row['goods_number'];//by Leah	
 
         $row['subtotal']     = price_format($row['goods_price'] * $row['goods_number'], false);
         $row['goods_price']  = price_format($row['goods_price'], false);
@@ -1715,7 +1715,7 @@ function exist_real_goods($order_id = 0, $flow_type = CART_GENERAL_GOODS)
     if ($order_id <= 0)
     {
         $sql = "SELECT COUNT(*) FROM " . $GLOBALS['ecs']->table('cart') .
-                " WHERE session_id = '" . SESS_ID . "' AND is_real = 1 " .
+                " WHERE " . get_cart_cond() . " AND is_real = 1 " .
                 "AND rec_type = '$flow_type'";
     }
     else
@@ -1811,7 +1811,7 @@ function get_total_bonus()
             "FROM " . $GLOBALS['ecs']->table('cart') . " AS c, "
                     . $GLOBALS['ecs']->table('bonus_type') . " AS t, "
                     . $GLOBALS['ecs']->table('goods') . " AS g " .
-            "WHERE c.session_id = '" . SESS_ID . "' " .
+            "WHERE " . get_cart_cond('c.') .
             "AND c.is_gift = 0 " .
             "AND c.goods_id = g.goods_id " .
             "AND g.bonus_type_id = t.type_id " .
@@ -1824,7 +1824,7 @@ function get_total_bonus()
     /* 取得购物车中非赠品总金额 */
     $sql = "SELECT SUM(goods_price * goods_number) " .
             "FROM " . $GLOBALS['ecs']->table('cart') .
-            " WHERE session_id = '" . SESS_ID . "' " .
+            " WHERE " . get_cart_cond() .
             " AND is_gift = 0 " .
             " AND rec_type = '" . CART_GENERAL_GOODS . "'";
     $amount = floatval($GLOBALS['db']->getOne($sql));
@@ -2442,7 +2442,7 @@ function compute_discount()
     $sql = "SELECT c.goods_id, c.goods_price * c.goods_number AS subtotal, g.cat_id, g.brand_id " .
             "FROM " . $GLOBALS['ecs']->table('cart') . " AS c, " . $GLOBALS['ecs']->table('goods') . " AS g " .
             "WHERE c.goods_id = g.goods_id " .
-            "AND c.session_id = '" . SESS_ID . "' " .
+            "AND " . get_cart_cond('c.') .
             "AND c.parent_id = 0 " .
             "AND c.is_gift = 0 " .
             "AND rec_type = '" . CART_GENERAL_GOODS . "'";
@@ -2542,7 +2542,7 @@ function get_give_integral()
                 "FROM " . $GLOBALS['ecs']->table('cart') . " AS c, " .
                           $GLOBALS['ecs']->table('goods') . " AS g " .
                 "WHERE c.goods_id = g.goods_id " .
-                "AND c.session_id = '" . SESS_ID . "' " .
+                "AND " . get_cart_cond('c.') .
                 "AND c.goods_id > 0 " .
                 "AND c.parent_id = 0 " .
                 "AND c.rec_type = 0 " .
@@ -2623,6 +2623,7 @@ function send_order_bonus($order_id)
         }
 
         /* 如果有红包，发送邮件 */
+        /*
         if ($count > 0)
         {
             $tpl = get_mail_template('send_bonus');
@@ -2634,7 +2635,7 @@ function send_order_bonus($order_id)
             $GLOBALS['smarty']->assign('sent_date', local_date($GLOBALS['_CFG']['date_format']));
             $content = $GLOBALS['smarty']->fetch('str:' . $tpl['template_content']);
             send_mail($user['user_name'], $user['email'], $tpl['template_subject'], $content, $tpl['is_html']);
-        }
+        }*/
     }
 
     return true;
@@ -2737,7 +2738,7 @@ function compute_discount_amount()
     $sql = "SELECT c.goods_id, c.goods_price * c.goods_number AS subtotal, g.cat_id, g.brand_id " .
             "FROM " . $GLOBALS['ecs']->table('cart') . " AS c, " . $GLOBALS['ecs']->table('goods') . " AS g " .
             "WHERE c.goods_id = g.goods_id " .
-            "AND c.session_id = '" . SESS_ID . "' " .
+            "AND " . get_cart_cond('c.') .
             "AND c.parent_id = 0 " .
             "AND c.is_gift = 0 " .
             "AND rec_type = '" . CART_GENERAL_GOODS . "'";
@@ -2892,7 +2893,7 @@ function add_package_to_cart($package_id, $num = 1)
     {
          /* 检查该商品是否已经存在在购物车中 */
         $sql = "SELECT goods_number FROM " .$GLOBALS['ecs']->table('cart').
-                " WHERE session_id = '" .SESS_ID. "' AND goods_id = '" . $package_id . "' ".
+                " WHERE " .get_cart_cond(). " AND goods_id = '" . $package_id . "' ".
                 " AND parent_id = 0 AND extension_code = 'package_buy' " .
                 " AND rec_type = '" . CART_GENERAL_GOODS . "'";
 
@@ -2904,7 +2905,7 @@ function add_package_to_cart($package_id, $num = 1)
             if ($GLOBALS['_CFG']['use_storage'] == 0 || $num > 0)
             {
                 $sql = "UPDATE " . $GLOBALS['ecs']->table('cart') . " SET goods_number = '" . $num . "'" .
-                       " WHERE session_id = '" .SESS_ID. "' AND goods_id = '$package_id' ".
+                       " WHERE " .get_cart_cond(). " AND goods_id = '$package_id' ".
                        " AND parent_id = 0 AND extension_code = 'package_buy' " .
                        " AND rec_type = '" . CART_GENERAL_GOODS . "'";
                 $GLOBALS['db']->query($sql);
@@ -2922,7 +2923,7 @@ function add_package_to_cart($package_id, $num = 1)
     }
 
     /* 把赠品删除 */
-    $sql = "DELETE FROM " . $GLOBALS['ecs']->table('cart') . " WHERE session_id = '" . SESS_ID . "' AND is_gift <> 0";
+    $sql = "DELETE FROM " . $GLOBALS['ecs']->table('cart') . " WHERE " . get_cart_cond() . " AND is_gift <> 0";
     $GLOBALS['db']->query($sql);
 
     return true;

@@ -132,6 +132,19 @@ function get_user_info($id=0)
     return $user;
 }
 /**
+ * 将未登录状态下的购物车商品合并至登录用户
+ *
+ * @access  public
+ * @return  void
+ */
+function update_user_cart()
+{
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('cart') . " SET user_id= {$_SESSION[user_id]} WHERE user_id = 0 AND session_id = '" . SESS_ID . "'";
+		$GLOBALS['db']->query($sql);
+	}
+}
+/**
  * 取得当前位置和页面标题
  *
  * @access  public
@@ -1999,14 +2012,15 @@ function get_navigator($ctype = '', $catlist = array())
             $navlist['middle'][$k]['active'] = 1;
             $noindex = true;
             $active += 1;
-        }		if(substr($v['url'],0,8)=='category')
-		{
-			$cat_id = $v['cid'];
-			$children = get_children($cat_id);
-			$cat_list = get_categories_tree_xaphp($cat_id);
-			$navlist['middle'][$k]['cat'] =1;
-			$navlist['middle'][$k]['cat_list'] =$cat_list;
-		}		
+        }
+        if(substr($v['url'],0,8)=='category')
+	{
+	    $cat_id = $v['cid'];
+	    $children = get_children($cat_id);
+	    $cat_list = get_categories_tree_xaphp($cat_id);
+	    $navlist['middle'][$k]['cat'] =1;
+	    $navlist['middle'][$k]['cat_list'] =$cat_list;
+	}		
     }
 	
     if(!empty($ctype) && $active < 1)
@@ -2122,5 +2136,14 @@ function url_domain()
 
     return $root;
 }
-
+function get_cart_cond($prefix = '')
+{
+	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
+		$cond = " {$prefix}user_id = {$_SESSION[user_id]} ";
+	} else {
+		$cond = " {$prefix}session_id = '" . SESS_ID . "' ";
+	}
+	
+	return $cond;
+}
 ?>
