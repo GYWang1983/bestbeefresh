@@ -216,10 +216,10 @@ class integrate
             return false;
         }
         /* 检查email是否重复 */
-        if ($this->check_email($email))
+        /*if ($this->check_email($email))
         {
         	return false;
-        }
+        }*/
 
         $post_username = $username;
 
@@ -256,13 +256,14 @@ class integrate
                " VALUES ('" . implode("', '", $values) . "')";
 
         $this->db->query($sql);
-
+		$uid = $this->db->insert_id();
+		
         if ($this->need_sync)
         {
             $this->sync($username, $password);
         }
 
-        return true;
+        return $uid;
     }
 
     /**

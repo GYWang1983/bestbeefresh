@@ -29,7 +29,7 @@ if (!defined('IN_ECTOUCH'))
  *
  * @return  bool         $bool
  */
-function register($username, $password, $email, $other = array())
+function register($username, $password, $email = NULL, $other = array())
 {
     /* 检查注册是否关闭 */
     if (!empty($GLOBALS['_CFG']['shop_reg_closed']))
@@ -66,8 +66,9 @@ function register($username, $password, $email, $other = array())
         $GLOBALS['err']->add(sprintf($GLOBALS['_LANG']['username_exist'], $username));
         return false;
     }
-   
-    if (!$GLOBALS['user']->add_user($username, $password, $email))
+    
+    $uid = $GLOBALS['user']->add_user($username, $password, $email);
+    if (empty($uid))
     { 
         if ($GLOBALS['user']->error == ERR_INVALID_USERNAME)
         {
@@ -170,12 +171,41 @@ function register($username, $password, $email, $other = array())
         $GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('users'), $update_data, 'UPDATE', 'user_id = ' . $_SESSION['user_id']);
 
         update_user_info();      // 更新用户信息
+        update_user_cart();
         recalculate_price();     // 重新计算购物车中的商品价格
 
-        return true;
+        return $uid;
     }
 }
 
+/**
+ * 根据微信用户openid注册用户
+ *
+ * @access  public
+ * @param   string       $openid            Openid
+ * @param   string       $subscribe         是否关注
+ * 
+ * @return  bool         $bool
+ */
+function register_openid($openid, $subscribe = FALSE) {
+	global $db;
+	
+	$uid = register($openid, md5($openid));
+	if (!empty($uid)) {
+		$wxuser = array(
+			'uid'       => $uid,
+			'subscribe' => $subscribe ? 1 : 0,
+			'wxid'		=> $openid,
+			'dateline'  => time(),
+		);
+		
+		$db->autoExecute('wxch_user', $wxuser);
+		
+		return true;
+	}
+	
+	return false;
+}
 /**
  * 绑定手机号
  *

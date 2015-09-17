@@ -29,7 +29,7 @@ if (!defined('IN_ECS'))
  *
  * @return  bool         $bool
  */
-function register($username, $password, $email, $other = array())
+function register($username, $password, $email = NULL, $other = array())
 {
     /* 检查注册是否关闭 */
     if (!empty($GLOBALS['_CFG']['shop_reg_closed']))
@@ -171,6 +171,7 @@ function register($username, $password, $email, $other = array())
         $GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('users'), $update_data, 'UPDATE', 'user_id = ' . $_SESSION['user_id']);
 
         update_user_info();      // 更新用户信息
+        update_user_cart();
         recalculate_price();     // 重新计算购物车中的商品价格
 
         return true;

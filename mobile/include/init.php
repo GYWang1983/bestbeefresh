@@ -209,7 +209,7 @@ if (!defined('INIT_NO_USERS')) {
             }
         }
     }
-
+    
     /* 设置推荐会员 */
     if (isset($_GET['u'])) {
         set_affiliate();
@@ -255,6 +255,20 @@ if (!defined('INIT_NO_SMARTY') && gzip_enabled()) {
     ob_start('ob_gzhandler');
 } else {
     ob_start();
+}
+
+if (empty($_SESSION['user_id']) && is_wechat_browser()) {
+	 
+	include_once(ROOT_PATH . 'include/lib_passport.php');
+	include_once(ROOT_PATH . 'weixin/login.php');
+	
+	$uri = str_replace('/mobile/', '/', $_SERVER['REQUEST_URI']);
+	if (substr($uri, -1) == '/') {
+		$uri .= 'index.php';
+	}
+	
+	$callback = $_CFG['site_url'] . $uri;	 
+	weixin_oauth($callback);
 }
 
 /* 检查是否是微信浏览器访问 */

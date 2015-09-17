@@ -694,7 +694,7 @@ class integrate
         }
         else 
         {
-            $sql = "SELECT user_id, password, email, mobile_phone FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
+            $sql = "SELECT user_id, password, mobile_phone FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
             $row = $GLOBALS['db']->getRow($sql);
 
             if ($row)
