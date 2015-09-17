@@ -107,7 +107,7 @@ function insert_cart_info()
 {
     $sql = 'SELECT SUM(goods_number) AS number, SUM(goods_price * goods_number) AS amount' .
            ' FROM ' . $GLOBALS['ecs']->table('cart') .
-           " WHERE session_id = '" . SESS_ID . "' AND rec_type = '" . CART_GENERAL_GOODS . "'";
+           " WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "'";
     $row = $GLOBALS['db']->GetRow($sql);
 
     if ($row)
@@ -371,14 +371,8 @@ function insert_vote()
 */
 function insert_cart_info_number()
 {
-	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
-		$cond = "user_id = " . $_SESSION['user_id'];
-	} else {
-		$cond = "session_id = '" . SESS_ID . "'";
-	}
-	
     $sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
-           " WHERE $cond AND rec_type = '" . CART_GENERAL_GOODS . "'";
+           " WHERE ".get_cart_cond()." AND rec_type = '" . CART_GENERAL_GOODS . "'";
     $number = $GLOBALS['db']->getOne($sql);
     return intval($number);
 }

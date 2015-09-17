@@ -334,7 +334,7 @@ function get_user_orders($user_id, $num = 10, $start = 0)
                        'order_sn'       => $row['order_sn'],
                        'order_time'     => local_date($GLOBALS['_CFG']['time_format'], $row['add_time']),
                        'order_status'   => $row['order_status'],
-					   'shipping_id'	=> $row['shipping_id'],
+		       'shipping_id'	=> $row['shipping_id'],
                        'total_fee'      => price_format($row['total_fee'], false),
                        'handler'        => $row['handler']);
     }
@@ -912,7 +912,7 @@ function return_to_cart($order_id)
 
         //检查商品价格是否有会员价格
         $sql = "SELECT goods_number FROM" . $GLOBALS['ecs']->table('cart') . " " .
-                "WHERE session_id = '" . SESS_ID . "' " .
+                "WHERE " . get_cart_cond() .
                 "AND goods_id = '" . $row['goods_id'] . "' " .
                 "AND rec_type = '" . CART_GENERAL_GOODS . "' LIMIT 1";
         $temp_number = $GLOBALS['db']->getOne($sql);
@@ -973,7 +973,7 @@ function return_to_cart($order_id)
         // 返回购物车：看有没有相同商品
         $sql = "SELECT goods_id " .
                 "FROM " . $GLOBALS['ecs']->table('cart') .
-                " WHERE session_id = '" . SESS_ID . "' " .
+                " WHERE " . get_cart_cond() .
                 " AND goods_id = '$return_goods[goods_id]' " .
                 " AND goods_attr = '$return_goods[goods_attr]' " .
                 " AND parent_id = '$return_goods[parent_id]' " .
@@ -993,7 +993,7 @@ function return_to_cart($order_id)
             $sql = "UPDATE " . $GLOBALS['ecs']->table('cart') . " SET " .
                     "goods_number = '" . $return_goods['goods_number'] . "' " .
                     ",goods_price = '" . $return_goods['goods_price'] . "' " .
-                    "WHERE session_id = '" . SESS_ID . "' " .
+                    "WHERE " . get_cart_cond() .
                     "AND goods_id = '" . $return_goods['goods_id'] . "' " .
                     "AND rec_type = '" . CART_GENERAL_GOODS . "' LIMIT 1";
             $GLOBALS['db']->query($sql);
@@ -1002,7 +1002,7 @@ function return_to_cart($order_id)
 
     // 清空购物车的赠品
     $sql = "DELETE FROM " . $GLOBALS['ecs']->table('cart') .
-            " WHERE session_id = '" . SESS_ID . "' AND is_gift = 1";
+            " WHERE " . get_cart_cond() . " AND is_gift = 1";
     $GLOBALS['db']->query($sql);
 
     return true;

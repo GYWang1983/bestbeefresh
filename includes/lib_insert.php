@@ -138,7 +138,7 @@ function insert_cart_info()
     $sql = 'SELECT c.*,g.goods_name,g.goods_thumb,g.goods_id,c.goods_number,c.goods_price' .
            ' FROM ' . $GLOBALS['ecs']->table('cart') ." AS c ".
 					 " LEFT JOIN ".$GLOBALS['ecs']->table('goods')." AS g ON g.goods_id=c.goods_id ".
-           " WHERE session_id = '" . SESS_ID . "' AND rec_type = '" . CART_GENERAL_GOODS . "'";
+           " WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "'";
     $row = $GLOBALS['db']->GetAll($sql);
 		$arr = array();
 		foreach($row AS $k=>$v)
@@ -154,7 +154,7 @@ function insert_cart_info()
 		}		
     $sql = 'SELECT SUM(goods_number) AS number, SUM(goods_price * goods_number) AS amount' .
            ' FROM ' . $GLOBALS['ecs']->table('cart') .
-           " WHERE session_id = '" . SESS_ID . "' AND rec_type = '" . CART_GENERAL_GOODS . "'";
+           " WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "'";
     $row = $GLOBALS['db']->GetRow($sql);
 
     if ($row)

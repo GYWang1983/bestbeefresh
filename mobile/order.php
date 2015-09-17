@@ -95,7 +95,7 @@ if($_REQUEST['act'] == 'order_lise')
 
     /* 检查购物车中是否有商品 */
     $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') .
-        " WHERE session_id = '" . SESS_ID . "' " .
+        " WHERE " . get_cart_cond() .
         "AND parent_id = 0 AND is_gift = 0 AND rec_type = '$flow_type'";
 
     if ($db->getOne($sql) == 0)
@@ -273,7 +273,7 @@ elseif($_REQUEST['act'] = 'done')
 
     /* 检查购物车中是否有商品 */
     $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') .
-        " WHERE session_id = '" . SESS_ID . "' " .
+        " WHERE " . get_cart_cond() .
         "AND parent_id = 0 AND is_gift = 0 AND rec_type = '$flow_type'";
     if ($db->getOne($sql) == 0)
     {
@@ -507,7 +507,7 @@ elseif($_REQUEST['act'] = 'done')
             " SELECT '$new_order_id', goods_id, goods_name, goods_sn, goods_number, market_price, ".
                 "goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, goods_attr_id".
             " FROM " .$ecs->table('cart') .
-            " WHERE session_id = '".SESS_ID."' AND rec_type = '$flow_type'";
+            " WHERE ".get_cart_cond()." AND rec_type = '$flow_type'";
     $db->query($sql);
 
 
@@ -577,7 +577,7 @@ function flow_available_points()
 {
     $sql = "SELECT SUM(g.integral * c.goods_number) ".
             "FROM " . $GLOBALS['ecs']->table('cart') . " AS c, " . $GLOBALS['ecs']->table('goods') . " AS g " .
-            "WHERE c.session_id = '" . SESS_ID . "' AND c.goods_id = g.goods_id AND c.is_gift = 0 AND g.integral > 0 " .
+            "WHERE " . get_cart_cond('c.') . " AND c.goods_id = g.goods_id AND c.is_gift = 0 AND g.integral > 0 " .
             "AND c.rec_type = '" . CART_GENERAL_GOODS . "'";
 
     $val = intval($GLOBALS['db']->getOne($sql));
