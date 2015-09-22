@@ -41,8 +41,9 @@ Template Type: type_0
 	.c-btn2 a,.c-btn2 a:visited{color:#fff;}
 	.c-btn3 { color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#ee6a6a; text-align: center}
 	.c-btn4 { color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#00D20D; text-align: center}
+	.c-btn3:disabled{background:#ccc;}
 	.hidden{display:none}
-	.wrap{padding:2rem 0.7rem 0 0.7rem;}
+	.wrap{padding:2rem 0 0 0;}
 	.price_s{color: #ec5151;font-size:1rem;display: inline-block;}
 	.price{color: #ec5151;font-size:1rem;display: inline-block; font-weight:bold}
 	.c333{ color:#333}
@@ -499,9 +500,9 @@ Template Type: type_0
 	float: left;
 	margin: 0.4rem 0.4rem 0 0;
 	padding: 0 0.6rem;font-size: 0.8rem;overflow:hidden}
-	.goodsItem{width:95%; padding:5px;border-bottom: solid 1px #aaa;height:90px;clear:both;}
+	.goodsItem{width:100%; padding:5px;border-bottom: solid 1px #aaa;height:90px;clear:both;}
 	.goodsItem .thumb{display:inline-block;width:25%;max-width:90px;padding:0.2rem;float:left;}
-	.goodsItem .desc{display:inline-block;width:70%;height:60px;padding-left: 0.5rem;}
+	.goodsItem .desc{display:inline-block;width:68%;height:60px;padding-left: 0.5rem;}
 	.goodsItem .desc .title{font-size:14px;}
 	.goodsItem .desc .price{display:inline-block;margin-right:5px;}
 	.goodsItem .desc .freemore{display:inline-block;color:#ec5151;font-size:1rem;}
@@ -973,7 +974,7 @@ Template Type: type_0
 	background-size:2.4rem 0.4rem;}
 	
 	/* 订单确认页通用表格 */
-	.order_box .table_box dl{ border-bottom:1px solid #f3f3f3; padding:0.7rem 0; }
+	.order_box .table_box dl{ border-bottom:1px solid #f3f3f3; padding:0.2rem 0; }
 	.order_box .line_no dl{ border-bottom:none; padding:0.4rem 0}
 	.order_box .table_box dl:last-child{ border-bottom:none}
 	.order_box .in{ color:#333; font-size:0.8rem; padding:0.8rem 0 0 0}
@@ -1298,3 +1299,5 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
     white-space: nowrap;
 }
 .side img{ width:100%; height:auto;}
+
+.order{padding:0rem 0.7rem 0 0.7rem;}

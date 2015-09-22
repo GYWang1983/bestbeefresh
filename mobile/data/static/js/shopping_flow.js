@@ -481,29 +481,33 @@ function changeOOS(obj)
 function checkOrderForm(frm)
 {
   var paymentSelected = false;
-  var shippingSelected = false;
+  var shippingSelected = true;
 
   // 检查是否选择了支付配送方式
   for (i = 0; i < frm.elements.length; i ++ )
   {
-    if (frm.elements[i].name == 'shipping' && frm.elements[i].checked)
+    /*if (frm.elements[i].name == 'shipping' && frm.elements[i].checked)
     {
       shippingSelected = true;
-    }
+    }*/
 
     if (frm.elements[i].name == 'payment' && frm.elements[i].checked)
     {
       paymentSelected = true;
     }
   }
+  
+  if (is_wechat_browser == 1) {
+	  paymentSelected = true;
+  }
 
-  if ( ! shippingSelected)
+  if (!shippingSelected)
   {
     alert(flow_no_shipping);
     return false;
   }
 
-  if ( ! paymentSelected)
+  if (!paymentSelected)
   {
     alert(flow_no_payment);
     return false;

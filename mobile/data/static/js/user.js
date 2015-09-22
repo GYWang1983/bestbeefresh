@@ -390,41 +390,41 @@ function registed_callback(result)
   }
 }
 
-function checkEmail(email)
+function check_mobile(mobile)
 {
-  var submit_disabled = false;
-  
-  if (email == '')
-  {
-    document.getElementById('email_notice').innerHTML = msg_email_blank;
-    submit_disabled = true;
-  }
-  else if (!Utils.isEmail(email))
-  {
-    document.getElementById('email_notice').innerHTML = msg_email_format;
-    submit_disabled = true;
-  }
- 
-  if( submit_disabled )
-  {
-    document.forms['formUser'].elements['Submit'].disabled = 'disabled';
-    return false;
-  }
-  Ajax.call( 'user.php?act=check_email', 'email=' + email, check_email_callback , 'GET', 'TEXT', true, true );
+	if ( Utils.isEmpty(mobile) )
+	{
+		$('#mobile_phone_notice').text('手机号不能为空');
+		return false;
+	}
+	else if ( !Utils.isMobile(mobile) )
+	{
+		$('#mobile_phone_notice').text('手机号不正确');
+		return false;
+	}
+	
+	$('#mobile_phone_notice').text('');
+	return true;
 }
 
-function check_email_callback(result)
+function is_mobile_registered( mobile )
 {
-  if ( result == 'ok' )
-  {
-    document.getElementById('email_notice').innerHTML = msg_can_rg;
-    document.forms['formUser'].elements['Submit'].disabled = '';
-  }
-  else
-  {
-    document.getElementById('email_notice').innerHTML = msg_email_registered;
-    document.forms['formUser'].elements['Submit'].disabled = 'disabled';
-  }
+	if ( !check_mobile(mobile) )
+    {
+        return false;
+    }
+	
+	Ajax.call( 'user.php?act=check_mobile', 'mobile=' + mobile, function (result) {
+		if ( result == "true" )
+		{
+		    $('#mobile_phone_notice').text(msg_can_rg);
+		}
+		else
+		{
+			$('#mobile_phone_notice').text(mobile_phone_registered);
+		}
+	}, 'GET', 'TEXT', true, true );
+	
 }
 
 /* *

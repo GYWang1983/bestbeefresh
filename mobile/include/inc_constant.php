@@ -247,5 +247,5 @@ define('SHIP_LIST', 'cac|city_express|ems|flat|fpd|post_express|post_mail|pressw
 define('SMS_REGISTER',    1);
 define('SMS_GETPASSWORD', 2);
 define('SMS_REBIND',      3);
-
+define('SMS_WXBIND',      4);
 ?>

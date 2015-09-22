@@ -2103,9 +2103,10 @@ function exist_real_goods($order_id = 0, $flow_type = CART_GENERAL_GOODS)
  */
 function check_consignee_info($consignee, $flow_type)
 {
-    if (exist_real_goods(0, $flow_type))
+	return true;
+    /*if (exist_real_goods(0, $flow_type))
     {
-        /* 如果存在实体商品 */
+        // 如果存在实体商品 
         $res = !empty($consignee['consignee']) &&
             !empty($consignee['country']) &&
             !empty($consignee['email']) &&
@@ -2115,13 +2116,13 @@ function check_consignee_info($consignee, $flow_type)
         {
             if (empty($consignee['province']))
             {
-                /* 没有设置省份，检查当前国家下面有没有设置省份 */
+                // 没有设置省份，检查当前国家下面有没有设置省份 
                 $pro = get_regions(1, $consignee['country']);
                 $res = empty($pro);
             }
             elseif (empty($consignee['city']))
             {
-                /* 没有设置城市，检查当前省下面有没有城市 */
+                // 没有设置城市，检查当前省下面有没有城市 
                 $city = get_regions(2, $consignee['province']);
                 $res = empty($city);
             }
@@ -2136,11 +2137,11 @@ function check_consignee_info($consignee, $flow_type)
     }
     else
     {
-        /* 如果不存在实体商品 */
+        // 如果不存在实体商品 
         return !empty($consignee['consignee']) &&
             !empty($consignee['email']) &&
             !empty($consignee['tel']);
-    }
+    }*/
 }
 
 /**

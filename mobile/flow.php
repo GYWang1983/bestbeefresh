@@ -397,277 +397,6 @@ elseif ($_REQUEST['step'] == 'link_buy')
     ecs_header("Location:./flow.php\n");
     exit;
 }
-elseif ($_REQUEST['step'] == 'login')
-{
-	/*
-    if(SESS_ID > 0){
-        ecs_header("Location:./flow.php?step=consignee\n");
-        exit;
-    }
-	*/
-    include_once('lang/'. $_CFG['lang']. '/user.php');
-    /*
-     * 用户登录注册
-     */
-    if ($_SERVER['REQUEST_METHOD'] == 'GET')
-    {
-        $smarty->assign('anonymous_buy', $_CFG['anonymous_buy']);
-
-        /* 检查是否有赠品，如果有提示登录后重新选择赠品 */
-        $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') .
-                " WHERE " . get_cart_cond() . " AND is_gift > 0";
-        if ($db->getOne($sql) > 0)
-        {
-            $smarty->assign('need_rechoose_gift', 1);
-        }
-
-         $smarty->assign('action',     $_REQUEST['step']);
-        /* 检查是否需要注册码 */
-        $captcha = intval($_CFG['captcha']);
-        if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
-        {
-            $smarty->assign('enabled_login_captcha', 1);
-            $smarty->assign('rand', mt_rand());
-        }
-        if ($captcha & CAPTCHA_REGISTER)
-        {
-            $smarty->assign('enabled_register_captcha', 1);
-            $smarty->assign('rand', mt_rand());
-        }
-        /* 短信发送设置 by carson */
-        if(intval($_CFG['sms_signin']) > 0){
-            $smarty->assign('enabled_sms_signin', 1);
-        }
-    }
-    else
-    {
-        include_once('include/lib_passport.php');
-        if (!empty($_POST['act']) && $_POST['act'] == 'signin')
-        {
-            $captcha = intval($_CFG['captcha']);
-            if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
-            {
-                if (empty($_POST['captcha']))
-                {
-                    show_message($_LANG['invalid_captcha']);
-                }
-
-                // 检查验证码
-                include_once('include/cls_captcha.php');
-
-                $validator = new captcha();
-                $validator->session_word = 'captcha_login';
-                if (!$validator->check_word($_POST['captcha']))
-                {
-                    show_message($_LANG['invalid_captcha']);
-                }
-            }
-            
-            $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-            $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-
-            if ($user->login($username, $password, isset($_POST['remember'])))
-            {
-                update_user_info();  //更新用户信息
-                recalculate_price(); // 重新计算购物车中的商品价格
-
-                /* 检查购物车中是否有商品 没有商品则跳转到首页 */
-                $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') . " WHERE " . get_cart_cond();
-                if ($db->getOne($sql) > 0)
-                {
-                    ecs_header("Location: flow.php?step=checkout\n");
-                }
-                else
-                {
-                    ecs_header("Location:index.php\n");
-                }
-
-                exit;
-            }
-            else
-            {
-                $_SESSION['login_fail']++;
-                show_message($_LANG['signin_failed'], '', 'flow.php?step=login');
-            }
-        }
-        elseif (!empty($_POST['act']) && $_POST['act'] == 'signup')
-        {
-            //注册类型 by carson start
-            $enabled_sms = intval($_POST['enabled_sms']);
-            if($enabled_sms){
-                $username = $other['mobile_phone'] = isset($_POST['mobile']) ? trim($_POST['mobile']) : '';
-                $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-                $email    = $username .'@qq.com';
-            }else{
-                $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-                $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-                $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-            }
-            //注册类型 by carson end
-
-            if ((intval($_CFG['captcha']) & CAPTCHA_REGISTER) && gd_version() > 0 && $enabled_sms <= 0)
-            {
-                if (empty($_POST['captcha']))
-                {
-                    show_message($_LANG['invalid_captcha']);
-                }
-
-                /* 检查验证码 */
-               include_once('include/cls_captcha.php');
-
-                $validator = new captcha();
-                if (!$validator->check_word($_POST['captcha']))
-                {
-                    show_message($_LANG['invalid_captcha']);
-                }
-            }
-
-            if (register($username, $password, $email))
-            {
-                /* 用户注册成功 */
-                ecs_header("Location: flow.php?step=consignee\n");
-                exit;
-            }
-            else
-            {
-                $err->show();
-            }
-        }
-        else
-        {
-            // TODO: 非法访问的处理
-        }
-    }
-}
-elseif ($_REQUEST['step'] == 'consignee')
-{
-    /*------------------------------------------------------ */
-    //-- 收货人信息
-    /*------------------------------------------------------ */
-    include_once('include/lib_transaction.php');
-
-    if ($_SERVER['REQUEST_METHOD'] == 'GET')
-    {
-        /* 取得购物类型 */
-        $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
-
-        /*
-         * 收货人信息填写界面
-         */
-
-        if (isset($_REQUEST['direct_shopping']))
-        {
-            $_SESSION['direct_shopping'] = 1;
-        }
-
-        /* 取得国家列表、商店所在国家、商店所在国家的省列表 */
-        $smarty->assign('country_list',       get_regions());
-        $smarty->assign('shop_country',       $_CFG['shop_country']);
-        $smarty->assign('shop_province_list', get_regions(1, $_CFG['shop_country']));
-
-        /* 获得用户所有的收货人信息 */
-        if ($_SESSION['user_id'] > 0)
-        {
-            $consignee_list = get_consignee_list($_SESSION['user_id']);
-
-            if (count($consignee_list) < 5)
-            {
-                /* 如果用户收货人信息的总数小于 5 则增加一个新的收货人信息 */
-                $consignee_list[] = array('country' => $_CFG['shop_country'], 'email' => isset($_SESSION['email']) ? $_SESSION['email'] : '');
-            }
-        }
-        else
-        {
-            if (isset($_SESSION['flow_consignee'])){
-                $consignee_list = array($_SESSION['flow_consignee']);
-            }
-            else
-            {
-                $consignee_list[] = array('country' => $_CFG['shop_country']);
-            }
-        }
-        $smarty->assign('name_of_region',   array($_CFG['name_of_region_1'], $_CFG['name_of_region_2'], $_CFG['name_of_region_3'], $_CFG['name_of_region_4']));
-        $smarty->assign('consignee_list', $consignee_list);
-
-        /* 取得每个收货地址的省市区列表 */
-        $province_list = array();
-        $city_list = array();
-        $district_list = array();
-        foreach ($consignee_list as $region_id => $consignee)
-        {
-            $consignee['country']  = isset($consignee['country'])  ? intval($consignee['country'])  : 0;
-            $consignee['province'] = isset($consignee['province']) ? intval($consignee['province']) : 0;
-            $consignee['city']     = isset($consignee['city'])     ? intval($consignee['city'])     : 0;
-
-            $province_list[$region_id] = get_regions(1, $consignee['country']);
-            $city_list[$region_id]     = get_regions(2, $consignee['province']);
-            $district_list[$region_id] = get_regions(3, $consignee['city']);
-        }
-        $smarty->assign('province_list', get_regions( 1 , 1 ));
-        // $smarty->assign('province_list', $province_list);
-        $smarty->assign('city_list',     $city_list);
-        $smarty->assign('district_list', $district_list);
-
-        /* 返回收货人页面代码 */
-        $smarty->assign('real_goods_count', exist_real_goods(0, $flow_type) ? 1 : 0);
-    }
-    else
-    {
-        /*
-         * 保存收货人信息
-         */
-        $consignee = array(
-            'address_id'    => empty($_POST['address_id']) ? 0  :   intval($_POST['address_id']),
-            'consignee'     => empty($_POST['consignee'])  ? '' :   compile_str(trim($_POST['consignee'])),
-            'country'       => empty($_POST['country'])    ? '' :   intval($_POST['country']),
-            'province'      => empty($_POST['province'])   ? '' :   intval($_POST['province']),
-            'city'          => empty($_POST['city'])       ? '' :   intval($_POST['city']),
-            'district'      => empty($_POST['district'])   ? '' :   intval($_POST['district']),
-            'email'         => empty($_POST['email'])      ? '' :   compile_str($_POST['email']),
-            'address'       => empty($_POST['address'])    ? '' :   compile_str($_POST['address']),
-            'zipcode'       => empty($_POST['zipcode'])    ? '' :   compile_str(make_semiangle(trim($_POST['zipcode']))),
-            'tel'           => empty($_POST['tel'])        ? '' :   compile_str(make_semiangle(trim($_POST['tel']))),
-            'mobile'        => empty($_POST['mobile'])     ? '' :   compile_str(make_semiangle(trim($_POST['mobile']))),
-            'sign_building' => empty($_POST['sign_building']) ? '' :compile_str($_POST['sign_building']),
-            'best_time'     => empty($_POST['best_time'])  ? '' :   compile_str($_POST['best_time']),
-        );
-        
-        if ($_SESSION['user_id'] > 0)
-        {
-            include_once(ROOT_PATH . 'include/lib_transaction.php');
-
-            /* 如果用户已经登录，则保存收货人信息 */
-            $consignee['user_id'] = $_SESSION['user_id'];
-
-            save_consignee($consignee, true);
-        }
-        
-        /* 保存到session */
-        $_SESSION['flow_consignee'] = stripslashes_deep($consignee);
-
-        ecs_header("Location: flow.php?step=checkout\n");
-        exit;
-    }
-}
-elseif ($_REQUEST['step'] == 'drop_consignee')
-{
-    /*------------------------------------------------------ */
-    //-- 删除收货人信息
-    /*------------------------------------------------------ */
-    include_once('include/lib_transaction.php');
-
-    $consignee_id = intval($_GET['id']);
-
-    if (drop_consignee($consignee_id))
-    {
-        ecs_header("Location: flow.php?step=consignee\n");
-        exit;
-    }
-    else
-    {
-        show_message($_LANG['not_fount_consignee']);
-    }
-}
 elseif ($_REQUEST['step'] == 'checkout')
 {
     /*------------------------------------------------------ */
@@ -716,6 +445,13 @@ elseif ($_REQUEST['step'] == 'checkout')
         exit;
     }
 
+    /* 检查是否已经绑定手机号 */
+    if (empty($_SESSION['mobile']))
+    {
+    	ecs_header("Location: user.php?act=bind&next=checkout\n");
+    	exit;
+    }
+    
     /* 检查收货人信息是否完整 */
     /*$consignee = get_consignee($_SESSION['user_id']);
     if (!check_consignee_info($consignee, $flow_type))
@@ -771,7 +507,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     $smarty->assign('market_price_desc', sprintf($_LANG['than_market_price'], $total['formated_market_price'], $total['formated_saving'], $total['save_rate']));
 
     /* 取得配送列表 */
-    $region            = array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']);
+    /*$region            = array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']);
     $shipping_list     = available_shipping_list($region);
     $cart_weight_price = cart_weight_price($flow_type);
     $insure_disabled   = true;
@@ -793,7 +529,7 @@ elseif ($_REQUEST['step'] == 'checkout')
         $shipping_list[$key]['insure_formated']     = strpos($val['insure'], '%') === false ?
             price_format($val['insure'], false) : $val['insure'];
 
-        /* 当前的配送方式是否支持保价 */
+        // 当前的配送方式是否支持保价
         if ($val['shipping_id'] == $order['shipping_id'])
         {
             $insure_disabled = ($val['insure'] == 0);
@@ -805,7 +541,6 @@ elseif ($_REQUEST['step'] == 'checkout')
     $smarty->assign('insure_disabled', $insure_disabled);
     $smarty->assign('cod_disabled',    $cod_disabled);
 
-    /* 取得支付列表 */
     if ($order['shipping_id'] == 0)
     {
         $cod        = true;
@@ -818,7 +553,7 @@ elseif ($_REQUEST['step'] == 'checkout')
 
         if ($cod)
         {
-            /* 如果是团购，且保证金大于0，不能使用货到付款 */
+            // 如果是团购，且保证金大于0，不能使用货到付款
             if ($flow_type == CART_GROUP_BUY_GOODS)
             {
                 $group_buy_id = $_SESSION['extension_id'];
@@ -837,7 +572,7 @@ elseif ($_REQUEST['step'] == 'checkout')
                     $cod = false;
                     $cod_fee = 0;
 
-                    /* 赋值保证金 */
+                    // 赋值保证金
                     $smarty->assign('gb_deposit', $group_buy['deposit']);
                 }
             }
@@ -852,43 +587,49 @@ elseif ($_REQUEST['step'] == 'checkout')
         {
             $cod_fee = 0;
         }
-    }
+    }*/
 
-    // 给货到付款的手续费加<span id>，以便改变配送的时候动态显示
-    $payment_list = available_payment_list(1, $cod_fee);
-    if(isset($payment_list))
+    /* 取得支付列表 */
+    if (!is_wechat_browser()) 
     {
-        foreach ($payment_list as $key => $payment)
-        {
-            if ($payment['is_cod'] == '1')
-            {
-                $payment_list[$key]['format_pay_fee'] = '<span id="ECS_CODFEE">' . $payment['format_pay_fee'] . '</span>';
-            }
-            /* 如果有易宝神州行支付 如果订单金额大于300 则不显示 */
-            if ($payment['pay_code'] == 'yeepayszx' && $total['amount'] > 300)
-            {
-                unset($payment_list[$key]);
-            }
-            /* 如果有余额支付 */
-            if ($payment['pay_code'] == 'balance')
-            {
-                /* 如果未登录，不显示 */
-                if ($_SESSION['user_id'] == 0)
-                {
-                    unset($payment_list[$key]);
-                }
-                else
-                {
-                    if ($_SESSION['flow_order']['pay_id'] == $payment['pay_id'])
-                    {
-                        $smarty->assign('disable_surplus', 1);
-                    }
-                }
-            }
-        }
+	    $payment_list = available_payment_list(1, $cod_fee);
+	    if(isset($payment_list))
+	    {
+	        foreach ($payment_list as $key => $payment)
+	        {
+	            if ($payment['is_cod'] == '1')
+	            {
+	                $payment_list[$key]['format_pay_fee'] = '<span id="ECS_CODFEE">' . $payment['format_pay_fee'] . '</span>';
+	            }
+	            /* 如果有易宝神州行支付 如果订单金额大于300 则不显示 */
+	            if ($payment['pay_code'] == 'yeepayszx' && $total['amount'] > 300)
+	            {
+	                unset($payment_list[$key]);
+	            }
+	            /* 如果有余额支付 */
+	            if ($payment['pay_code'] == 'balance')
+	            {
+	                /* 如果未登录，不显示 */
+	                if ($_SESSION['user_id'] == 0)
+	                {
+	                    unset($payment_list[$key]);
+	                }
+	                else
+	                {
+	                    if ($_SESSION['flow_order']['pay_id'] == $payment['pay_id'])
+	                    {
+	                        $smarty->assign('disable_surplus', 1);
+	                    }
+	                }
+	            }
+	        }
+	    }
+	    $smarty->assign('payment_list', $payment_list);
     }
-    $smarty->assign('payment_list', $payment_list);
-
+    
+    $smarty->assign('is_wechat_browser', is_wechat_browser() ? 1 : 0);
+    
+    
     /* 取得包装与贺卡 */
     if ($total['real_goods_count'] > 0)
     {
@@ -1598,15 +1339,14 @@ elseif ($_REQUEST['step'] == 'done')
         exit;
     }
 
-    $consignee = get_consignee($_SESSION['user_id']);
-
     /* 检查收货人信息是否完整 */
+    /*$consignee = get_consignee($_SESSION['user_id']);
     if (!check_consignee_info($consignee, $flow_type))
     {
-        /* 如果不完整则转向到收货人信息填写界面 */
+        // 如果不完整则转向到收货人信息填写界面 
         ecs_header("Location: flow.php?step=consignee\n");
         exit;
-    }
+    }*/
 
     $_POST['how_oos'] = isset($_POST['how_oos']) ? intval($_POST['how_oos']) : 0;
     $_POST['card_message'] = isset($_POST['card_message']) ? compile_str($_POST['card_message']) : '';
@@ -1724,10 +1464,11 @@ elseif ($_REQUEST['step'] == 'done')
     }
 
     /* 收货人信息 */
-    foreach ($consignee as $key => $value)
+    /*foreach ($consignee as $key => $value)
     {
         $order[$key] = addslashes($value);
-    }
+    }*/
+    $order['mobile'] = $_SESSION['mobile'];
 
    /* 判断是不是实体商品 */
     foreach ($cart_goods AS $val)
@@ -1738,14 +1479,14 @@ elseif ($_REQUEST['step'] == 'done')
             $is_real_good=1;
         }
     }
-    if(isset($is_real_good))
+    /*if(isset($is_real_good))
     {
         $sql="SELECT shipping_id FROM " . $ecs->table('touch_shipping') . " WHERE shipping_id=".$order['shipping_id'] ." AND enabled =1"; 
         if(!$db->getOne($sql))
         {
            show_message($_LANG['flow_no_shipping']);
         }
-    }
+    }*/
     /* 订单中的总额 */
     $total = order_fee($order, $cart_goods, $consignee);
     $order['bonus']        = $total['bonus'];
@@ -1764,13 +1505,13 @@ elseif ($_REQUEST['step'] == 'done')
     }
 
     /* 配送方式 */
-    if ($order['shipping_id'] > 0)
+    /*if ($order['shipping_id'] > 0)
     {
         $shipping = shipping_info($order['shipping_id']);
         $order['shipping_name'] = addslashes($shipping['shipping_name']);
     }
     $order['shipping_fee'] = $total['shipping_fee'];
-    $order['insure_fee']   = $total['shipping_insure'];
+    $order['insure_fee']   = $total['shipping_insure'];*/
 
     /* 支付方式 */
     if ($order['pay_id'] > 0)
@@ -1929,7 +1670,7 @@ elseif ($_REQUEST['step'] == 'done')
 
     /* 给商家发邮件 */
     /* 增加是否给客服发送邮件选项 */
-    if ($_CFG['send_service_email'] && $_CFG['service_email'] != '')
+    /*if ($_CFG['send_service_email'] && $_CFG['service_email'] != '')
     {
         $tpl = get_mail_template('remind_of_new_order');
         $smarty->assign('order', $order);
@@ -1938,10 +1679,10 @@ elseif ($_REQUEST['step'] == 'done')
         $smarty->assign('send_date', date($_CFG['time_format']));
         $content = $smarty->fetch('str:' . $tpl['template_content']);
         send_mail($_CFG['shop_name'], $_CFG['service_email'], $tpl['template_subject'], $content, $tpl['is_html']);
-    }
+    }*/
 
     /* 如果需要，发短信 */
-    if ($_CFG['sms_order_placed'] == '1' && $_CFG['sms_shop_mobile'] != '')
+    /*if ($_CFG['sms_order_placed'] == '1' && $_CFG['sms_shop_mobile'] != '')
     {
         include_once('include/cls_sms.php');
         $sms = new sms();
@@ -1950,7 +1691,7 @@ elseif ($_REQUEST['step'] == 'done')
         if(!$sms->send($_CFG['sms_shop_mobile'], sprintf($msg, $order['consignee'], $order['tel']), $sms_error)){
 			echo $sms_error;
 		}
-    }
+    }*/
 
     /* 如果订单金额为0 处理虚拟卡 */
     if ($order['order_amount'] <= 0)

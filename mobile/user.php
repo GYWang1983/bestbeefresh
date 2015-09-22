@@ -32,7 +32,7 @@ array('login','act_login','register','act_register','act_edit_password','get_pas
     'get_passwd_question', 'check_answer', 'oath', 'oath_login');
 
 /* 显示页面的action列表 */
-$ui_arr = array('register', 'login', 'profile', 'order_list', 'order_detail', 'order_tracking', 'address_list', 'act_edit_address', 'collection_list',
+$ui_arr = array('register', 'login', 'profile', 'order_list', 'order_detail', 'order_tracking', 'address_list', 'act_edit_address', 'collection_list', 'bind', 'act_bind',
 'message_list', 'tag_list', 'get_password', 'reset_password', 'booking_list', 'add_booking', 'account_raply',
 'account_deposit', 'account_log', 'account_detail', 'act_account', 'pay', 'default', 'bonus', 'group_buy', 'group_buy_detail', 'affiliate', 'comment_list','validate_email','track_packages', 'transform_points','qpassword_name', 'get_passwd_question', 'check_answer');
 /* 未登录处理 */
@@ -525,7 +525,120 @@ elseif ($action == 'act_login')
         show_message($_LANG['login_failure'], $_LANG['relogin_lnk'], 'user.php', 'error');
     }
 }
-
+/* 绑定手机号 */
+elseif ($action == 'bind')
+{
+	if (empty($back_act)) {
+		if (empty($back_act) && isset($GLOBALS['_SERVER']['HTTP_REFERER'])) {
+			$back_act = strpos($GLOBALS['_SERVER']['HTTP_REFERER'], 'user.php') ? './index.php' : $GLOBALS['_SERVER']['HTTP_REFERER'];
+		} else {
+			$back_act = 'user.php';
+		}
+	}
+	
+	if ($_SESSION['user_id'] == 0)
+	{
+		ecs_header("Location: user.php?act=login\n");
+		exit;
+	}
+	elseif (!empty($_SESSION['mobile']))
+	{
+		ecs_header("Location: $back_act\n");
+		exit;
+	}
+	
+	$smarty->assign('next', $_REQUEST['next']);
+	$smarty->assign('back_act', $back_act);
+	$smarty->assign('message', '您需要先绑定手机号才能下单');
+	$smarty->display('user_passport.dwt');
+}
+elseif ($action == 'act_bind')
+{
+	
+	if ($_SESSION['user_id'] == 0)
+	{
+		ecs_header("Location: user.php?act=login\n");
+		exit;
+	}
+	elseif (!empty($_SESSION['mobile']))
+	{
+		ecs_header("Location: user.php\n");
+		exit;
+	}
+	
+	$mobile_phone = $_POST['mobile_phone'];
+	$smscode      = $_POST['smscode'];
+	$success      = false;
+	
+	
+	$sql = "SELECT COUNT(user_id) FROM " . $ecs->table('users') ." a, wxch_user b WHERE ".
+			" a.user_id = b.uid AND a.mobile_phone = '$mobile_phone'";
+	if ($db->getOne($sql) > 0)
+	{
+		$message = "{$mobile_phone}已和其他用户绑定";
+		$mobile_phone = '';
+	}
+	else
+	{
+		include_once(ROOT_PATH . 'include/lib_sms.php');
+		include_once(ROOT_PATH . 'include/lib_passport.php');
+		
+		if (check_sms_verifycode($mobile_phone, $smscode, SMS_WXBIND))
+		{
+			$other_user = $GLOBALS['user']->get_profile_by_mobile($mobile_phone);
+			if (empty($other_user))
+			{
+				$success = bind_mobile($_SESSION['user_name'], $mobile_phone, $smscode, SMS_WXBIND);
+			}
+			else
+			{
+				$uid = $_SESSION[user_id];
+				
+				// 已在PC端注册，首次绑定微信
+				$SQL = "UPDATE wxch_user SET uid = {$other_user[user_id]} WHERE uid = $uid";
+				$db->query($SQL);
+				
+				$SQL = "DELETE FROM " . $ecs->table('users') . " WHERE user_id = $uid";
+				$db->query($SQL);
+				
+				$GLOBALS['user']->set_session($other_user);
+				$GLOBALS['user']->set_cookie($other_user, true);
+				
+				update_user_info();
+				update_user_cart($uid);
+				recalculate_price();
+				
+				$success = true;
+			}
+		}
+		else
+		{
+			$message = "输入的验证码不正确";
+		}
+	}
+	
+	if ($success)
+	{
+		if (!empty($_POST['next']))
+		{
+			ecs_header("Location: flow.php?step={$_POST[next]}\n");
+		}
+		else
+		{
+			ecs_header("Location: user.php\n");
+		}
+	}
+	else
+	{
+		$smarty->assign('action', 'bind');
+		$smarty->assign('mobile_phone', $mobile_phone);
+		$smarty->assign('next', $_REQUEST['next']);
+		$smarty->assign('back_act', $_REQUEST['back_act']);
+		$smarty->assign('message', $message ?: '手机号绑定失败，请稍候再试');
+		$smarty->display('user_passport.dwt');
+	}
+	
+}
 /* 处理 ajax 的登录请求 */
 elseif ($action == 'signin')
 {

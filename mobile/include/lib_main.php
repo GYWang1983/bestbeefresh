@@ -47,7 +47,7 @@ function update_user_info()
         $_SESSION['last_time']   = $row['last_login'];
         $_SESSION['last_ip']     = $row['last_ip'];
         $_SESSION['login_fail']  = 0;
-        $_SESSION['email']       = $row['email'];
+        //$_SESSION['email']       = $row['email'];
 
         /*判断是否是特殊等级，可能后台把特殊会员组更改普通会员组*/
         if($row['user_rank'] >0)
@@ -137,10 +137,17 @@ function get_user_info($id=0)
  * @access  public
  * @return  void
  */
-function update_user_cart()
+function update_user_cart($merge_uid = NULL)
 {
 	if (!empty($_SESSION['user_id']) && intval($_SESSION['user_id']) > 0) {
-		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('cart') . " SET user_id= {$_SESSION[user_id]} WHERE user_id = 0 AND session_id = '" . SESS_ID . "'";
+		
+		if (empty($merge_uid)) {
+			$cond = " user_id = 0 AND session_id = '" . SESS_ID . "'";
+		} else {
+			$cond = " user_id = $merge_uid";
+		}
+		
+		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('cart') . " SET user_id= {$_SESSION[user_id]} WHERE $cond";
 		$GLOBALS['db']->query($sql);
 	}
 }
