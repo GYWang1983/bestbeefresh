@@ -1,5 +1,5 @@
 <?php
-function new_access_token($db) 
+/*function new_access_token($db) 
 {
 	$ret = $db->getRow("SELECT * FROM `wxch_config` WHERE `id` = 1");
 	$appid = $ret['appid'];
@@ -47,7 +47,7 @@ function access_token($db)
 	{
 		return $access_token;
 	}
-}
+}*/
 function curl_get_contents($url) 
 {
 	$ch = curl_init();

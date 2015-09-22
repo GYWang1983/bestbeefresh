@@ -210,24 +210,7 @@ function htmltowei($contents)
 	$contents = str_replace(' ','',$contents);
 	return $contents;
 }
-function access_token($db) 
-{
-	$ret = $db->getRow("SELECT * FROM `wxch_config` WHERE `id` = 1");
-	$appid = $ret['appid'];
-	$appsecret = $ret['appsecret'];
-	$dateline = $ret['dateline'];
-	$time = time();
-	if(($time - $dateline) > 7200) 
-	{
-		$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-		$ret_json = curl_get_contents($url);
-		$ret = json_decode($ret_json);
-		if($ret->access_token)
-		{
-			$db->query("UPDATE `wxch_config` SET `access_token` = '$ret->access_token',`dateline` = '$time' WHERE `wxch_config`.`id` =1;");
-		}
-	}
-}
+
 function curl_get_contents($url) 
 {
 	$ch = curl_init();

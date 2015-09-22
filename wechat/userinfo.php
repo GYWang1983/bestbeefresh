@@ -86,51 +86,7 @@ function random_filename()
 	}
 	return gmtime() . $str.'.jpg';
 }
-function access_token($db) 
-{
-	$ret = $db->getRow("SELECT * FROM `wxch_config` WHERE `id` = 1");
-	$appid = $ret['appid'];
-	$appsecret = $ret['appsecret'];
-	$access_token = $ret['access_token'];
-	$dateline = $ret['dateline'];
-	$time = time();
-	if(($time - $dateline) >= 7200) 
-	{
-		$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-		$ret_json = curl_get_contents($url);
-		echo 1;
-		$ret = json_decode($ret_json);
-		if($ret->access_token)
-		{
-			$db->query("UPDATE `wxch_config` SET `access_token` = '$ret->access_token',`dateline` = '$time' WHERE `id` =1;");
-		}
-	}
-	elseif(empty($access_token)) 
-	{
-		$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-		echo 2;
-		$ret_json = curl_get_contents($url);
-		$ret = json_decode($ret_json);
-		if($ret->access_token)
-		{
-			$db->query("UPDATE `wxch_config` SET `access_token` = '$ret->access_token',`dateline` = '$time' WHERE `id` =1;");
-		}
-	}
-}
-function new_access_token($db) 
-{
-	$ret = $db->getRow("SELECT * FROM `wxch_config` WHERE `id` = 1");
-	$appid = $ret['appid'];
-	$appsecret = $ret['appsecret'];
-	$url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
-	$ret_json = curl_get_contents($url);
-	$ret = json_decode($ret_json);
-	if($ret->access_token)
-	{
-		$db->query("UPDATE `wxch_config` SET `access_token` = '$ret->access_token',`dateline` = '$time' WHERE `id` =1;");
-	}
-	return $ret->access_token;
-}
+
 function curl_get_contents($url) 
 {
 	$ch = curl_init();
