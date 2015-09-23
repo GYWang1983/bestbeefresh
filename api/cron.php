@@ -63,7 +63,7 @@ foreach ($crondb AS $key => $cron_val)
         {
             foreach ($cron_val['cron_config'] AS $k => $v)
             {
-                $cron[$v['name']] = $v['value'];
+                $cron_val['cron'][$v['name']] = $v['value'];
             }
         }
         include_once(ROOT_PATH . 'includes/modules/cron/' . $cron_val['cron_code'] . '.php');
@@ -85,37 +85,43 @@ write_error_arr($error_log);
 
 function get_next_time($cron)
 {
-    $y  = local_date('Y', $GLOBALS['timestamp']);
-    $mo = local_date('n', $GLOBALS['timestamp']);
-    $d  = local_date('j', $GLOBALS['timestamp']);
-    $w  = local_date('w', $GLOBALS['timestamp']);
-    $h  = local_date('G', $GLOBALS['timestamp']);
-    $sh = $sm = 0;
-    $sy = $y;
-    if ($cron['day'])
-    {
-        $sd = $cron['day'];
-        $smo = $mo + 1;
-    }
-    else
-    {
-        $sd = $d;
-        $smo = $mo;
-        if ($cron['week'] != '')
-        {
-            $sd += $cron['week'] - $w + 7;
-        }
-    }
-    if ($cron['hour'])
-    {
-        $sh = $cron['hour'];
-        if (empty($cron['day']) && $cron['week']=='')
-        {
-            $sd++;
-        }
-    }
-    //$next = gmmktime($sh,$sm,0,$smo,$sd,$sy);
-    $next = local_strtotime("$sy-$smo-$sd $sh:$sm:0");
+	if (!empty($cron['minuts_interval'])) {		
+		$next = $GLOBALS['timestamp'] + 60 * intval($cron['minuts_interval']);
+	} else {
+	
+	    $y  = local_date('Y', $GLOBALS['timestamp']);
+	    $mo = local_date('n', $GLOBALS['timestamp']);
+	    $d  = local_date('j', $GLOBALS['timestamp']);
+	    $w  = local_date('w', $GLOBALS['timestamp']);
+	    $h  = local_date('G', $GLOBALS['timestamp']);
+	    $sh = $sm = 0;
+	    $sy = $y;
+	    if ($cron['day'])
+	    {
+	        $sd = $cron['day'];
+	        $smo = $mo + 1;
+	    }
+	    else
+	    {
+	        $sd = $d;
+	        $smo = $mo;
+	        if ($cron['week'] != '')
+	        {
+	            $sd += $cron['week'] - $w + 7;
+	        }
+	    }
+	    if ($cron['hour'])
+	    {
+	        $sh = $cron['hour'];
+	        if (empty($cron['day']) && $cron['week']=='')
+	        {
+	            $sd++;
+	        }
+	    }
+	    //$next = gmmktime($sh,$sm,0,$smo,$sd,$sy);
+	    $next = local_strtotime("$sy-$smo-$sd $sh:$sm:0");
+	}
+	
     if ($next < $GLOBALS['timestamp'])
     {
         if ($cron['m'])
