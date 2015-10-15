@@ -66,14 +66,23 @@ if (!empty($wx) && $wx['dateline'] <= $timestamp) {
 			'jsapi_token'  => $jsticket,
 			'expire'       => $expire,
 		));
-		
-		// copy to mobile dir
-		$src  = ROOT_PATH . '/data/wxtoken.php';
-		$dest = ROOT_PATH . '/mobile/data/wxtoken.php';
-		@copy($src, $dest);
 	}
 	
+} elseif (!file_exists(ROOT_PATH . '/data/wxtoken.php')) {
+	
+	write_config('wxtoken', array(
+			'appid'        => $wx['appid'],
+			'appsecret'    => $wx['appsecret'],
+			'access_token' => $wx['access_token'],
+			'jsapi_token'  => $wx['jsapi_token'],
+			'expire'       => $wx['dateline'],
+	));
 }
+
+// copy to mobile dir
+$src  = ROOT_PATH . '/data/wxtoken.php';
+$dest = ROOT_PATH . '/mobile/data/wxtoken.php';
+@copy($src, $dest);
 
 function get_access_token($appid, $secret, $retry = 0) {
 

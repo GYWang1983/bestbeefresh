@@ -16,6 +16,10 @@
 <script type="text/javascript" src="{$ectouch_themes}/js/TouchSlide.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/ectouch.js"></script>
+<!--{if is_wechat_browser() }-->
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript" src="weixin/wxjsconfig.php?api=chooseWXPay&debug=1"></script>
+<!-- {/if} -->
 </head>
 
 <body>
@@ -376,7 +380,7 @@ var is_wechat_browser = {$is_wechat_browser};
       </section>
       <div class="blank3"> </div>
       <!--{else}-->
-      <input name = "payment" type="radio" value = "5" checked="checked"  style="display:none"/>
+      <input name = "payment" type="radio" value = "2" checked="checked"  style="display:none"/>
       <!--{/if}-->
     <!--{else}-->
     <input name = "payment" type="radio" value = "-1" checked="checked"  style="display:none"/>

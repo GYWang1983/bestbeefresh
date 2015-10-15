@@ -1,10 +1,8 @@
 <?php
-
 /**
  * ECSHOP 微信支付插件
  * ============================================================================
- * * 版权所有 2005-2014 ecshop模板堂(ecmoban.com) 版权所有
- * 网站地址: http://www.ecmoban.com；
+ * * 版权所有 2015-2016 蜂蚁网络科技 版权所有
  */
 
 if (!defined('IN_ECTOUCH')) {
@@ -38,22 +36,21 @@ if (isset($set_modules) && $set_modules == TRUE)
     $modules[$i]['is_online']  = '1';
 
     /* 作者 */
-    $modules[$i]['author']  = 'ECTOUCH';
+    $modules[$i]['author']  = 'gy.wang';
 
     /* 网址 */
-    $modules[$i]['website'] = 'http://mp.weixin.qq.com/';
+    $modules[$i]['website'] = '';
 
     /* 版本号 */
-    $modules[$i]['version'] = '2.5';
+    $modules[$i]['version'] = '0.1.0';
 
     /* 配置信息 */
     $modules[$i]['config']  = array(
-        array('name' => 'wxpay_appid',           'type' => 'text',   'value' => ''),
-        array('name' => 'wxpay_appsecret',       'type' => 'text',   'value' => ''),
-        array('name' => 'wxpay_paysignkey',      'type' => 'text',   'value' => ''),
-		array('name' => 'wxpay_partnerid',       'type' => 'text',   'value' => ''),
-        array('name' => 'wxpay_partnerkey',      'type' => 'text', 'value' => ''),
-		array('name' => 'wxpay_signtype',      'type' => 'text', 'value' => 'sha1')
+        array('name' => 'wxpay_mchid',         'type' => 'text',   'value' => ''),               //微信商户ID
+    	array('name' => 'wxpay_key',           'type' => 'text',   'value' => ''),               //API密钥
+    	array('name' => 'wxpay_title',         'type' => 'text',   'value' => '最鲜蜂水果订购'),      //支付显示标题 
+    	array('name' => 'wxpay_expiretime',    'type' => 'text',   'value' => '60'),             //支付超时时间
+    	array('name' => 'wxpay_debug',         'type' => 'select', 'value' => '0'),              //开启Debug
     );
 
     return;
@@ -75,13 +72,10 @@ class wxpay
      */
 	var $parameters; //cft 参数
 	var $payments; //配置信息
-    function wxpay()
-    {
-    }
 
     function __construct()
     {
-        $this->wxpay();
+    	
     }
 
     /**
@@ -91,261 +85,154 @@ class wxpay
      */
     function get_code($order, $payment)
     {
-        if (!defined('EC_CHARSET'))
-        {
-            $charset = 'utf-8';
-        }
-        else
-        {
-            $charset = EC_CHARSET;
-        }
-		$charset = strtoupper($charset);
+    	$wxtk = read_config('wxtoken');
+    	$payment = array_merge($payment, $wxtk);
+    	
+    	$result = $this->unifiedorder($order, $payment);
+    	
+    	if (!$result['errcode'])
+    	{
+    		//TODO: 需要保存统一订单号，以便支付失败后再次发起支付
+    		
+	    	$noncestr = rands(16);
+	    	$timestamp = time();
+	    	$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	    	
+	    	// jsapi config
+	    	$str = "jsapi_ticket=$wxtk[jsapi_token]&noncestr=$noncestr&timestamp=$timestamp&url=$url";
+	    	$signature = sha1($str);
+	    	
+	    	// pay options
+	    	$options = $this->makePayOptions($result, $payment);
+	    	$opts = json_encode($options);
+	    	
+	    	$code = "<script>
+wx.ready(function() {
+    var payOpts = $opts;
+    payOpts['complete'] = function(res) {alert(res)};
+    wx.chooseWXPay(payOpts);
+});
+</script>";
+			
+			return $code;
+    	}
+    	else
+    	{
+    		// TODO error message
+    	}
 
-		//配置参数
-		$this->payments = $payment;
-		//根目录url
-		$root_url = str_replace('mobile/', '', $GLOBALS['ecs']->url());
-		
-		//银行通道类型
-		$this->setParameter("bank_type", "WX");
-		//商品描述
-		$this->setParameter("body", $order['order_sn']);
-		//商户号
-		$this->setParameter("partner", $payment['wxpay_partnerid']);
-		//商户订单号
-		$this->setParameter("out_trade_no", $order['order_sn'] .'O'. $order['log_id']);
-		//订单总金额
-		$this->setParameter("total_fee", $order['order_amount'] * 100);
-		//支付币种
-		$this->setParameter("fee_type", "1");
-		//通知URL
-		$this->setParameter("notify_url", $root_url.'notify_wap_wxpay.php');
-		//订单生成的机器IP
-		$this->setParameter("spbill_create_ip", real_ip());
-		//传入参数字符编码
-		$this->setParameter("input_charset", $charset);
-		
-		//生成jsapi支付请求json
-		$jsapi = $this->create_biz_package();
-
-		//wxjsbridge
-		$js = '<script language="javascript">
-			function callpay(){WeixinJSBridge.invoke("getBrandWCPayRequest",'.$jsapi.',function(res){if(res.err_msg == "get_brand_wcpay_request:ok"){location.href="respond.php?code=wxpay&status=1"}else{location.href="respond.php?code=wxpay&status=0"}});}
-			</script>';
-
-		$button = '<div style="text-align:center"><button class="c-btn4" type="button" onclick="callpay()">微信安全支付</button></div>'.$js;
-
-		return $button;
-
-        
     }
 
     /**
-     * 响应操作
+     * 统一下单
      */
-    function respond()
-    {
-        if($_GET['status'] == 1){
-    		return true;
+    private function unifiedorder($order, $payment)
+    {    	
+    	// TODO: 支付超时时间 ，修改为下单截止时间
+    	$paytime = intval($payment['wxpay_expiretime']);
+    	$paytime = $paytime > 5 ? time() + $paytime * 60 : time() + 3600;
+    	
+    	//微信订单信息
+    	$wxOrder = array(
+    		'appid' 			=> $payment['appid'], 		    //公众账号ID
+    		'mch_id' 			=> $payment['wxpay_mchid'],		//商户号
+    		'spbill_create_ip' 	=> REMOTE_ADDR,					//终端ip
+    		'nonce_str' 		=> rands(32),					//随机字符串
+    		'out_trade_no'  	=> $order['order_sn'],		    //本系统订单ID
+    		'body'				=> $payment['wxpay_title'],	    //商品描述
+    		'total_fee'         => $order['order_amount'] * 100,//支付金额
+    		'trade_type'		=> 'JSAPI',						//支付方式
+    		'openid'			=> $_SESSION['openid'],			//支付用户OpenId
+    		'time_expire'       => date('YmdHis', $paytime),	//支付失效时间
+    		'notify_url'		=> $_CFG['site_url'] . '/api/paid.php', //支付结果通知URL
+    	);
+
+    	// 签名
+    	$wxOrder["sign"] = $this->sign($wxOrder, $payment['wxpay_key']);
+    	
+    	// 调用微信接口创建统一订单    	
+    	require_once(ROOT_PATH . 'include/cls_curl.php');
+    	$curl = new Curl(array(
+    		'server' => 'https://api.mch.weixin.qq.com',
+    		'ssl_verify_peer' => FALSE,
+    	));
+    	
+    	$response = $curl->post('pay/unifiedorder', array2xml($wxOrder), 'xml');
+    	//var_dump($response);
+    	// 检查错误
+    	if ($response['return_code'] == 'FAIL')
+    	{
+    		return array('errcode'=>1, 'message'=>$response['return_msg']);
     	}
-    	else{
-    		return false;
+    	elseif ($response['result_code'] == 'FAIL')
+    	{
+    		return array('errcode'=>$response['err_code'], 'message'=>$response['err_code_des']);
     	}
+    	
+    	return $response;
     }
-
-	/**
-	* 设置参数
-	*/
-	function setParameter($parameter, $parameterValue) {
-		$this->parameters[$this->trimString($parameter)] = $this->trimString($parameterValue);
-	}
-
-	/**
-	* trim
-	* @param value
-	* @return
-	*/
-	function trimString($value){
-		$ret = null;
-		if (null != $value) {
-			$ret = $value;
-			if (strlen($ret) == 0) {
-				$ret = null;
-			}
-		}
-		return $ret;
-	}
-
-	//生成随机数
-	function create_noncestr( $length = 16 ) {  
-		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";  
-		$str ="";  
-		for ( $i = 0; $i < $length; $i++ )  {  
-			$str.= substr($chars, mt_rand(0, strlen($chars)-1), 1);  
-			//$str .= $chars[ mt_rand(0, strlen($chars) - 1) ];  
-		}  
-		return $str;  
-	}
-	
-	//参数判断
-	function check_cft_parameters(){
-		if($this->parameters["bank_type"] == null || $this->parameters["body"] == null || $this->parameters["partner"] == null || 
-			$this->parameters["out_trade_no"] == null || $this->parameters["total_fee"] == null || $this->parameters["fee_type"] == null ||
-			$this->parameters["notify_url"] == null || $this->parameters["spbill_create_ip"] == null || $this->parameters["input_charset"] == null
-			)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	//生成package
-	protected function get_cft_package(){
-		try {
-			if (null == $this->payments['wxpay_partnerkey'] || "" == $this->payments['wxpay_partnerkey']) {
-				throw new Exception("密钥不能为空！" . "<br>");
-			}
-			ksort($this->parameters);
-			$unSignParaString = $this->formatQueryParaMap($this->parameters, false);
-			$paraString = $this->formatQueryParaMap($this->parameters, true);
-
-			return $paraString . "&sign=" . $this->sign($unSignParaString,$this->trimString($this->payments['wxpay_partnerkey']));
-		}catch (Exception $e)
-		{
-			die($e->getMessage());
-		}
-
-	}
-	protected function get_biz_sign($bizObj){
-		 foreach ($bizObj as $k => $v){
-			 $bizParameters[strtolower($k)] = $v;
-		 }
-		 try {
-		 	if($this->payments['wxpay_paysignkey'] == ""){
-		 			throw new Exception("APPKEY为空！" . "<br>");
-		 	}
-		 	$bizParameters["appkey"] = $this->payments['wxpay_paysignkey'];
-		 	ksort($bizParameters);
-		 	//var_dump($bizParameters);
-		 	$bizString = $this->formatBizQueryParaMap($bizParameters, false);
-		 	//var_dump($bizString);
-		 	return sha1($bizString);
-		 }catch (Exception $e)
-		 {
-			die($e->getMessage());
-		 }
-	}
-	
-	
-	function formatQueryParaMap($paraMap, $urlencode){
-		$buff = "";
-		ksort($paraMap);
-		foreach ($paraMap as $k => $v){
-			if (null != $v && "null" != $v && "sign" != $k) {
-			    if($urlencode){
-				   $v = urlencode($v);
-				}
-				$buff .= $k . "=" . $v . "&";
-			}
-		}
-		$reqPar;
-		if (strlen($buff) > 0) {
-			$reqPar = substr($buff, 0, strlen($buff)-1);
-		}
-		return $reqPar;
-	}
-	function formatBizQueryParaMap($paraMap, $urlencode){
-		$buff = "";
-		ksort($paraMap);
-		foreach ($paraMap as $k => $v){
-		//	if (null != $v && "null" != $v && "sign" != $k) {
-			    if($urlencode){
-				   $v = urlencode($v);
-				}
-				$buff .= strtolower($k) . "=" . $v . "&";
-			//}
-		}
-		$reqPar;
-		if (strlen($buff) > 0) {
-			$reqPar = substr($buff, 0, strlen($buff)-1);
-		}
-		return $reqPar;
-	}
-	
-	//md5
-	function sign($content, $key) {
-	    try {
-		    if (null == $key) {
-			   throw new Exception("财付通签名key不能为空！" . "<br>");
-		    }
-			if (null == $content) {
-			   throw new Exception("财付通签名内容不能为空" . "<br>");
-		    }
-		    $signStr = $content . "&key=" . $key;
-		
-		    return strtoupper(md5($signStr));
-		}catch (Exception $e)
-		{
-			die($e->getMessage());
-		}
-	}
-	
-	function verifySignature($content, $sign, $md5Key) {
-		$signStr = $content . "&key=" . $md5Key;
-		$calculateSign = strtolower(md5($signStr));
-		$tenpaySign = strtolower($sign);
-		return $calculateSign == $tenpaySign;
-	}
-
-	
-	function arrayToXml($arr)
+    
+    /**
+     * 生成微信支付JS参数
+     *
+     * @param array $order
+     */
+    private function makePayOptions($order, $payment)
     {
-        $xml = "<xml>";
-        foreach ($arr as $key=>$val)
-        {
-        	 if (is_numeric($val))
-        	 {
-        	 	$xml.="<".$key.">".$val."</".$key.">"; 
-
-        	 }
-        	 else
-        	 	$xml.="<".$key."><![CDATA[".$val."]]></".$key.">";  
-        }
-        $xml.="</xml>";
-        return $xml; 
+    	$options = array (
+    		'appId' 	=> $payment['appid'],     		//公众号APPID
+    		'timeStamp'	=> time(),         					//时间戳
+    		'nonceStr' 	=> rands(32), 			//随机串
+    		'package' 	=> "prepay_id={$order[prepay_id]}",	//微信订单ID
+    		'signType' 	=> 'MD5',         					//微信签名方式
+    	);
+    
+    	$options['paySign'] = $this->sign($options, $payment['wxpay_key']);
+    
+    	// 转化为JSSDK需要的参数
+    	$options['timestamp'] = $options['timeStamp'];
+    	unset($options['timeStamp']);
+    	unset($options['appId']);
+    
+    	return $options;
     }
-
-	//生成jsapi支付请求json
-	/*
-	"appId" : "wxf8b4f85f3a794e77", //公众号名称，由商户传入
-	"timeStamp" : "189026618", //时间戳这里随意使用了一个值
-	"nonceStr" : "adssdasssd13d", //随机串
-	"package" : "bank_type=WX&body=XXX&fee_type=1&input_charset=GBK&notify_url=http%3a%2f
-	%2fwww.qq.com&out_trade_no=16642817866003386000&partner=1900000109&spbill_create_i
-	p=127.0.0.1&total_fee=1&sign=BEEF37AD19575D92E191C1E4B1474CA9",
-	//扩展字段，由商户传入
-	"signType" : "SHA1", //微信签名方式:sha1
-	"paySign" : "7717231c335a05165b1874658306fa431fe9a0de" //微信签名
-	*/
-	function create_biz_package(){
-		 try {
-			if($this->check_cft_parameters() == false) {   
-			   throw new Exception("生成package参数缺失！" . "<br>");
-		    }
-		    $nativeObj["appId"] = $this->payments['wxpay_appid'];
-		    $nativeObj["package"] = $this->get_cft_package();
-		    $nativeObj["timeStamp"] = strval(time());
-		    $nativeObj["nonceStr"] = $this->create_noncestr();
-		    $nativeObj["paySign"] = $this->get_biz_sign($nativeObj);
-		    $nativeObj["signType"] = $this->payments['wxpay_signtype'];
-		   
-		    return json_encode($nativeObj);
-		   
-		}catch (Exception $e)
+	
+	/**
+	 * 生成微信签名
+	 *
+	 * @param array   $obj       签名对象
+	 * @param string  $key       签名密钥，可为空
+	 * @param boolean $urlencode 参数是否需要UrlEncode
+	 */
+	private function sign($obj, $key = NULL, $urlencode = FALSE)
+	{
+		foreach ($obj as $k => $v)
 		{
-			die($e->getMessage());
-		}		   
-		
+			$p[$k] = $v;
+		}
+	
+		//签名步骤一：按字典序排序参数
+		ksort($p);
+		$buff = array();
+		foreach ($p as $k => $v)
+		{
+			$buff[] = $k . '=' . ($urlencode ? urlencode($v) : $v);
+		}
+		$s = implode('&', $buff);
+	
+		//签名步骤二：在string后加入KEY
+		if (!empty($key))
+		{
+			$s = $s . "&key=$key";
+		}
+	
+		//签名步骤三：MD5加密
+		$s = md5($s);
+	
+		//签名步骤四：所有字符转为大写
+		$result_ = strtoupper($s);
+	
+		return $result_;
 	}
 	
 }
