@@ -2033,8 +2033,6 @@ elseif ($_REQUEST['step'] == 'done')
 
     /* 清空购物车 */
     clear_cart($flow_type);
-    /* 清除缓存，否则买了商品，但是前台页面读取缓存，商品数量不减少 */
-    clear_all_files();
 
     /* 插入支付日志 */
     $order['log_id'] = insert_pay_log($new_order_id, $order['order_amount'], PAY_ORDER);
