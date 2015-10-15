@@ -1295,4 +1295,131 @@ function write_static_cache($cache_name, $caches)
     file_put_contents($cache_file_path, $content, LOCK_EX);
 }
 
+
+/**
+ * 读配置文件
+ *
+ * @params  string  $name
+ *
+ * @return  array   $data
+ */
+function read_config($name)
+{
+	static $config = array();
+	if (!empty($config[$name]))
+	{
+		return $config[$name];
+	}
+	$cache_file_path = ROOT_PATH . '/data/' . $name . '.php';
+	if (file_exists($cache_file_path))
+	{
+		include_once($cache_file_path);
+		$config[$name] = $data;
+		return $config[$name];
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
+ * 写配置文件
+ *
+ * @params  string  $cache_name
+ * @params  string  $caches
+ *
+ * @return
+ */
+function write_config($name, $caches)
+{
+	$cache_file_path = ROOT_PATH . '/data/' . $name . '.php';
+	$content = "<?php\r\n";
+	$content .= "\$data = " . var_export($caches, true) . ";\r\n";
+	$content .= "?>";
+	file_put_contents($cache_file_path, $content, LOCK_EX);
+}
+
+/**
+ * 键值对转换为XML
+ *
+ * @param array  $data
+ * @param string $item
+ */
+function array2xml($data, $item = 'item')
+{
+
+	$xml = new \SimpleXMLElement ('<xml></xml>');
+
+	foreach ($data as $key => $value)
+	{
+		is_numeric($key) && ($key = $item);
+		if (is_array($value) || is_object($value))
+		{
+			$child = $xml->addChild($key);
+			$this->_data2xml($child, $value, $item);
+		}
+		else
+		{
+			if (is_numeric($value))
+			{
+				$child = $xml->addChild($key, $value);
+			}
+			else
+			{
+				$child = $xml->addChild($key);
+				$node  = dom_import_simplexml($child);
+				$node->appendChild($node->ownerDocument->createCDATASection($value));
+			}
+		}
+	}
+
+	return $xml->asXML();
+}
+
+/**
+ * XML转换为键值对
+ *
+ * @param string $xml
+ */
+function xml2array($xml)
+{
+	return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), TRUE);
+}
+
+/**
+ * 随机生成一个长度为 $length 的，只含数字和字母的字符串，默认是 6
+ *
+ * @param int $length 长度
+ * @param int $mixed 随机串的组成，0：数字+字母；1：数字；2：字母
+ * @param boolean $casesensitive 大小写敏感。如果为TRUE，则返回小写字母
+ *
+ * @return string 字符串
+ */
+function rands($length = 6, $mixed = 0, $casesensitive = FALSE)
+{
+	$numArr = range(0, 9);
+	$alphaArr = $casesensitive ? range('a', 'z') : array_merge(range('a', 'z'), range('A', 'Z'));
+
+	switch ($mixed)
+	{
+		case 1:
+			$arr = $numArr;
+			break;
+		case 2:
+			$arr = $alphaArr;
+			break;
+		default:
+			$arr = array_merge($numArr, $alphaArr);
+			break;
+	}
+	$l = count($arr) - 1;
+
+	$salt = '';
+	for ($i = 0; $i < $length; $i++)
+	{
+		$salt .= $arr[mt_rand(0, $l)];
+	}
+	return $salt;
+}
 ?>

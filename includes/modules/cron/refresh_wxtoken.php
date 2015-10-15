@@ -59,7 +59,7 @@ if (!empty($wx) && $wx['dateline'] <= $timestamp) {
 		$db->query("UPDATE `wxch_config` SET access_token='{$tk[access_token]}', jsapi_token='{$jsticket}',dateline='$expire' WHERE `id`=1");
 	
 		//write to cache file
-		write_static_cache('wxtoken', array(
+		write_config('wxtoken', array(
 			'appid'        => $wx['appid'],
 			'appsecret'    => $wx['appsecret'],
 			'access_token' => $tk['access_token'],
@@ -68,8 +68,8 @@ if (!empty($wx) && $wx['dateline'] <= $timestamp) {
 		));
 		
 		// copy to mobile dir
-		$src  = ROOT_PATH . '/temp/static_caches/wxtoken.php';
-		$dest = ROOT_PATH . '/mobile/data/static_caches/wxtoken.php';
+		$src  = ROOT_PATH . '/data/wxtoken.php';
+		$dest = ROOT_PATH . '/mobile/data/wxtoken.php';
 		@copy($src, $dest);
 	}
 	
