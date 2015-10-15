@@ -220,7 +220,7 @@ if (!defined('INIT_NO_USERS')) {
     /* session 不存在，检查cookie */
     if (!empty($_COOKIE['ECS']['user_id']) && !empty($_COOKIE['ECS']['password'])) {
         // 找到了cookie, 验证cookie信息
-        $sql = 'SELECT user_id, user_name, password ' .
+        $sql = 'SELECT user_id, user_name, password, mobile_phone ' .
                 ' FROM ' . $ecs->table('users') .
                 " WHERE user_id = '" . intval($_COOKIE['ECS']['user_id']) . "' AND password = '" . $_COOKIE['ECS']['password'] . "'";
 
@@ -234,6 +234,7 @@ if (!defined('INIT_NO_USERS')) {
         } else {
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['user_name'] = $row['user_name'];
+            $_SESSION['mobile'] = $row['mobile_phone'];
             update_user_info();
         }
     }
