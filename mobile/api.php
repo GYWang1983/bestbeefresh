@@ -386,7 +386,7 @@ function data_back($info, $msg = '', $post, $result = 'success')
             die($doc->saveXML());
         }
 
-        die('<?xml version="1.0" encoding="UTF-8"?>' . array2xml($data_arr)) ;
+        die('<?xml version="1.0" encoding="UTF-8"?>' . array_xml($data_arr)) ;
     }
     else
     {
@@ -450,7 +450,7 @@ function create_tree($doc, $top, $info_arr, $have_item = false)
     }
 }
 
-function array2xml($data,$root='shopex'){
+function array_xml($data,$root='shopex'){
     $xml='<'.$root.'>';
     _array2xml($data,$xml);
     $xml.='</'.$root.'>';

@@ -83,6 +83,8 @@ if (!get_magic_quotes_gpc()) {
     $_REQUEST = addslashes_deep($_REQUEST);
 }
 
+define('REMOTE_ADDR', $_SERVER['REMOTE_ADDR']);
+
 /* 创建 ECSHOP 对象 */
 $ecs = new ECS($db_name, $prefix);
 define('DATA_DIR', $ecs->data_dir());
@@ -257,19 +259,29 @@ if (!defined('INIT_NO_SMARTY') && gzip_enabled()) {
     ob_start();
 }
 
-if (empty($_SESSION['user_id']) && is_wechat_browser()) {
+if (is_wechat_browser()) {
+
+	if (empty($_SESSION['user_id'])) {
 	 
-	include_once(ROOT_PATH . 'include/lib_passport.php');
-	include_once(ROOT_PATH . 'weixin/login.php');
-	
-	$uri = str_replace('/mobile/', '/', $_SERVER['REQUEST_URI']);
-	if (substr($uri, -1) == '/') {
-		$uri .= 'index.php';
+		include_once(ROOT_PATH . 'include/lib_passport.php');
+		include_once(ROOT_PATH . 'weixin/login.php');
+		
+		$uri = str_replace('/mobile/', '/', $_SERVER['REQUEST_URI']);
+		if (substr($uri, -1) == '/') {
+			$uri .= 'index.php';
+		}
+		
+		$callback = $_CFG['site_url'] . $uri;	 
+		weixin_oauth($callback);
+		
+	} elseif (empty($_SESSION['openid'])) {
+		
+		$openid = $db->getOne("SELECT wxid FROM wxch_user WHERE uid=$_SESSION[user_id]");
+		$_SESSION['openid'] = $openid;
 	}
-	
-	$callback = $_CFG['site_url'] . $uri;	 
-	weixin_oauth($callback);
 }
+
+
 
 /* 检查是否是微信浏览器访问 */
 function is_wechat_browser(){

@@ -26,27 +26,22 @@ function weixin_oauth($callback) {
 		$content = file_get_contents ( $url );
 		$token = json_decode ( $content, true );
 		
-		//register
 		$user_info = $db->getRow("SELECT * FROM `wxch_user` WHERE `wxid` = '{$token[openid]}'");
 		if (empty($user_info)) {
-			
+			//register
 			if (register_openid($token['openid'])) {
-				
 				$user_info = $GLOBALS['user']->get_user_info($user_info['openid']);
-				
 			} else {
 				return false;
 			}
-			
 		} else {
-			
 			//login
 			$user_info = $GLOBALS['user']->get_profile_by_id($user_info['uid']);
 			if (!empty($user_info) && $user_info['status'] == 1) {
 		  
 	            $GLOBALS['user']->set_session($user_info);
 	            $GLOBALS['user']->set_cookie($user_info, TRUE);
-	
+				
 	            update_user_info();      // 更新用户信息
 	            update_user_cart();
 	            recalculate_price();     // 重新计算购物车中的商品价格
@@ -57,6 +52,7 @@ function weixin_oauth($callback) {
 
 		}
 		
+		$_SESSION['openid'] = $token['openid'];
 		return $user_info;
 	}
 }
