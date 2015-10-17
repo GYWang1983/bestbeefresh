@@ -1244,8 +1244,8 @@ elseif ($_REQUEST['act'] == 'step_post')
         admin_log($order['order_sn'], 'add', 'order');
 
         /* 插入 pay_log */
-        $sql = 'INSERT INTO ' . $ecs->table('pay_log') . " (order_id, order_amount, order_type, is_paid)" .
-                " VALUES ('$order_id', 0, '" . PAY_ORDER . "', 0)";
+        $sql = 'INSERT INTO ' . $ecs->table('pay_log') . " (order_id, order_amount, order_type, pay_id, is_paid)" .
+                " VALUES ('$order_id', 0, '" . PAY_ORDER . "', 0, 0)";
         $db->query($sql);
 
         /* 下一步 */
@@ -5115,8 +5115,8 @@ function update_pay_log($order_id)
             {
                 /* 已付款，生成新的pay_log */
                 $sql = "INSERT INTO " . $GLOBALS['ecs']->table('pay_log') .
-                        " (order_id, order_amount, order_type, is_paid)" .
-                        "VALUES('$order_id', '$order_amount', '" . PAY_ORDER . "', 0)";
+                        " (order_id, order_amount, order_type, pay_id, is_paid)" .
+                        "VALUES('$order_id', '$order_amount', '" . PAY_ORDER . "', 0, 0)";
             }
             $GLOBALS['db']->query($sql);
         }

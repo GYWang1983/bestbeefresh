@@ -1689,7 +1689,7 @@ elseif ($action == 'act_account')
         $order['order_amount']   = $amount + $payment_info['pay_fee'];
 
         //记录支付log
-        $order['log_id'] = insert_pay_log($surplus['rec_id'], $order['order_amount'], $type=PAY_SURPLUS, 0);
+        $order['log_id'] = insert_pay_log($surplus['rec_id'], $order['order_amount'], $surplus['payment_id'], $type=PAY_SURPLUS);
 
         /* 调用相应的支付方式文件 */
         include_once(ROOT_PATH . 'includes/modules/payment/' . $payment_info['pay_code'] . '.php');

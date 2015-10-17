@@ -392,15 +392,16 @@ function update_user_account($surplus)
  * @access  public
  * @param   integer     $id         订单编号
  * @param   float       $amount     订单金额
+ * @param   integer     $pay_id     支付ID
  * @param   integer     $type       支付类型
  * @param   integer     $is_paid    是否已支付
  *
  * @return  int
  */
-function insert_pay_log($id, $amount, $type = PAY_SURPLUS, $is_paid = 0)
+function insert_pay_log($id, $amount, $pay_id, $type = PAY_SURPLUS, $is_paid = 0)
 {
-    $sql = 'INSERT INTO ' .$GLOBALS['ecs']->table('pay_log')." (order_id, order_amount, order_type, is_paid)".
-            " VALUES  ('$id', '$amount', '$type', '$is_paid')";
+    $sql = 'INSERT INTO ' .$GLOBALS['ecs']->table('pay_log')." (order_id, order_amount, pay_id, order_type, is_paid)".
+            " VALUES  ('$id', '$amount', '$pay_id', '$type', '$is_paid')";
     $GLOBALS['db']->query($sql);
 
      return $GLOBALS['db']->insert_id();

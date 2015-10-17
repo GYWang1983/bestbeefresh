@@ -1754,7 +1754,7 @@ elseif ($_REQUEST['step'] == 'done')
     clear_cart($flow_type);
 
     /* 插入支付日志 */
-    $order['log_id'] = insert_pay_log($new_order_id, $order['order_amount'], PAY_ORDER);
+    $order['log_id'] = insert_pay_log($new_order_id, $order['order_amount'], $order['pay_id'], PAY_ORDER);
 
     /* 取得支付信息，生成支付代码 */
     if ($order['order_amount'] > 0)

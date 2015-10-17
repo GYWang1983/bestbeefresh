@@ -383,10 +383,10 @@ elseif($_REQUEST['act'] = 'done')
 
 
     /* 收货人信息 */
-    foreach ($consignee as $key => $value)
+    /*foreach ($consignee as $key => $value)
     {
         $order[$key] = addslashes($value);
-    }
+    }*/
 
     /* 订单中的总额 */
     $total = order_fee($order, $cart_goods, $consignee);
@@ -544,7 +544,7 @@ elseif($_REQUEST['act'] = 'done')
         include_once('includes/modules/payment/' . $payment['pay_code'] . '.php');
 
         $pay_obj    = new $payment['pay_code'];
-        $order['log_id'] = insert_pay_log($new_order_id, $order['order_amount'], PAY_ORDER);
+        $order['log_id'] = insert_pay_log($new_order_id, $order['order_amount'], $order['pay_id'], PAY_ORDER);
         $pay_online = $pay_obj->get_code($order, unserialize_config($payment['pay_config']));
 
         $order['pay_desc'] = $payment['pay_desc'];
