@@ -49,7 +49,7 @@ if (isset($set_modules) && $set_modules == TRUE)
         array('name' => 'wxpay_mchid',         'type' => 'text',   'value' => ''),               //微信商户ID
     	array('name' => 'wxpay_key',           'type' => 'text',   'value' => ''),               //API密钥
     	array('name' => 'wxpay_title',         'type' => 'text',   'value' => '最鲜蜂水果订购'),      //支付显示标题 
-    	array('name' => 'wxpay_expiretime',    'type' => 'text',   'value' => '60'),             //支付超时时间
+    	array('name' => 'wxpay_expiretime',    'type' => 'text',   'value' => '120'),            //支付超时时间
     	array('name' => 'wxpay_debug',         'type' => 'select', 'value' => '0'),              //开启Debug
     );
 
@@ -83,7 +83,7 @@ class wxpay
      * @param   array   $order      订单信息
      * @param   array   $payment    支付方式信息
      */
-    function get_code($order, $payment)
+    function get_code($order, $payment, $opt_only = FALSE)
     {
     	$wxtk = read_config('wxtoken');
     	$payment = array_merge($payment, $wxtk);
@@ -91,17 +91,7 @@ class wxpay
     	$result = $this->unifiedorder($order, $payment);
     	
     	if (!$result['errcode'])
-    	{
-    		//TODO: 需要保存统一订单号，以便支付失败后再次发起支付
-    		
-	    	$noncestr = rands(16);
-	    	$timestamp = time();
-	    	$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-	    	
-	    	// jsapi config
-	    	$str = "jsapi_ticket=$wxtk[jsapi_token]&noncestr=$noncestr&timestamp=$timestamp&url=$url";
-	    	$signature = sha1($str);
-	    	
+    	{    			    	
 	    	// pay options
 	    	$options = $this->makePayOptions($result, $payment);
 	    	$opts = json_encode($options);
@@ -122,15 +112,73 @@ wx.ready(function() {
     	}
 
     }
+    
+    /**
+     * 微信支付结果通知回调函数
+     * 
+     * @param array $payment
+     */
+    public function respond($payment)
+    {
+    	global $db, $ecs;
+    	
+    	$xml = file_get_contents('php://input');
+    	$data = xml2array($xml);
+    	if (empty($data))
+    	{
+    		$this->outputXml('FAIL', '参数格式校验错误');
+    	}
+    	
+    	// 检查签名
+    	$sendSign = $data['sign'];
+    	unset($data['sign']);
+    	$sign = $this->sign($data, $payment['wxpay_key']);
+    	    	
+    	if ($sendSign != $sign)
+    	{
+    		$this->outputXml('FAIL', '签名失败');
+    	}
+    	
+    	$log_id = intval($data['attach']);
+    	
+    	if ($data['return_code'] == 'FAIL' || $data['result_code'] == 'FAIL')
+    	{   
+    		//支付结果为失败
+    		$sql = "UPDATE " . $ecs->table('pay_log') . " SET is_paid = 9 WHERE log_id = '$log_id'";
+    		$db->query($sql);
+    		
+    		$data['paytype'] = 'wxpay';
+    		insert_error_log('pay', json_encode($data));
+    	}
+    	else
+    	{
+    		// 支付成功
+    		order_paid($log_id, PS_PAYED, 'wxpay');
+    	}
+    	
+    	$this->outputXml();
+    }
+    
+    /**
+     * 退款流程
+     * 
+     * @param array $order
+     * @param array $payment
+     */
+    public function refund($order, $payment)
+    {
+    	
+    }
 
     /**
      * 统一下单
      */
     private function unifiedorder($order, $payment)
-    {    	
-    	// TODO: 支付超时时间 ，修改为下单截止时间
+    {
+    	global $_CFG;
+    	
     	$paytime = intval($payment['wxpay_expiretime']);
-    	$paytime = $paytime > 5 ? time() + $paytime * 60 : time() + 3600;
+    	$paytime = $paytime > 5 ? time() + $paytime * 60 : time() + 300; //支付失效时间最短为5分钟
     	
     	//微信订单信息
     	$wxOrder = array(
@@ -139,12 +187,13 @@ wx.ready(function() {
     		'spbill_create_ip' 	=> REMOTE_ADDR,					//终端ip
     		'nonce_str' 		=> rands(32),					//随机字符串
     		'out_trade_no'  	=> $order['order_sn'],		    //本系统订单ID
-    		'body'				=> $payment['wxpay_title'],	    //商品描述
+    		'body'				=> "$payment[wxpay_title][$order[order_sn]]",	    //商品描述
     		'total_fee'         => $order['order_amount'] * 100,//支付金额
     		'trade_type'		=> 'JSAPI',						//支付方式
     		'openid'			=> $_SESSION['openid'],			//支付用户OpenId
     		'time_expire'       => date('YmdHis', $paytime),	//支付失效时间
-    		'notify_url'		=> $_CFG['site_url'] . '/api/paid.php', //支付结果通知URL
+    		'attach'            => $order['log_id'],   			//支付logid，用于支付结果通知
+    		'notify_url'		=> $_CFG['site_url'] . '/wxpay/respond.html', //支付结果通知URL
     	);
 
     	// 签名
@@ -158,7 +207,7 @@ wx.ready(function() {
     	));
     	
     	$response = $curl->post('pay/unifiedorder', array2xml($wxOrder), 'xml');
-    	//var_dump($response);
+
     	// 检查错误
     	if ($response['return_code'] == 'FAIL')
     	{
@@ -168,6 +217,9 @@ wx.ready(function() {
     	{
     		return array('errcode'=>$response['err_code'], 'message'=>$response['err_code_des']);
     	}
+    	
+    	//保存统一订单号，以便支付失败后再次发起支付
+    	$this->saveUnifiedorder($order['log_id'], $response['prepay_id'], $paytime);
     	
     	return $response;
     }
@@ -197,6 +249,23 @@ wx.ready(function() {
     	return $options;
     }
 	
+    /**
+     * 保存同一下单接口返回的订单号
+     * 
+     * @param interger $log_id
+     * @param string   $order_sn
+     * @param integer  $deadline
+     */
+    private function saveUnifiedorder($log_id, $order_sn, $deadline)
+    {
+    	global $db, $ecs;
+    	
+    	$sql = "UPDATE " . $ecs->table('pay_log') . 
+    	" SET outer_sn = '$order_sn', deadline = '$deadline' WHERE log_id = '$log_id'";
+    	
+    	$db->query($sql);
+    }
+    
 	/**
 	 * 生成微信签名
 	 *
@@ -235,6 +304,24 @@ wx.ready(function() {
 		return $result_;
 	}
 	
+	/**
+	 * 返回XML
+	 *
+	 * @param string $error
+	 * @param string $msg
+	 */
+	private function outputXml($error = 'SUCCESS', $msg = 'OK')
+	{
+		$arr = array(
+			'return_code' => $error,
+			'return_msg'  => $msg,
+		);
+	
+		ob_end_clean();
+		$xml = array2xml($arr);
+		echo $xml;
+		exit;
+	}
 }
 
 ?>

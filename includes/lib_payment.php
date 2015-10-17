@@ -53,11 +53,11 @@ function get_payment($code)
 /**
  *  通过订单sn取得订单ID
  *  @param  string  $order_sn   订单sn
- *  @param  blob    $voucher    是否为会员充值
+ *  @param  boolean $voucher    是否为会员充值
  */
-function get_order_id_by_sn($order_sn, $voucher = 'false')
+function get_order_id_by_sn($order_sn, $voucher = FALSE)
 {
-    if ($voucher == 'true')
+    if ($voucher)
     {
         if(is_numeric($order_sn))
         {
@@ -167,9 +167,9 @@ function order_paid($log_id, $pay_status = PS_PAYED, $note = '')
 
                 /* 修改订单状态为已付款 */
                 $sql = 'UPDATE ' . $GLOBALS['ecs']->table('order_info') .
-                            " SET order_status = '" . OS_CONFIRMED . "', " .
-                                " confirm_time = '" . gmtime() . "', " .
-                                " pay_status = '$pay_status', " .
+                            //" SET order_status = '" . OS_CONFIRMED . "', " .
+                            //    " confirm_time = '" . gmtime() . "', " .
+                              " SET pay_status = '$pay_status', " .
                                 " pay_time = '".gmtime()."', " .
                                 " money_paid = order_amount," .
                                 " order_amount = 0 ".
@@ -177,7 +177,7 @@ function order_paid($log_id, $pay_status = PS_PAYED, $note = '')
                 $GLOBALS['db']->query($sql);
 
                 /* 记录订单操作记录 */
-                order_action($order_sn, OS_CONFIRMED, SS_UNSHIPPED, $pay_status, $note, $GLOBALS['_LANG']['buyer']);
+                order_action($order_sn, OS_UNCONFIRMED, SS_UNSHIPPED, $pay_status, $note, $GLOBALS['_LANG']['buyer']);
 
                 /* 如果需要，发短信 */
                 if ($GLOBALS['_CFG']['sms_order_payed'] == '1' && $GLOBALS['_CFG']['sms_shop_mobile'] != '')

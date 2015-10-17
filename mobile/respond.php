@@ -15,11 +15,18 @@
 
 define('IN_ECTOUCH', true);
 
+/* 支付方式代码 */
+$pay_code = !empty($_REQUEST['code']) ? trim($_REQUEST['code']) : '';
+
+if ($pay_code == 'wxpay')
+{
+	define('INIT_NO_USERS', true);
+	define('INIT_NO_SMARTY', true);
+}
+
 require(dirname(__FILE__) . '/include/init.php');
 require(ROOT_PATH . 'include/lib_payment.php');
 require(ROOT_PATH . 'include/lib_order.php');
-/* 支付方式代码 */
-$pay_code = !empty($_REQUEST['code']) ? trim($_REQUEST['code']) : '';
 
 //获取首信支付方式
 if (empty($pay_code) && !empty($_REQUEST['v_pmode']) && !empty($_REQUEST['v_pstring']))
@@ -54,8 +61,9 @@ else
     }
 
     /* 判断是否启用 */
-    $sql = "SELECT COUNT(*) FROM " . $ecs->table('touch_payment') . " WHERE pay_code = '$pay_code' AND enabled = 1";
-    if ($db->getOne($sql) == 0)
+    $sql = "SELECT pay_id FROM " . $ecs->table('touch_payment') . " WHERE pay_code = '$pay_code' AND enabled = 1";
+    $pay_id = $db->getOne($sql);
+    if (empty($pay_id))
     {
         $msg = $_LANG['pay_disabled'];
     }
@@ -66,11 +74,12 @@ else
         /* 检查插件文件是否存在，如果存在则验证支付是否成功，否则则返回失败信息 */
         if (file_exists($plugin_file))
         {
+        	$param = payment_info($pay_id);
+        	
             /* 根据支付方式代码创建支付类的对象并调用其响应操作方法 */
             include_once($plugin_file);
-
             $payment = new $pay_code();
-            $msg     = (@$payment->respond()) ? $_LANG['pay_success'] : $_LANG['pay_fail'];
+            $msg     = (@$payment->respond(unserialize_config($param['pay_config']))) ? $_LANG['pay_success'] : $_LANG['pay_fail'];
         }
         else
         {
