@@ -25,7 +25,8 @@ if (!defined('IN_ECS'))
  */
 function gmtime()
 {
-    return (time() - date('Z'));
+    //return (time() - date('Z'));
+	return time();
 }
 
 /**
@@ -61,13 +62,13 @@ function server_timezone()
  */
 function local_mktime($hour = NULL , $minute= NULL, $second = NULL,  $month = NULL,  $day = NULL,  $year = NULL)
 {
-    $timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
+    //$timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
 
     /**
     * $time = mktime($hour, $minute, $second, $month, $day, $year) - date('Z') + (date('Z') - $timezone * 3600)
     * 先用mktime生成时间戳，再减去date('Z')转换为GMT时间，然后修正为用户自定义时间。以下是化简后结果
     **/
-    $time = mktime($hour, $minute, $second, $month, $day, $year) - $timezone * 3600;
+    $time = mktime($hour, $minute, $second, $month, $day, $year);// - $timezone * 3600;
 
     return $time;
 }
@@ -84,7 +85,7 @@ function local_mktime($hour = NULL , $minute= NULL, $second = NULL,  $month = NU
 
 function local_date($format, $time = NULL)
 {
-    $timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
+    /*$timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
 
     if ($time === NULL)
     {
@@ -95,7 +96,11 @@ function local_date($format, $time = NULL)
         return '';
     }
 
-    $time += ($timezone * 3600);
+    $time += ($timezone * 3600);*/
+	if (empty($time))
+	{
+		$time = time();
+	}
 
     return date($format, $time);
 }
@@ -112,10 +117,10 @@ function gmstr2time($str)
 {
     $time = strtotime($str);
 
-    if ($time > 0)
+    /*if ($time > 0)
     {
         $time -= date('Z');
-    }
+    }*/
 
     return $time;
 }
@@ -130,13 +135,13 @@ function gmstr2time($str)
  */
 function local_strtotime($str)
 {
-    $timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
+    //$timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
 
     /**
     * $time = mktime($hour, $minute, $second, $month, $day, $year) - date('Z') + (date('Z') - $timezone * 3600)
     * 先用mktime生成时间戳，再减去date('Z')转换为GMT时间，然后修正为用户自定义时间。以下是化简后结果
     **/
-    $time = strtotime($str) - $timezone * 3600;
+    $time = strtotime($str);// - $timezone * 3600;
 
     return $time;
 
@@ -148,11 +153,17 @@ function local_strtotime($str)
  * @param   $timestamp  integer     该时间戳必须是一个服务器本地的时间戳
  *
  * @return  array
- */
+ */		
 function local_gettime($timestamp = NULL)
 {
-    $tmp = local_getdate($timestamp);
-    return $tmp[0];
+    //$tmp = local_getdate($timestamp);
+    //return $tmp[0];
+	if (empty($timestamp))
+	{
+		$timestamp = time();
+	}
+	
+	return $timestamp;
 }
 
 /**
@@ -167,13 +178,13 @@ function local_getdate($timestamp = NULL)
     $timezone = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : $GLOBALS['_CFG']['timezone'];
 
     /* 如果时间戳为空，则获得服务器的当前时间 */
-    if ($timestamp === NULL)
+    if (empty($timestamp))
     {
         $timestamp = time();
     }
 
-    $gmt        = $timestamp - date('Z');       // 得到该时间的格林威治时间
-    $local_time = $gmt + ($timezone * 3600);    // 转换为用户所在时区的时间戳
+    //$gmt        = $timestamp - date('Z');       // 得到该时间的格林威治时间
+    //$local_time = $gmt + ($timezone * 3600);    // 转换为用户所在时区的时间戳
 
     return getdate($local_time);
 }
