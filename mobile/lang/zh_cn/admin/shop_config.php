@@ -539,5 +539,13 @@ $_LANG['cfg_range']['ecsdxt_order_picking']['0'] = '关闭';
 $_LANG['cfg_range']['ecsdxt_order_shipped']['1'] = '开启';
 $_LANG['cfg_range']['ecsdxt_order_shipped']['0'] = '关闭';
 
+$_LANG['cfg_name']['site_url'] = '站点URL';
+$_LANG['cfg_name']['order_lock_time'] = '订单锁定时间(HH:mm)';
+$_LANG['cfg_desc']['order_lock_time'] = '每天锁定订单的时间点，在此时间前完成付款可在第二天提货';
+$_LANG['cfg_name']['shipping_limit_time'] = '提货限制时间(小时)';
+$_LANG['cfg_desc']['shipping_limit_time'] = '超过提货时间订单作废';
+$_LANG['cfg_name']['shop_open_time'] = '门店开门时间(HH:mm)';
+$_LANG['cfg_name']['shop_close_time'] = '门店关门时间(HH:mm)';
+
 //$_LANG['sms_url'] = '<a href="'.$url.'" target="_blank">点此注册手机短信服务</a>';
 ?>
