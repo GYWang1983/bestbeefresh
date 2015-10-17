@@ -2114,7 +2114,7 @@ function merge_order($from_order_sn, $to_order_sn)
 
     include_once(ROOT_PATH . 'include/lib_clips.php');
     /* 插入支付日志 */
-    insert_pay_log($order_id, $order['order_amount'], PAY_ORDER);
+    insert_pay_log($order_id, $order['order_amount'], $order['pay_id'], PAY_ORDER);
 
     /* 删除原订单 */
     $sql = 'DELETE FROM ' . $GLOBALS['ecs']->table('order_info') .
@@ -3005,5 +3005,86 @@ function judge_package_stock($package_id, $package_num = 1)
     }
 
     return false;
+}
+
+/**
+ * 计算订单锁定时间
+ * 
+ * @param $basetime 订单创建时间/支付时间
+ * @return integer
+ */
+function get_order_lock_deadline($basetime = NULL)
+{
+	global $_CFG;
+
+	if (empty($basetime))
+	{
+		$basetime = time();
+	}
+
+	$arr = explode(':', $_CFG['order_lock_time']);
+	$locktime = $arr[0] * 3600 + $arr[1] * 60 - date('Z');
+	if ($locktime < 0)
+	{
+		$locktime += 86400;
+	}
+	
+	$base_time = $basetime % 86400;
+	$base_date = $basetime - $base_time;
+
+	// 超过订单截止时间，算做下一天订单
+	if ($base_time <= $locktime)
+	{
+		$result = $base_date + $locktime;
+	}
+	else
+	{
+		$result = $base_date + $locktime + 86400;
+	}
+
+	return $result;
+}
+
+/**
+ * 计算订单最晚取货时间
+ * 
+ * @param $paytime 支付时间
+ * @return Array
+ */
+function get_order_pickup_time($paytime)
+{
+	global $_CFG;
+
+	$tz = timezone_open(date_default_timezone_get());
+	$start = new DateTime('@' . $paytime);
+	$start->setTimezone($tz);
+	
+	if (strcmp($_CFG['order_lock_time'], $_CFG['shop_open_time']) > 0)
+	{
+		//第二天开门取货
+		$start->modify('+1 day');
+	}
+
+	$arr_op = explode(':', $_CFG['shop_open_time']);
+	$start->setTime(intval($arr_op[0]), intval($arr_op[1]), 0);
+
+	$end = new DateTime();
+	$end->setTimestamp($start->getTimestamp());
+	$end->setTimezone($tz);
+	
+	$end->modify('+' . $_CFG['shipping_limit_time'] . ' hour');
+	
+	if (strcmp($end->format('H:i'), $_CFG['shop_open_time']) <= 0)
+	{
+		$end->modify('-1 day');	
+	}
+	
+	$arr_ed = explode(':', $_CFG['shop_close_time']);
+	$end->setTime(intval($arr_ed[0]), intval($arr_ed[1]), 0);
+	
+	return array(
+		'start' => $start->getTimestamp(),
+		'end'   => $end->getTimestamp()
+	);
 }
 ?>
