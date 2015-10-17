@@ -2781,6 +2781,27 @@ if (!function_exists('array_combine')) {
     }
 }
 
+/**
+ * 插入错误日志
+ * 
+ * @param string $type
+ * @param string $info
+ * @param string $file
+ */
+function insert_error_log($type, $info, $file = '')
+{
+	global $db, $ecs;
+	
+	$log = array(
+		'type' => $type,
+		'info' => $info,
+		'file' => $file,
+		'time' => time(),	
+	);
+	
+	$db->autoExecute($ecs->table('error_log'), $log);
+}
+
 function get_free_more_desc($free_more) {
 
 	if (empty($free_more)) {

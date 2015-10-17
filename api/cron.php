@@ -81,7 +81,7 @@ foreach ($crondb AS $key => $cron_val)
 
     $db->query($sql);
 }
-write_error_arr($error_log);
+write_error_arr($error_log, 'cron');
 
 function get_next_time($cron)
 {
@@ -165,18 +165,18 @@ function make_error_arr($msg,$file)
     return array('info' => $msg, 'file' => $file, 'time' => $GLOBALS['timestamp']);
 }
 
-function write_error_arr($err_arr)
+function write_error_arr($err_arr, $type)
 {
     if (!empty($err_arr))
     {
         $query = '';
         foreach ($err_arr AS $key => $val)
         {
-            $query .= $query ? ",('$val[info]', '$val[file]', '$val[time]')" : "('$val[info]', '$val[file]', '$val[time]')";
+            $query .= $query ? ",('$val[info]', '$val[file]', '$val[time]', '$type')" : "('$val[info]', '$val[file]', '$val[time]', '$type')";
         }
         if ($query)
         {
-            $sql = "INSERT INTO " . $GLOBALS['ecs']->table('error_log') . "(info, file, time) VALUES " . $query;
+            $sql = "INSERT INTO " . $GLOBALS['ecs']->table('error_log') . "(info, file, time, `type`) VALUES " . $query;
             $GLOBALS['db']->query($sql);
         }
     }

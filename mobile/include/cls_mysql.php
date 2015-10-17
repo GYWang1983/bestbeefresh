@@ -618,7 +618,7 @@ class cls_mysql
             {
                 if (array_key_exists($value, $field_values) == true)
                 {
-                    $fields[] = $value;
+                    $fields[] = "`$value`";
                     $values[] = "'" . $field_values[$value] . "'";
                 }
             }
