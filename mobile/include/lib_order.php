@@ -264,9 +264,10 @@ function pay_fee($payment_id, $order_amount, $cod_fee=null)
  * @param   bool    $support_cod        配送方式是否支持货到付款
  * @param   int     $cod_fee            货到付款手续费（当配送方式支持货到付款时才传此参数）
  * @param   int     $is_online          是否支持在线支付
+ * @param   int     $is_wechat          是否支持微信支付
  * @return  array   配送方式数组
  */
-function available_payment_list($support_cod, $cod_fee = 0, $is_online = false)
+function available_payment_list($support_cod, $cod_fee = 0, $is_online = false, $is_wechat = false)
 {
     $sql = 'SELECT pay_id, pay_code, pay_name, pay_fee, pay_desc, pay_config, is_cod' .
             ' FROM ' . $GLOBALS['ecs']->table('touch_payment') .
@@ -275,7 +276,12 @@ function available_payment_list($support_cod, $cod_fee = 0, $is_online = false)
     {
         $sql .= 'AND is_cod = 0 '; // 如果不支持货到付款
     }
-    if ($is_online)
+    
+    if ($is_wechat)
+    {
+    	$sql .= "AND is_wechat = '1' ";
+    }
+    elseif ($is_online)
     {
         $sql .= "AND is_online = '1' ";
     }
@@ -3086,5 +3092,62 @@ function get_order_pickup_time($paytime)
 		'start' => $start->getTimestamp(),
 		'end'   => $end->getTimestamp()
 	);
+}
+
+/**
+ * 获取订单状态描述
+ * 
+ * @param array $order
+ * @return string
+ */
+function get_order_custom_status($order)
+{
+	if ($order['pay_status'] == PS_UNPAYED)
+	{
+		return CS_ADDED;
+	}
+	
+	if ($order['pay_status'] == PS_PAYING)
+	{
+		return CS_PAYING;
+	}
+	
+	if ($order['pay_status'] == PS_PAYED)
+	{
+		return CS_PAID;
+	}
+	
+	if ($order['order_status'] == OS_CONFIRMED)
+	{
+		if ($order['shipping_status'] == SS_PREPARING)
+		{
+			return CS_CONFIRMED;
+		}
+		
+		if ($order['shipping_status'] == SS_SHIPPED)
+		{
+			return CS_UNPICK;
+		}
+		
+		if ($order['shipping_status'] == SS_RECEIVED)
+		{
+			return CS_PICKED;
+		}
+	}
+	
+	if ($order['order_status'] == OS_CANCELED)
+	{
+		return CS_CANCELED;
+	}
+	
+	if ($order['order_status'] == OS_RETURNED)
+	{
+		return CS_RETURNED;
+	}
+	
+	if ($order['order_status'] == OS_EXPIRED)
+	{
+		return CS_EXPIRED;
+	}
 }
 ?>

@@ -333,7 +333,6 @@
 
 var flow_no_payment   = "{$lang.flow_no_payment}";
 var flow_no_shipping  = "{$lang.flow_no_shipping}";
-var is_wechat_browser = {$is_wechat_browser};
 </script>
 <div id="page">
   <header id="header">
@@ -380,7 +379,7 @@ var is_wechat_browser = {$is_wechat_browser};
       </section>
       <div class="blank3"> </div>
       <!--{else}-->
-      <input name = "payment" type="radio" value = "2" checked="checked"  style="display:none"/>
+      <input name = "payment" type="radio" value = "{$wechat_pay_id}" checked="checked"  style="display:none"/>
       <!--{/if}-->
     <!--{else}-->
     <input name = "payment" type="radio" value = "-1" checked="checked"  style="display:none"/>

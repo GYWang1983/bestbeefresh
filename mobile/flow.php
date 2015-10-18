@@ -592,7 +592,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     /* 取得支付列表 */
     if (!is_wechat_browser()) 
     {
-	    $payment_list = available_payment_list(1, $cod_fee);
+	    $payment_list = available_payment_list(false, $cod_fee, true);
 	    if(isset($payment_list))
 	    {
 	        foreach ($payment_list as $key => $payment)
@@ -626,9 +626,14 @@ elseif ($_REQUEST['step'] == 'checkout')
 	    }
 	    $smarty->assign('payment_list', $payment_list);
     }
-    
-    $smarty->assign('is_wechat_browser', is_wechat_browser() ? 1 : 0);
-    
+    else
+    {
+    	$payment_list = available_payment_list(false, $cod_fee, false, true);
+    	if (!empty($payment_list))
+    	{
+    		$smarty->assign('wechat_pay_id', $payment_list[0]['pay_id']);
+    	}
+    }   
     
     /* 取得包装与贺卡 */
     if ($total['real_goods_count'] > 0)
