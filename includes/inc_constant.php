@@ -73,6 +73,7 @@ define('OS_INVALID',                3); // 无效
 define('OS_RETURNED',               4); // 退货
 define('OS_SPLITED',                5); // 已分单
 define('OS_SPLITING_PART',          6); // 部分分单
+define('OS_EXPIRED',                7); // 退货
 
 /* 支付类型 */
 define('PAY_ORDER',                 0); // 订单支付
@@ -91,8 +92,21 @@ define('OS_SHIPPED_PART',           6); // 已发货(部分商品)
 define('PS_UNPAYED',                0); // 未付款
 define('PS_PAYING',                 1); // 付款中
 define('PS_PAYED',                  2); // 已付款
+define('PS_REFUNDING',              3); // 退款中
+define('PS_REFUND',                 4); // 已退款
 
 /* 综合状态 */
+define('CS_ADDED',              	1); // 待付款
+define('CS_PAYING',             	2); // 已付款
+define('CS_PAID',             		3); // 已付款
+define('CS_CONFIRMED',              4); // 已确认
+define('CS_UNPICK',              	5); // 待取货
+define('CS_PICKED',              	6); // 已取货
+define('CS_CANCELED',              	7); // 已取消
+define('CS_RETURNED',              	8); // 已退货
+define('CS_EXPIRED',              	9); // 已过期
+define('CS_COMMENTED',             10); // 已点评
+
 define('CS_AWAIT_PAY',              100); // 待付款：货到付款且已发货且未付款，非货到付款且未付款
 define('CS_AWAIT_SHIP',             101); // 待发货：货到付款且未发货，非货到付款且已付款且未发货
 define('CS_FINISHED',               102); // 已完成：已确认、已付款、已发货

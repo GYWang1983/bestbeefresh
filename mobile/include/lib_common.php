@@ -2794,9 +2794,9 @@ function insert_error_log($type, $info, $file = '')
 	
 	$log = array(
 		'type' => $type,
-		'info' => $info,
+		'info' => is_array($info) ? json_encode($info) : $info,
 		'file' => $file,
-		'time' => time(),	
+		'time' => time(),
 	);
 	
 	$db->autoExecute($ecs->table('error_log'), $log);

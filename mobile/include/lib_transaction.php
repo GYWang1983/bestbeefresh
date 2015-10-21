@@ -354,7 +354,8 @@ function get_user_orders($user_id, $num = 10, $start = 0)
 function cancel_order($order_id, $user_id = 0)
 {
     /* 查询订单信息，检查状态 */
-    $sql = "SELECT user_id, order_id, order_sn , surplus , integral , bonus_id, order_status, shipping_status, pay_status FROM " .$GLOBALS['ecs']->table('order_info') ." WHERE order_id = '$order_id'";
+    $sql = "SELECT user_id, order_id, order_sn , surplus , integral , bonus_id, order_status, shipping_status, pay_status, pay_id, money_paid " .
+    		" FROM " .$GLOBALS['ecs']->table('order_info') ." WHERE order_id = '$order_id'";
     $order = $GLOBALS['db']->GetRow($sql);
 
     if (empty($order))
@@ -367,48 +368,39 @@ function cancel_order($order_id, $user_id = 0)
     if ($user_id > 0 && $order['user_id'] != $user_id)
     {
         $GLOBALS['err'] ->add($GLOBALS['_LANG']['no_priv']);
-
         return false;
     }
 
-    // 订单状态只能是“未确认”或“已确认”
-    if ($order['order_status'] != OS_UNCONFIRMED && $order['order_status'] != OS_CONFIRMED)
+    // 订单状态只能是“未确认”
+    if ($order['order_status'] != OS_UNCONFIRMED)
     {
         $GLOBALS['err']->add($GLOBALS['_LANG']['current_os_not_unconfirmed']);
-
         return false;
     }
-
-    //订单一旦确认，不允许用户取消
-    if ( $order['order_status'] == OS_CONFIRMED)
+    
+    // 如果已付款，走退款流程
+    if ($order['pay_status'] != PS_PAYED && $order['money_paid'] > 0)
     {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['current_os_already_confirmed']);
+    	$payment = payment_info($order['pay_id']);
+    	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+    	
+    	$pay_obj = new $payment['pay_code'];
+    	$result  = $pay_obj->refund($order, unserialize_config($payment['pay_config']));
 
-        return false;
-    }
-
-    // 发货状态只能是“未发货”
-    if ($order['shipping_status'] != SS_UNSHIPPED)
-    {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['current_ss_not_cancel']);
-
-        return false;
-    }
-
-    // 如果付款状态是“已付款”、“付款中”，不允许取消，要取消和商家联系
-    if ($order['pay_status'] != PS_UNPAYED)
-    {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['current_ps_not_cancel']);
-
-        return false;
+    	if (!$result)
+    	{
+    		$GLOBALS['err']->add('退款失败，请联系客服处理。');
+    		return false;
+    	}
     }
 
     //将用户订单设置为取消
-    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = '".OS_CANCELED."' WHERE order_id = '$order_id'";
+    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = " . OS_CANCELED . ", pay_status = " . PS_UNPAYED .
+    		" WHERE order_id = '$order_id'";
     if ($GLOBALS['db']->query($sql))
     {
         /* 记录log */
-        order_action($order['order_sn'], OS_CANCELED, $order['shipping_status'], PS_UNPAYED,$GLOBALS['_LANG']['buyer_cancel'],'buyer');
+        order_action($order['order_sn'], OS_CANCELED, $order['shipping_status'], PS_UNPAYED, $GLOBALS['_LANG']['buyer_cancel'], 'buyer');
         /* 退货用户余额、积分、红包 */
         if ($order['user_id'] > 0 && $order['surplus'] > 0)
         {
@@ -436,7 +428,7 @@ function cancel_order($order_id, $user_id = 0)
             'bonus_id'  => 0,
             'bonus'     => 0,
             'integral'  => 0,
-            'integral_money'    => 0,
+            'integral_money' => 0,
             'surplus'   => 0
         );
         update_order($order['order_id'], $arr);

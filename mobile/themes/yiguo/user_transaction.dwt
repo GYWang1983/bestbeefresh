@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>{$page_title} 触屏版</title>
+<title>{$page_title}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -13,6 +13,9 @@
 {* 包含脚本文件 *}
 {insert_scripts files='transport.js,common.js,user.js'}
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.4.4.min.js"></script>
+<!--{if is_wechat_browser() }-->
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<!-- {/if} -->
 </head>
 <body>
 <div id="tbh5v0">
@@ -288,84 +291,20 @@ jQuery(function($){
     <!--#包裹追踪查询界面 end--> 
     
     <!-- ==========订单详情页面,包括：订单状态，商品列表，费用总计，收货人信息，支付方式，其它信息========== --> 
-    <!--{if $action eq order_detail} -->
+    <!--{if $action eq 'order_detail'} -->
+    <!--{if is_wechat_browser() }-->
+    <script type="text/javascript" src="weixin/wxjsconfig.php?api=chooseWXPay&debug=1"></script>
+    <!-- {/if} -->
+    
     <header id="header">
       <div class="header_l header_return"> <a class="ico_10" href="javascript:history.go(-1)"> 返回 </a> </div>
-      <h1> {$lang.order_status} </h1>
+      <h1>订单详情</h1>
     </header>
     <section class="wrap">
-      <section class="order_box padd1 radius10">
-        <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
-      	<tr>
-        	<td>订单状态：{$order.order_status} {$order.pay_status} {$order.shipping_time}</td>
-        </tr>
-        <tr>
-        	<td>订单编号：{$order.order_sn}</td>
-        </tr>
-        <tr>
-        	<td>订单金额：{$order.formated_total_fee}</td>
-        </tr>
-        <tr>
-        	<td>下单时间：{$order.formated_add_time}</td>
-        </tr>
-        <!--{if $order.to_buyer}-->
-        <tr>
-          <td>{$lang.detail_to_buyer}：{$order.to_buyer}</td>
-        </tr>
-        <!-- {/if} -->
-        <!--{if $virtual_card}-->
-        <tr>
-          <td>{$lang.virtual_card_info}：<br>
-          	<!--{foreach from=$virtual_card item=vgoods}--> 
-            <!--{foreach from=$vgoods.info item=card}--> 
-            <hr style="border:none;border-top:1px #CCCCCC dashed; margin:5px 0" />
-            <!--{if $card.card_sn}-->{$lang.card_sn}:<span style="color:red;">{$card.card_sn}</span><br><!--{/if}-->
-            <!--{if $card.card_password}-->{$lang.card_password}:<span style="color:red;">{$card.card_password}</span><br><!--{/if}--> 
-            <!--{if $card.end_date}-->{$lang.end_date}:{$card.end_date}<br><!--{/if}-->
-            <!--{/foreach}--> 
-            <!--{/foreach}--></td>
-        </tr>
-        <!--{/if}-->
-        <!-- {if $order.invoice_no}-->
-        <tr>
-            <td><a href="user.php?act=order_tracking&order_id={$order.order_id}" class="c-btn3">订单跟踪</a></td>
-        </tr>
-        <!--{/if}-->
-      </table>
+      <section class="order_status padd1">
+        <div class="status_{$order.order_cs}">{$order.order_cs_desc}</div>
       </section>
-      
-      <section class="order_box padd1 radius10">
-      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
-        <tr>
-          <td width="32%" align="right">{$lang.consignee_name}：</td>
-          <td width="68%" align="left">{$order.consignee}</td>
-        </tr>
-        <tr>
-          <td align="right">{$lang.email_address}：</td>
-          <td align="left">{$order.email}</td>
-        </tr>
-        <!-- {if $order.exist_real_goods} -->
-        <tr>
-          <td align="right">{$lang.detailed_address}：</td>
-          <td align="left">{$order.address} 
-            <!-- {if $order.zipcode} --> 
-            [{$lang.postalcode}: {$order.zipcode}] 
-            <!-- {/if} --></td>
-        </tr>
-        <!-- {/if}-->
-        <tr>
-          <td align="right">{$lang.phone}：</td>
-          <td align="left">{$order.tel} </td>
-        </tr>
-        <!-- {if $order.exist_real_goods} -->
-        <tr>
-          <td align="right">{$lang.deliver_goods_time}：</td>
-          <td align="left">{$order.best_time}</td>
-        </tr>
-        <!--{/if}-->
-      </table>
-      </section>
-      
+      <!--商品列表 -->
       <section class="order_box padd1 radius10">
         <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
       	  <!-- {foreach from=$goods_list item=goods} -->
@@ -375,13 +314,13 @@ jQuery(function($){
             <td>{$goods.goods_name}</td>
           </tr>
           <tr>
-            <td style="border-bottom:1px #CCCCCC dashed">售价：{$goods.goods_price} 数量：{$goods.goods_number}<br>小计：{$goods.subtotal}</td>
+            <td style="border-bottom:1px #CCCCCC dashed">价格：{$goods.goods_price} × {$goods.goods_number}<br>小计：{$goods.subtotal}</td>
           </tr>
           <!-- {/foreach} -->
       </table>
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
-          <td align="right"> {$lang.goods_all_price}<!-- {if $order.extension_code eq "group_buy"} -->{$lang.gb_deposit}<!-- {/if} -->: {$order.formated_goods_amount} 
+          <td align="right"> 订单总金额<!-- {if $order.extension_code eq "group_buy"} -->{$lang.gb_deposit}<!-- {/if} -->: {$order.formated_goods_amount} 
             <!-- {if $order.discount gt 0} 折扣 --> 
             - {$lang.discount}: {$order.formated_discount} 
             <!-- {/if} --> 
@@ -398,10 +337,10 @@ jQuery(function($){
             + {$lang.pay_fee}: {$order.formated_pay_fee} 
             <!-- {/if} --> 
             <!-- {if $order.pack_fee > 0} --> 
-            + {$lang.pack_fee}: {$order.formated_pack_fee} 
+            + {$lang.pack_fee}（{$order.pack_name}）: {$order.formated_pack_fee} 
             <!-- {/if} --> 
             <!-- {if $order.card_fee > 0} --> 
-            + {$lang.card_fee}: {$order.formated_card_fee} 
+            + {$lang.card_fee}（{$order.card_name}）: {$order.formated_card_fee} 
             <!-- {/if} --></td>
         </tr>
         <tr>
@@ -418,11 +357,13 @@ jQuery(function($){
             - {$lang.use_bonus}: {$order.formated_bonus} 
             <!-- {/if} --></td>
         </tr>
+        <!-- {if $order.order_amount > 0} -->
         <tr>
-          <td align="right">{$lang.order_amount}: {$order.formated_order_amount} 
+          <td align="right" style="font-size:1.2rem;color:red;">{$lang.order_amount}: {$order.formated_order_amount} 
             <!-- {if $order.extension_code eq "group_buy"} --><br />
             {$lang.notice_gb_order_amount}<!-- {/if} --></td>
         </tr>
+        <!-- {/if} -->
         <!-- {if $allow_edit_surplus} 如果可以编辑使用余额数 -->
         <tr>
           <td align="right" bgcolor="#ffffff"><form action="user.php" method="post" name="formFee" id="formFee">
@@ -437,102 +378,107 @@ jQuery(function($){
         <!--{/if}-->
       </table>
       </section>
-      
+
       <section class="order_box padd1 radius10">
-      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
-          <td bgcolor="#ffffff"> {$lang.select_payment}: {$order.pay_name}。<br>{$lang.order_amount}: <strong>{$order.formated_order_amount}</strong><br />
-            {$order.pay_desc}<br>{if $order.order_amount gt 0}{$order.pay_online}{/if}</td>
+            <td>订单编号：{$order.order_sn}</td>
         </tr>
         <tr>
-          <td bgcolor="#ffffff" align="center"><!--{if $payment_list}-->
-            
-            <form name="payment" method="post" action="user.php">
-              {$lang.change_payment}: <br/>
-              <select name="pay_id" style="margin:6px 0">
-                <!--{foreach from=$payment_list item=payment}-->
-                <option value="{$payment.pay_id}"> {$payment.pay_name}({$lang.pay_fee}:{$payment.format_pay_fee}) </option>
-                <!--{/foreach}-->
-              </select>
-              <br/>
-              <input type="hidden" name="act" value="act_edit_payment" />
-              <input type="hidden" name="order_id" value="{$order.order_id}" />
-              <input type="submit" name="Submit" class="c-btn3" value="{$lang.button_submit}" />
-            </form>
-            
-            <!--{/if}--></td>
+            <td>创建时间：{$order.formated_add_time}</td>
         </tr>
-      </table>
-      </section>
-      
-      <section class="order_box padd1 radius10">
-      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
-        <!-- {if $order.shipping_id > 0} -->
+        <!--{if $order.formated_pay_time}-->
         <tr>
-          <td width="25%" align="right" bgcolor="#ffffff">{$lang.shipping}：</td>
-          <td colspan="3" width="75%" align="left" bgcolor="#ffffff">{$order.shipping_name}</td>
+            <td>付款时间：{$order.formated_pay_time}</td>
+        </tr>
+        <!--{/if}-->
+        <!--{if $order.formated_receive_time}-->
+        <tr>
+            <td>取货时间：{$order.formated_receive_time}</td>
+        </tr>
+        <!--{/if}-->
+        <!--{if $order.to_buyer}-->
+        <tr>
+          <td>{$lang.detail_to_buyer}：{$order.to_buyer}</td>
         </tr>
         <!-- {/if} -->
-        
+        <!--{if $virtual_card}-->
         <tr>
-          <td width="15%" align="right" bgcolor="#ffffff">{$lang.payment}：</td>
-          <td colspan="3" align="left" bgcolor="#ffffff">{$order.pay_name}</td>
+          <td>{$lang.virtual_card_info}：<br>
+            <!--{foreach from=$virtual_card item=vgoods}--> 
+            <!--{foreach from=$vgoods.info item=card}--> 
+            <hr style="border:none;border-top:1px #CCCCCC dashed; margin:5px 0" />
+            <!--{if $card.card_sn}-->{$lang.card_sn}:<span style="color:red;">{$card.card_sn}</span><br><!--{/if}-->
+            <!--{if $card.card_password}-->{$lang.card_password}:<span style="color:red;">{$card.card_password}</span><br><!--{/if}--> 
+            <!--{if $card.end_date}-->{$lang.end_date}:{$card.end_date}<br><!--{/if}-->
+            <!--{/foreach}--> 
+            <!--{/foreach}--></td>
         </tr>
-        <!--{if $order.insure_fee > 0}--> 
-        <!--{/if}--> 
-        <!-- {if $order.pack_name} 是否使用包装 -->
-        <tr>
-          <td width="15%" align="right" bgcolor="#ffffff">{$lang.use_pack}：</td>
-          <td colspan="3" align="left" bgcolor="#ffffff">{$order.pack_name}</td>
-        </tr>
-        <!-- {/if} 是否使用包装 --> 
-        <!-- {if $order.card_name} 是否使用贺卡 -->
-        <tr>
-          <td width="15%" align="right" bgcolor="#ffffff">{$lang.use_card}：</td>
-          <td colspan="3" align="left" bgcolor="#ffffff">{$order.card_name}</td>
-        </tr>
-        <!-- {/if} --> 
+        <!--{/if}-->
+      </table>
+      </section> 
+      
+      <!-- {if $order.card_message or $order.postscript}  是否有订单附言 -->
+      <section class="order_box padd1 radius10">
+      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <!-- {if $order.card_message} 是否使用贺卡 -->
         <tr>
           <td width="15%" align="right" bgcolor="#ffffff">{$lang.bless_note}：</td>
           <td colspan="3" align="left" bgcolor="#ffffff">{$order.card_message}</td>
         </tr>
-        <!-- {/if} 是否使用贺卡 --> 
-        <!-- {if $order.surplus > 0} 是否使用余额 --> 
-        <!-- {/if} --> 
-        <!-- {if $order.integral > 0} 是否使用积分 -->
-        <tr>
-          <td width="15%" align="right" bgcolor="#ffffff">{$lang.use_integral}：</td>
-          <td colspan="3" align="left" bgcolor="#ffffff">{$order.integral}</td>
-        </tr>
-        <!-- {/if} 是否使用积分 --> 
-        <!-- {if $order.bonus > 0} 是否使用红包 --> 
-        <!-- {/if} --> 
-        <!-- {if $order.inv_payee && $order.inv_content} 是否开发票 -->
-        <tr>
-          <td width="15%" align="right" bgcolor="#ffffff">{$lang.invoice_title}：</td>
-          <td width="36%" align="left" bgcolor="#ffffff">{$order.inv_payee}</td>
-          <td width="19%" align="right" bgcolor="#ffffff">{$lang.invoice_content}：</td>
-          <td width="25%" align="left" bgcolor="#ffffff">{$order.inv_content}</td>
-        </tr>
-        <!-- {/if} --> 
+        <!-- {/if} 是否使用贺卡 -->  
         <!-- {if $order.postscript} 是否有订单附言 -->
         <tr>
           <td width="15%" align="right" bgcolor="#ffffff">{$lang.order_postscript}：</td>
           <td colspan="3" align="left" bgcolor="#ffffff">{$order.postscript}</td>
         </tr>
         <!-- {/if} -->
-        <tr>
-          <td width="15%" align="right" bgcolor="#ffffff">{$lang.booking_process}：</td>
-          <td colspan="3" align="left" bgcolor="#ffffff">{$order.how_oos_name}</td>
-        </tr>
       </table>
       </section>
+      <!-- {/if} -->
       
+      <!-- {if $need_pay } -->
+      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
+        <tr>
+          <td align="center">
+            <form name="refund" method="post" action="user.php">
+            <!--{if $payment_list}-->            
+              {$lang.change_payment}: <br/>
+              <select name="pay_id" style="margin:6px 0">
+                <!--{foreach from=$payment_list item=payment}-->
+                <option value="{$payment.pay_id}"> {$payment.pay_name} </option>
+                <!--{/foreach}-->
+              </select>
+              <br/>
+              <input type="hidden" id="order_id" value="{$order.order_id}" />
+              <input type="button" id="goto_pay" class="c-btn3" value="去付款" />
+            <!--{/if}-->
+            <!--{if $payment}-->
+              <input type="hidden" id="pay_id" value="{$payment.pay_id}" />
+              <input type="hidden" id="order_id" value="{$order.order_id}" />
+              <input type="button" id="goto_pay" class="c-btn3" value="使用 {$payment.pay_name} 付款" />
+            <!--{/if}-->
+            </form>
+          </td>
+        </tr>
+      </table>
+      <!-- {elseif $order.order_cs eq CS_PAID} -->
+      <form name="refund" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
+        <input type="hidden" id="act" value="cancel_order" />
+        <input type="hidden" id="order_id" value="{$order.order_id}" />
+        <input type="submit" id="refund" class="c-btn3" value="申请退款" />
+      </form>
+      <!-- {elseif $order.order_cs eq CS_ADDED} -->
+      <form name="refund" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
+        <input type="hidden" id="act" value="cancel_order" />
+        <input type="hidden" id="order_id" value="{$order.order_id}" />
+        <input type="submit" id="refund" class="c-btn3" value="取消订单" />
+      </form>
+      <!-- {/if} -->   
     </section>
     <!--{/if} --> 
-    
-    <!--#订单详情页 end--> 
+    <!--#订单详情页 end-->
+     
     <!--#会员余额 start--> 
     <!--{if $action eq "account_raply" || $action eq "account_log" || $action eq "account_deposit" || $action eq "account_detail"} -->
     <header id="header">

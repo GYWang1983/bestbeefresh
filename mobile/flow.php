@@ -1765,13 +1765,10 @@ elseif ($_REQUEST['step'] == 'done')
     if ($order['order_amount'] > 0)
     {
         $payment = payment_info($order['pay_id']);
-
-        include_once('include/modules/payment/' . $payment['pay_code'] . '.php');
-
+        include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+        
         $pay_obj    = new $payment['pay_code'];
-
         $pay_online = $pay_obj->get_code($order, unserialize_config($payment['pay_config']));
-
         $order['pay_desc'] = $payment['pay_desc'];
 
         $smarty->assign('pay_online', $pay_online);
@@ -1803,7 +1800,7 @@ elseif ($_REQUEST['step'] == 'paid')
 		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('order_info') .
         		" SET pay_status = " . PS_PAYING . "," .
                 " pay_time = ". time() .
-                " WHERE order_id = '$order_id' AND pay_status = " . PS_UNPAYED;
+                " WHERE order_id = '$order_id' AND user_id = '$_SESSION[user_id]' AND pay_status = " . PS_UNPAYED;
 		$db->query($sql);
 	}
 }

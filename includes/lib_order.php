@@ -442,6 +442,15 @@ function order_info($order_id, $order_sn = '')
         $order['formated_surplus']        = price_format($order['surplus'], false);
         $order['formated_order_amount']   = price_format(abs($order['order_amount']), false);
         $order['formated_add_time']       = local_date($GLOBALS['_CFG']['time_format'], $order['add_time']);
+        
+        if (!empty($order['pay_time']))
+        {
+        	$order['formated_pay_time']       = local_date($GLOBALS['_CFG']['time_format'], $order['pay_time']);
+        }
+        if (!empty($order['receive_time']))
+        {
+        	$order['formated_receive_time']       = local_date($GLOBALS['_CFG']['time_format'], $order['receive_time']);
+        }
     }
 
     return $order;
@@ -3454,5 +3463,62 @@ function get_order_pickup_time($paytime)
 			'start' => $start->getTimestamp(),
 			'end'   => $end->getTimestamp()
 	);
+}
+
+/**
+ * 获取订单状态描述
+ *
+ * @param array $order
+ * @return string
+ */
+function get_order_custom_status($order)
+{
+	if ($order['pay_status'] == PS_UNPAYED)
+	{
+		return CS_ADDED;
+	}
+
+	if ($order['pay_status'] == PS_PAYING)
+	{
+		return CS_PAYING;
+	}
+
+	if ($order['pay_status'] == PS_PAYED)
+	{
+		return CS_PAID;
+	}
+
+	if ($order['order_status'] == OS_CONFIRMED)
+	{
+		if ($order['shipping_status'] == SS_PREPARING)
+		{
+			return CS_CONFIRMED;
+		}
+
+		if ($order['shipping_status'] == SS_SHIPPED)
+		{
+			return CS_UNPICK;
+		}
+
+		if ($order['shipping_status'] == SS_RECEIVED)
+		{
+			return CS_PICKED;
+		}
+	}
+
+	if ($order['order_status'] == OS_CANCELED)
+	{
+		return CS_CANCELED;
+	}
+
+	if ($order['order_status'] == OS_RETURNED)
+	{
+		return CS_RETURNED;
+	}
+
+	if ($order['order_status'] == OS_EXPIRED)
+	{
+		return CS_EXPIRED;
+	}
 }
 ?>

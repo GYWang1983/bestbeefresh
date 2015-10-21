@@ -2867,10 +2867,10 @@ function insert_error_log($type, $info, $file = '')
 	global $db, $ecs;
 
 	$log = array(
-			'type' => $type,
-			'info' => $info,
-			'file' => $file,
-			'time' => time(),
+		'type' => $type,
+		'info' => is_array($info) ? json_encode($info) : $info,
+		'file' => $file,
+		'time' => time(),
 	);
 
 	$db->autoExecute($ecs->table('error_log'), $log);

@@ -39,11 +39,11 @@ Template Type: type_0
 	.c-btn1 { border:none;display: inline-block;height: 2rem;line-height: 2rem;font-size:0.8rem;color: #fff;padding: 0 2rem; width:5rem; border-radius: 5px;background:#ec5151;}
 	.c-btn2 {color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:40%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#ec5151; text-align: center}
 	.c-btn2 a,.c-btn2 a:visited{color:#fff;}
-	.c-btn3 { color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#ee6a6a; text-align: center}
+	.c-btn3 { color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:1.2rem;background:#ffb24c; text-align: center}
 	.c-btn4 { color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#00D20D; text-align: center}
 	.c-btn3:disabled{background:#ccc;}
 	.hidden{display:none}
-	.wrap{padding:2rem 0 0 0;}
+	.wrap{padding:3rem 0 0 0;}
 	.price_s{color: #ec5151;font-size:1rem;display: inline-block;}
 	.price{color: #ec5151;font-size:1rem;display: inline-block; font-weight:bold}
 	.c333{ color:#333}
@@ -125,7 +125,7 @@ Template Type: type_0
      首页模块
 ==================== */
 	/*头部*/
-	#header{z-index:999;background-color:#ec5151;position:fixed;width:100%;height:3rem;display: block;}
+	#header{z-index:999;background-color:#4d9546;position:fixed;width:100%;height:3rem;display: block;}
 	#header h1{color: #fff;font-size: 1.2rem;line-height: 3rem;text-align:center;  font-weight:normal;}
 	#header .header_r{position: absolute;top: 0;right: 0;}
 	#header .header_r a {width: 3rem;height:3rem;display: block;padding: 0 0.2rem;text-indent: -999em;overflow: hidden;}
@@ -460,7 +460,7 @@ Template Type: type_0
 	.item_show_box2 .position_a_lt div,.item_show_box2 .position_a_rb div{
 	width:6rem; height:3.5rem; 
 	position:relative; 
-	background:#ee6a6a;}
+	background:#50944a;}
 	.item_show_box2 .position_a_lt a,.item_show_box2 .position_a_rb a{
 	display:block;
 	color: #FFFFFF;
@@ -487,7 +487,7 @@ Template Type: type_0
 	-o-transform: rotate(-180deg); /* Opera 10.5 */
 	-webkit-transform: rotate(-180deg); /* Saf3.1+, Chrome */}
 	/*循环分类*/
-	.item_show_box1  header{ background:#ee6a6a; color:#FFFFFF; font-size:0.8rem ;height:1.9rem; line-height:1.9rem;   padding-left:0.3rem; margin:0.6rem; text-align:right}
+	.item_show_box1  header{ background:#50944a; color:#FFFFFF; font-size:0.8rem ;height:1.9rem; line-height:1.9rem;   padding-left:0.3rem; margin:0.6rem; text-align:right}
 	.item_show_box1  header span{ float:left}
 	.item_show_box1  header .more{float:right;  margin:0.55rem 0.3rem 0 0}
 	.item_show_box1 .item_tags{ margin:0.6rem; }
@@ -611,8 +611,8 @@ Template Type: type_0
 	.filter{width:100%;text-align:center; height:2.4rem;background:#fff;}
 	.filter ul{display:table;width:100%;margin:0;padding:0;border-collapse:collapse}
 	.filter ul li{display:table-cell; padding:0.5rem 0}
-	.filter ul li.filter-cur{border-bottom:1px solid #ee6a6a}
-	.filter ul li.filter-cur a{color:#ee6a6a}
+	.filter ul li.filter-cur{border-bottom:1px solid #50944a}
+	.filter ul li.filter-cur a{color:#50944a}
 	.filter a{display:inline-block;width:100%; font-size:0.9rem;color:#666;text-decoration:none}
 	.filter a span{position:relative}
 	.filter a:hover{text-decoration:none}
@@ -622,8 +622,8 @@ Template Type: type_0
 	.filter .f-ico-triangle-mt,.filter .f-ico-triangle-mb{border-width:0.33rem;border-style:solid;border-color:transparent;height:0;width:0}
 	.filter .f-ico-triangle-mt{border-bottom-color:#666;top:-0.2rem}
 	.filter .f-ico-triangle-mb{border-top-color:#666;top:0.6rem}
-	.filter .filter-cur .f-ico-triangle-mt.f-ico-triangle-slctd{border-bottom-color:#ee6a6a}
-	.filter .filter-cur .f-ico-triangle-mb.f-ico-triangle-slctd{border-top-color:#ee6a6a}
+	.filter .filter-cur .f-ico-triangle-mt.f-ico-triangle-slctd{border-bottom-color:#50944a}
+	.filter .filter-cur .f-ico-triangle-mb.f-ico-triangle-slctd{border-top-color:#50944a}
 	.filter .filter-navBtn{padding:0} 
 	.filter .filter-navBtn a{border:1px solid #e2e2e2;border-radius:3px;width:80%;padding:0.13rem 0;color:#333}
 	/* 弹出筛选样式 */
@@ -675,7 +675,7 @@ Template Type: type_0
 	.srp .proImg-wrap img{border-radius:5px}
 	.srp .proInfo-wrap{float:left;padding:5px;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;-o-box-sizing:border-box;box-sizing:border-box}
 	.srp .proPrice{font-family:arial;height:20px;line-height:21px}
-	.srp .proPrice em{color:#ee6a6a;font-size:16px;font-weight:700;margin-left:2px}
+	.srp .proPrice em{color:#50944a;font-size:16px;font-weight:700;margin-left:2px}
 	.srp  del{color:#999;font-size:12px}
 	.srp .proTitle{overflow:hidden}
 	.srp .proTitle a{color:#333;font-size:13px;text-decoration:none;-webkit-transition:all .3s linear}
@@ -857,7 +857,7 @@ Template Type: type_0
 	.s-detail header{ position:sticky;top:0;z-index:1;margin-top: 10px;}
 	.s-detail header ul{text-align:center;font-size:0.8rem;background-color:#eee;display: -webkit-box }
 	.s-detail header ul li{background-color:#f5f5f5;color:#333;line-height:2.4rem;margin-right:1px;border-top:1px solid #f8f8f8;-webkit-box-flex:1;-webkit-box-sizing:border-box;box-sizing:border-box}
-	.s-detail header ul li.current{position:relative;background-color:#fff;border-top:0.1rem solid #ee6a6a}
+	.s-detail header ul li.current{position:relative;background-color:#fff;border-top:0.1rem solid #50944a}
 	.s-detail header ul li.current .mod{display:block}
 	.s-detail header ul li .review-count{font-size:0.76rem;color:#666}
 	.s-detail header ul li>a{display:block;height:100%}
@@ -905,7 +905,7 @@ Template Type: type_0
 	.cart-step{width:100%;text-align:center; height:2.4rem;background:#fff;}
 	.cart-step ul{display:table;width:100%;margin:0;padding:0;border-collapse:collapse; vertical-align:middle}
 	.cart-step ul li{display:table-cell; line-height:2.4rem; position:relative }
-	.cart-step ul .cur{  border-bottom:1px solid #ee6a6a; color:#ee6a6a  }
+	.cart-step ul .cur{  border-bottom:1px solid #50944a; color:#50944a  }
  
 	/* 购物浮动条 */
 	 
@@ -958,14 +958,20 @@ Template Type: type_0
 	.loginBox .hd span{ float:left; font-size:0.8rem; }
 	.loginBox .hd ul{ float:right;   }
 	.loginBox .hd ul li{ float:left; padding-left:0.5rem;   vertical-align:top;  }
-	.loginBox .hd ul li.on a{ color:#ee6a6a; display:block; height:2.5rem; line-height:2.5rem;   border-bottom:2px solid #ee6a6a;  }
-	.loginBox .bd   ul{ padding:0px 0.2rem;  }
+	.loginBox .hd ul li.on a{ color:#50944a; display:block; height:2.5rem; line-height:2.5rem;   border-bottom:2px solid #50944a;  }
+	.loginBox .bd ul{ padding:0px 0.2rem;  }
 	.loginBox .bd ul li{ border-bottom:1px dotted #ddd;  }
 	.loginBox .bd li a{ -webkit-tap-highlight-color:rgba(0,0,0,0); }  /* 去掉链接触摸高亮 */
 	.readMore{ display:block; height:30px; line-height:30px; margin:10px auto 20px auto;  text-align:center; text-decoration:underline;}
 	
 	
 	/* 订单确认页 */
+	.order_status{ background:#FFF; font-size:1.6rem; margin:0 auto; padding:5px; text-align:center;}
+	.order_status .status_1, .order_status .status_7, .order_status .status_9{ color:red; }
+	.order_status .status_2{ color:#ffb24c; }
+	.order_status .status_3, .order_status .status_4, .order_status .status_5{ color:#4d9546; }
+	.order_status .status_6, .order_status .status_8{ color:#000; }
+	
 	.order_box{ background:#FFF; font-size:0.8rem; margin:5px auto; padding:5px; }
 	.order_box .in{ display:block;
 	background:url(images/order_bg1.png) repeat-x;  
@@ -1125,7 +1131,7 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 ==================== */
 
 	/* 提示信息 */
-	.info a{ color:#fff;border:0;height:2.5rem; line-height:2.5rem; margin:1rem 10%; width:80%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#ee6a6a; text-align: center}	
+	.info a{ color:#fff;border:0;height:2.5rem; line-height:2.5rem; margin:1rem 10%; width:80%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#50944a; text-align: center}	
 	/* 文章列表 / 会员中心功能列表样式 */
 	.list_box { background:#FFF; font-size:0.8rem;word-break:break-all; word-wrap:break-word;}
 	.list_box img { width:100%; height: 100%}
@@ -1180,7 +1186,7 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 	background: url(images/jd_icon.png) -47px -806px no-repeat;
 }
 /*订单列表 操作按纽 add by yang*/
-.order_handler a{color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#46776f; text-align: center}
+.order_handler a{color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#ffb24c; text-align: center}
 .order_handler span {color:#fff;border:0;height:2.5rem; line-height:2.5rem; width:100%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#1BBD5C; text-align: center}
 
 .smart-result { padding: 0 }

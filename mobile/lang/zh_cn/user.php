@@ -298,6 +298,7 @@ $_LANG['os'][OS_SPLITING_PART] = '已确认';
 $_LANG['os'][OS_CANCELED] = '已取消';
 $_LANG['os'][OS_INVALID] = '无效';
 $_LANG['os'][OS_RETURNED] = '退货';
+$_LANG['os'][OS_EXPIRED]  = '已过期';
 
 $_LANG['ss'][SS_UNSHIPPED] = '未发货';
 $_LANG['ss'][SS_PREPARING] = '配货中';
@@ -307,8 +308,21 @@ $_LANG['ss'][SS_SHIPPED_PART] = '已发货(部分商品)';
 $_LANG['ss'][SS_SHIPPED_ING] = '配货中'; // 已分单
 
 $_LANG['ps'][PS_UNPAYED] = '未付款';
-$_LANG['ps'][PS_PAYING] = '付款中';
-$_LANG['ps'][PS_PAYED] = '已付款';
+$_LANG['ps'][PS_PAYING]  = '付款中';
+$_LANG['ps'][PS_PAYED]   = '已付款';
+$_LANG['ps'][PS_REFUND]  = '已退款';
+
+$_LANG['cs'][CS_ADDED]  = '待付款';
+$_LANG['cs'][CS_PAYING] = '付款中';
+$_LANG['cs'][CS_PAID]   = '已付款';
+$_LANG['cs'][CS_CONFIRMED] = '备货中';
+$_LANG['cs'][CS_UNPICK]  = '待取货';
+$_LANG['cs'][CS_PICKED]  = '已取货';
+$_LANG['cs'][CS_CANCELED] = '已取消';
+$_LANG['cs'][CS_RETURNED] = '已退货';
+$_LANG['cs'][CS_EXPIRED]  = '已过期';
+$_LANG['cs'][CS_EXPIRED]  = '已过期';
+$_LANG['cs'][CS_COMMENTED] = '已点评';
 
 $_LANG['shipping_not_need'] = '无需使用配送方式';
 $_LANG['current_os_not_unconfirmed'] = '当前订单状态不是“未确认”。';

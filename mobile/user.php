@@ -1240,27 +1240,33 @@ elseif ($action == 'order_detail')
     /* 未发货，未付款时允许更换支付方式 */
     if ($order['order_amount'] > 0 && $order['pay_status'] == PS_UNPAYED && $order['shipping_status'] == SS_UNSHIPPED)
     {
-        $payment_list = available_payment_list(false, 0, true);
-
-        /* 过滤掉当前支付方式和余额支付方式 */
-        if(is_array($payment_list))
-        {
-            foreach ($payment_list as $key => $payment)
-            {
-                if ($payment['pay_id'] == $order['pay_id'] || $payment['pay_code'] == 'balance')
-                {
-                    unset($payment_list[$key]);
-                }
-            }
+    	if (!is_wechat_browser())
+    	{
+        	$payment_list = available_payment_list(false, 0, true);
+    	}
+    	else
+    	{
+    		$payment_list = available_payment_list(false, 0, false, true);
+    	}
+    	
+        $smarty->assign('need_pay', true);
+        if (count($payment_list) > 1)
+        {	
+        	$smarty->assign('payment_list', $payment_list);
         }
-        $smarty->assign('payment_list', $payment_list);
+        else
+        {
+        	$smarty->assign('payment', $payment_list[0]);
+        }
     }
 
     /* 订单 支付 配送 状态语言项 */
-    $order['order_status'] = $_LANG['os'][$order['order_status']];
-    $order['pay_status'] = $_LANG['ps'][$order['pay_status']];
-    $order['shipping_status'] = $_LANG['ss'][$order['shipping_status']];
-
+    //$order['order_status'] = $_LANG['os'][$order['order_status']];
+    //$order['pay_status'] = $_LANG['ps'][$order['pay_status']];
+    //$order['shipping_status'] = $_LANG['ss'][$order['shipping_status']];
+    $order['order_cs'] = get_order_custom_status($order);
+    $order['order_cs_desc'] = $_LANG['cs'][$order['order_cs']];
+    
     $smarty->assign('order',      $order);
     $smarty->assign('goods_list', $goods_list);
     $smarty->display('user_transaction.dwt');
@@ -2495,7 +2501,14 @@ elseif ($action == 'act_edit_payment')
     $db->query($sql);
 
     /* 跳转 */
-    ecs_header("Location: user.php?act=order_detail&order_id=$order_id\n");
+    //ecs_header("Location: user.php?act=order_detail&order_id=$order_id\n");
+    
+    //返回支付代码
+    include_once(ROOT_PATH . 'include/modules/payment/' . $payment_info['pay_code'] . '.php');
+    $pay_obj    = new $payment_info['pay_code'];
+    $pay_online = $pay_obj->get_code($order, unserialize_config($payment_info['pay_config']));
+    
+    echo $pay_online;
     exit;
 }
 
