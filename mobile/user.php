@@ -1277,8 +1277,9 @@ elseif ($action == 'cancel_order')
 {
     include_once(ROOT_PATH . 'include/lib_transaction.php');
     include_once(ROOT_PATH . 'include/lib_order.php');
-
-    $order_id = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
+    include_once(ROOT_PATH . 'include/lib_clips.php');
+    
+    $order_id = isset($_REQUEST['order_id']) ? intval($_REQUEST['order_id']) : 0;
 
     if (cancel_order($order_id, $user_id))
     {

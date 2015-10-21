@@ -181,7 +181,7 @@ wx.ready(function() {
     		$db->query($sql);
     		
     		$data['paytype'] = 'wxpay';
-    		insert_error_log('pay', json_encode($data), __FILE__);
+    		insert_error_log('pay', $data, __FILE__);
     	}
     	else
     	{
@@ -190,6 +190,7 @@ wx.ready(function() {
     		
     		//更新pay_log的order_sn，退款时会用到
     		$sql = "UPDATE " . $ecs->table('pay_log') . " SET outer_sn = '$data[transaction_id]' WHERE log_id = '$log_id'";
+    		$db->query($sql);
     	}
     	
     	$this->outputXml();
@@ -208,9 +209,9 @@ wx.ready(function() {
     	
     	//获取pay_log记录
     	$sql = "SELECT * FROM " . $ecs->table('pay_log') . 
-    		" WHERE order_id = '$order[order_id]' AND pay_id = '$payment[pay_id]' AND is_paid = 1 ORDER BY log_id DESC LIMIT 1";
+    		" WHERE order_id = '$order[order_id]' AND pay_id = '$order[pay_id]' AND is_paid = 1 ORDER BY log_id DESC LIMIT 1";
     	$log = $db->getRow($sql);
-    	
+
     	if (empty($log))
     	{
     		return false;
@@ -233,7 +234,7 @@ wx.ready(function() {
     		'total_fee'      => $log['order_amount'] * 100,	//订单支付金额
     		'transaction_id' => $log['outer_sn'],			//微信订单号
     	);
-    	
+
     	$refund['sign'] = $this->sign($refund, $payment['wxpay_key']);
     	
     	// 调用微信退款接口
@@ -249,19 +250,21 @@ wx.ready(function() {
 		$curl->option(CURLOPT_SSLKEY, ROOT_PATH . '../data/cert/wxpay_key.pem');
 		
 		$xml = array2xml($refund);
+		//echo htmlspecialchars($xml);exit;
 		$response = $curl->post('secapi/pay/refund', $xml, 'xml');
 		
 		// 检查错误
-		if ($response['return_code'] == 'FAIL')
+		if ($response['return_code'] == 'FAIL' || $response['result_code'] == 'FAIL')
 		{
-			//return $this->errJSON($response['return_code'], $response['return_msg'], FALSE);
-		}
-		elseif ($response['result_code'] == 'FAIL')
-		{
-			//return $this->errJSON($response['err_code'], $response['err_code_des'], FALSE);
+			$response['paytype']  = 'wxpay';
+			$response['order_id'] = $order['order_id'];
+			insert_error_log('refund', $response, __FILE__);
+			return false;
 		}
 		
-		//TODO: pay_log 插入退款记录
+		//pay_log 插入退款记录
+		insert_pay_log($order['order_id'], $amount, $order['pay_id'], PAY_ORDER, 3);
+		return true;
     }
 
     /**
@@ -275,7 +278,7 @@ wx.ready(function() {
     	
     	// 查找当前订单是否已经存在同一订单号
     	$sql = "SELECT * FROM " . $ecs->table('pay_log') . 
-    		" WHERE order_id = '$order[order_id]' AND pay_id = '$payment[pay_id]' AND is_paid = 0 " .
+    		" WHERE order_id = '$order[order_id]' AND pay_id = '$order[pay_id]' AND is_paid = 0 " .
     		" AND outer_sn IS NOT NULL AND deadline > $timestamp ORDER BY log_id DESC LIMIT 1";
     	$log = $db->getRow($sql);
     	

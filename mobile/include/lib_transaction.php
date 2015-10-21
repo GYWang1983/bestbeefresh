@@ -379,7 +379,7 @@ function cancel_order($order_id, $user_id = 0)
     }
     
     // 如果已付款，走退款流程
-    if ($order['pay_status'] != PS_PAYED && $order['money_paid'] > 0)
+    if ($order['pay_status'] == PS_PAYED && $order['money_paid'] > 0)
     {
     	$payment = payment_info($order['pay_id']);
     	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');

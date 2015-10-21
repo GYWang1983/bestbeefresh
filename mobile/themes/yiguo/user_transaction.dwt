@@ -464,15 +464,15 @@ jQuery(function($){
       </table>
       <!-- {elseif $order.order_cs eq CS_PAID} -->
       <form name="refund" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
-        <input type="hidden" id="act" value="cancel_order" />
-        <input type="hidden" id="order_id" value="{$order.order_id}" />
-        <input type="submit" id="refund" class="c-btn3" value="申请退款" />
+        <input type="hidden" name="act" value="cancel_order" />
+        <input type="hidden" name="order_id" value="{$order.order_id}" />
+        <input type="submit" name="refund" class="c-btn3" value="申请退款" />
       </form>
       <!-- {elseif $order.order_cs eq CS_ADDED} -->
-      <form name="refund" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
-        <input type="hidden" id="act" value="cancel_order" />
-        <input type="hidden" id="order_id" value="{$order.order_id}" />
-        <input type="submit" id="refund" class="c-btn3" value="取消订单" />
+      <form name="cancel" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
+        <input type="hidden" name="act" value="cancel_order" />
+        <input type="hidden" name="order_id" value="{$order.order_id}" />
+        <input type="submit" name="cancel" class="c-btn3" value="取消订单" />
       </form>
       <!-- {/if} -->   
     </section>

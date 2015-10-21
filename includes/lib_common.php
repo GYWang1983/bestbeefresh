@@ -2868,7 +2868,7 @@ function insert_error_log($type, $info, $file = '')
 
 	$log = array(
 		'type' => $type,
-		'info' => is_array($info) ? json_encode($info) : $info,
+		'info' => is_array($info) ? json_encode($info, JSON_UNESCAPED_UNICODE) : $info,
 		'file' => $file,
 		'time' => time(),
 	);

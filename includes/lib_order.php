@@ -3473,19 +3473,22 @@ function get_order_pickup_time($paytime)
  */
 function get_order_custom_status($order)
 {
-	if ($order['pay_status'] == PS_UNPAYED)
+	if ($order['order_status'] == OS_UNCONFIRMED)
 	{
-		return CS_ADDED;
-	}
-
-	if ($order['pay_status'] == PS_PAYING)
-	{
-		return CS_PAYING;
-	}
-
-	if ($order['pay_status'] == PS_PAYED)
-	{
-		return CS_PAID;
+		if ($order['pay_status'] == PS_UNPAYED)
+		{
+			return CS_ADDED;
+		}
+	
+		if ($order['pay_status'] == PS_PAYING)
+		{
+			return CS_PAYING;
+		}
+	
+		if ($order['pay_status'] == PS_PAYED)
+		{
+			return CS_PAID;
+		}
 	}
 
 	if ($order['order_status'] == OS_CONFIRMED)

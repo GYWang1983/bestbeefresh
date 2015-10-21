@@ -1345,10 +1345,9 @@ function write_config($name, $caches)
  * @param array  $data
  * @param string $item
  */
-function array2xml($data, $item = 'item')
+function array2xml($data, $item = 'item', $xml = NULL)
 {
-
-	$xml = new \SimpleXMLElement ('<xml></xml>');
+	$xml = empty($xml) ? new SimpleXMLElement('<xml></xml>') : $xml;
 
 	foreach ($data as $key => $value)
 	{
@@ -1356,11 +1355,11 @@ function array2xml($data, $item = 'item')
 		if (is_array($value) || is_object($value))
 		{
 			$child = $xml->addChild($key);
-			$this->_data2xml($child, $value, $item);
+			array2xml($value, $item, $xml);
 		}
 		else
 		{
-			if (is_numeric($value))
+			if (is_numeric($value) || ctype_alnum($value))
 			{
 				$child = $xml->addChild($key, $value);
 			}
@@ -1370,6 +1369,7 @@ function array2xml($data, $item = 'item')
 				$node  = dom_import_simplexml($child);
 				$node->appendChild($node->ownerDocument->createCDATASection($value));
 			}
+			
 		}
 	}
 
