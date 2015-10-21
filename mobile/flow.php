@@ -1792,11 +1792,21 @@ elseif ($_REQUEST['step'] == 'done')
     unset($_SESSION['flow_order']);
     unset($_SESSION['direct_shopping']);
 }
-
 /*------------------------------------------------------ */
-//-- 更新购物车
+//-- 已提交支付请求
 /*------------------------------------------------------ */
-
+elseif ($_REQUEST['step'] == 'paid')
+{
+	$order_id = trim($_POST['order_id']);	
+	if (!empty($order_id))
+	{
+		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('order_info') .
+        		" SET pay_status = " . PS_PAYING . "," .
+                " pay_time = ". time() .
+                " WHERE order_id = '$order_id' AND pay_status = " . PS_UNPAYED;
+		$db->query($sql);
+	}
+}
 elseif ($_REQUEST['step'] == 'update_cart')
 {
     if (isset($_POST['goods_number']) && is_array($_POST['goods_number']))

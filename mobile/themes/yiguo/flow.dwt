@@ -521,7 +521,11 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <h6 style="text-align:center;line-height:20px;">{$lang.remember_order_number}: <font style="color:red">{$order.order_sn}</font></h6>
             <table width="90%" align="center" border="0" cellpadding="15" cellspacing="0" style="border:1px solid #ddd; margin:10px auto;" bgcolor="#FFFFFF">
               <tr>
-                <td align="left" style="padding: 5px;line-height: 24px;"><!--{if $order.shipping_name}-->{$lang.select_shipping}: <strong>{$order.shipping_name}</strong><br><!--{/if}-->{$lang.select_payment}: <strong>{$order.pay_name}</strong><br>{$lang.order_amount}: <strong>{$total.amount_formated}</strong><br>{$order.pay_desc}</td>
+                <td align="center" style="padding:5px;line-height:40px;font-size:1.8rem;">
+                <!--{if $order.shipping_name}-->{$lang.select_shipping}: <strong>{$order.shipping_name}</strong><br><!--{/if}-->
+                <strong>{$order.pay_name}</strong><br>
+                <strong style="color:red">{$total.amount_formated}</strong>
+                </td>
               </tr>
               <!-- {if $pay_online} --> 
               <!-- 如果是线上支付则显示支付按钮 -->
