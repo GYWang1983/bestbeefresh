@@ -497,10 +497,6 @@ function checkOrderForm(frm)
     }
   }
   
-  if (is_wechat_browser == 1) {
-	  paymentSelected = true;
-  }
-
   if (!shippingSelected)
   {
     alert(flow_no_shipping);
