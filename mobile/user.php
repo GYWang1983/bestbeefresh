@@ -516,7 +516,8 @@ elseif ($action == 'act_login')
         if (!empty($_POST['next'])) {
         	ecs_header("Location: flow.php?step={$_POST[next]}\n");
         } else {
-        	show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+        	//show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+        	ecs_header("Location: user.php\n");
         }
     }
     else
@@ -1283,8 +1284,9 @@ elseif ($action == 'cancel_order')
 
     if (cancel_order($order_id, $user_id))
     {
-        ecs_header("Location: user.php?act=order_list\n");
-        exit;
+        //ecs_header("Location: user.php?act=order_list\n");
+    	show_message('订单取消成功', $_LANG['order_list_lnk'], 'user.php?act=order_list');
+    	exit;
     }
     else
     {
