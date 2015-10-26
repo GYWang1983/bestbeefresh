@@ -23,8 +23,15 @@
                 if(options){
                     $.extend(settings, options);
                 }
-                template = $(this).children(settings.template).wrap('<div/>').parent();
-                template.css('display','none')
+                variables.last = 0;
+                if ($('.more_div_template', this).length == 0) {
+                	template = $(this).children(settings.template).wrap('<div class="more_div_template"/>').parent();
+                	template.css('display','none');
+                } else {
+                	template = $('.more_div_template', this);
+                }
+                $(settings.template + ':visible').remove();
+                $('.more_loader_spinner', this).remove();
                 $(this).append('<div class="more_loader_spinner">'+settings.spinner_code+'</div>')
                 $(this).children(settings.template).remove()   
                 target = $(this);
@@ -45,54 +52,40 @@
                 target.more('get_data');
             }
         },
-        debug :   function(){
+        debug : function(){
             var debug_string = '';
             $.each(variables, function(k,v){
                 debug_string += k+' : '+v+'\n';
             })
             alert(debug_string);
         },     
-        remove        : function(){            
+        remove : function(){            
             target.children(settings.trigger).unbind('.more');
-            target.unbind('.more')
+            target.unbind('.more');
             target.children(settings.trigger).remove();
         },
-        add_elements  : function(data){
-            //alert('adding elements')
-            
-            var root = target       
-         //   alert(root.attr('id'))
-            var counter = 0;
+        add_elements : function(data){
+            var root = target, counter = 0;
             if(data){
                 $(data).each(function(){
-                    counter++
-                    var t = template                    
+                    counter++;
+                    var t = template;
                     $.each(this, function(key, value){                          
                         if(t.find('.'+key)) t.find('.'+key).html(value);
-                    })         
-                    //t.attr('id', 'more_element_'+ (variables.last++))
+                    })
                     if(settings.scroll == 'true'){
-                    //    root.append(t.html())
-                    root.children('.more_loader_spinner').before(t.html())  
+                        root.children('.more_loader_spinner').before(t.html())  
                     }else{
-                    //    alert('...')
-                          
-                          root.children(settings.trigger).before(t.html())  
-
+                        root.children(settings.trigger).before(t.html())  
                     }
-
                     root.children(settings.template+':last').attr('id', 'more_element_'+ ((variables.last++)+1))  
-                 
                 })
-                
-                
             }            
             else  methods.remove()
             target.children('.more_loader_spinner').css('display','none');
             if(counter < settings.amount) methods.remove()            
-
         },
-        get_data      : function(){   
+        get_data : function(){   
            // alert('getting data')
             var ile;
             lock = true;
@@ -104,8 +97,8 @@
             }
             
             $.post(settings.address, {
-                last : variables.last, 
-                amount : ile                
+                last : variables.last,
+                amount : ile
             }, function(data){            
                 $(settings.trigger).css('display','block')
                 methods.add_elements(data)
