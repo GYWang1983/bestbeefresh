@@ -11,7 +11,7 @@
         'format'      :   'json',
         'template'    :   '.single_item',
         'trigger'     :   '.get_more',
-        'scroll'      :   'false',
+        'scroll'      :   false,
         'offset'      :   '100',
         'spinner_code':   ''
     }
@@ -32,18 +32,19 @@
                 }
                 $(settings.template + ':visible').remove();
                 $('.more_loader_spinner', this).remove();
-                $(this).append('<div class="more_loader_spinner">'+settings.spinner_code+'</div>')
-                $(this).children(settings.template).remove()   
+                
                 target = $(this);
-                if(settings.scroll == 'false'){                    
-                    $(this).find(settings.trigger).bind('click.more',methods.get_data);
-                    $(this).more('get_data');
+                target.append('<div class="more_loader_spinner">'+settings.spinner_code+'</div>')
+                target.children(settings.template).remove()   
+                if(settings.scroll == false) {
+                	target.find(settings.trigger).bind('click.more',methods.get_data);
+                	target.more('get_data');
                 }                
                 else{
                     if($(this).height() <= $(this).attr('scrollHeight')){
                         target.more('get_data',settings.amount*2);
                     }
-                    $(this).bind('scroll.more',methods.check_scroll);
+                    target.bind('scroll.more',methods.check_scroll);
                 }
             })
         },
@@ -62,7 +63,7 @@
         remove : function(){            
             target.children(settings.trigger).unbind('.more');
             target.unbind('.more');
-            target.children(settings.trigger).remove();
+            //target.children(settings.trigger).remove();
         },
         add_elements : function(data){
             var root = target, counter = 0;
@@ -85,9 +86,9 @@
             target.children('.more_loader_spinner').css('display','none');
             if(counter < settings.amount) methods.remove()            
         },
-        get_data : function(){   
-           // alert('getting data')
+        get_data : function(){
             var ile;
+            if (lock) return;
             lock = true;
             target.children(".more_loader_spinner").css('display','block');
             $(settings.trigger).css('display','none');

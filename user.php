@@ -989,7 +989,7 @@ elseif ($action == 'order_list')
 
     $pager  = get_pager('user.php', array('act' => $action), $record_count, $page);
 
-    $orders = get_user_orders($user_id, $pager['size'], $pager['start']);
+    $orders = get_user_orders($user_id, '', $pager['size'], $pager['start']);
     $merge  = get_user_merge($user_id);
 
     $smarty->assign('merge',  $merge);

@@ -1115,7 +1115,7 @@ elseif ($action == 'order_list')
 
     $pager  = get_pager('user.php', array('act' => $action), $record_count, $page);
 
-    $orders = get_user_orders($user_id, $pager['size'], $pager['start']);
+    $orders = get_user_orders($user_id, '', $pager['size'], $pager['start']);
     $merge  = get_user_merge($user_id);
 
     $smarty->assign('merge',  $merge);
@@ -1131,16 +1131,32 @@ elseif ($action == 'async_order_list')
     
     $start = $_POST['last'];
     $limit = $_POST['amount'];
+    $status = intval($_GET['status']);
     
-    $orders = get_user_orders($user_id, $limit, $start);
+    switch ($status)
+    {
+    case 1:
+    	$cond = 'pay_status IN (' . PS_UNPAYED . ',' . PS_PAYING . ')';
+    	break;
+    case 2:
+    	$cond = 'pay_status = ' . PS_PAYED . ' AND shipping_status != ' . SS_RECEIVED . ' AND order_status IN (' . OS_CONFIRMED . ',' . OS_UNCONFIRMED . ')';
+    	break;
+    case 3:
+    	$cond = 'shipping_status = ' . SS_RECEIVED . ' OR order_status IN (' . OS_CANCELED . ',' . OS_EXPIRED . ',' . OS_RETURNED . ')';
+    	break;
+    default:
+    	$cond = '';
+    }
+    
+    $orders = get_user_orders($user_id, $cond, $limit, $start);
     if(is_array($orders)){
         foreach($orders as $vo){
             //获取订单第一个商品的图片
             $img = $db->getOne("SELECT g.goods_thumb FROM " .$ecs->table('order_goods'). " as og left join " .$ecs->table('goods'). " g on og.goods_id = g.goods_id WHERE og.order_id = ".$vo['order_id']." limit 1");
-            $tracking = ($vo['shipping_id'] > 0) ? '<a href="user.php?act=order_tracking&order_id='.$vo['order_id'].'" class="c-btn3">订单跟踪</a>':'';
+            //$tracking = ($vo['shipping_id'] > 0) ? '<a href="user.php?act=order_tracking&order_id='.$vo['order_id'].'" class="c-btn3">订单跟踪</a>':'';
             $asyList[] = array(
                 'order_status' => '订单状态：'.$vo['order_status'],
-                'order_handler' => $vo['handler'],
+                //'order_handler' => $vo['handler'],
                 'order_content' => '<a href="user.php?act=order_detail&order_id='.$vo['order_id'].'"><table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table_no_border">
             <tr>
                 <td><img src="'.$config['site_url'].$img.'" width="50" height="50" /></td>
@@ -1150,7 +1166,7 @@ elseif ($action == 'async_order_list')
                 <td style="position:relative"><span class="new-arr"></span></td>
             </tr>
           </table></a>',
-                'order_tracking' => $tracking
+                //'order_tracking' => $tracking
             );
         }
     }

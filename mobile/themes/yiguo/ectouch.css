@@ -577,12 +577,9 @@ Template Type: type_0
 	.pagenav-wrapper  a{ color:#333}
 	.pagenav-wrapper  a.no{ color:#B4B1B1}
 	.pagenav a:hover{text-decoration:none}
-	
-	
 /* ====================
      所有分类页
 ==================== */
- 
 	.clist{  width:100%;backgroubd:#f4f4f4;clear:both}
 	.clist ul{ width:100%; background:#f4f4f4}
 	.clist_sub{border-bottom:1px solid #d7d7d8}
@@ -597,11 +594,9 @@ Template Type: type_0
 	.crow_title span{font-size:1rem;heigth:4.5rem}
 	.crow_arrow{float:right;margin-right:1.2rem}
 	.crow_arrow img{ width:1rem;} 
-
 /* ====================
      分类页
 ==================== */
-
 	/* 三种样式切换 */
 	.switchBtn{-webkit-background-size:1.2rem 1.2rem;-moz-background-size:1.2rem 1.2rem;background-size:1.2rem 1.2rem; }
 	.switchBtn-list{background:url(images/sort1.png) no-repeat 50% 50%;opacity:1}
@@ -736,7 +731,6 @@ Template Type: type_0
 /* ====================
      商品详细页
 ==================== */
-
 	/* 商品页详细图 */
 	.goods_slider{background-color:#fff; height:auto;position:relative}
 	.goods_slider .scroller{transition-property: transform; transition-timing-function: cubic-bezier(0, 0, 0.25, 1); transition-duration: 0ms; transform: translate3d(0px, 0px, 0px); max-width:80%; overflow:hidden; margin: 0 auto;display:-webkit-box;-webkit-box-lines:multiple}
@@ -751,7 +745,6 @@ Template Type: type_0
 	.goods_slider .slideBox .bd li{ position:relative; text-align:center; width:100%; }
 	.goods_slider .slideBox .bd li img{ background:url(images/loading.gif) center center no-repeat;  vertical-align:middle; margin: auto 0; width:100%; height:auto; /* 图片宽度100%，达到自适应效果 */}
 	/* 商品参数 */
-	 
 	.goodsInfo{background-color:#fff;padding:0 1.5rem; }
 	.goodsInfo .collect{display:none;float:right;clear:both;color:#fff;font-size:0.8rem;font-weight:700;padding:0 0.8rem 0 2.2rem;height:1.7rem;line-height:1.7rem;margin:-3rem -0.5rem 0.5rem 0;position:relative;z-index:1;-webkit-border-radius:2rem;border-radius:2rem;background:url(images/ico_star.png) no-repeat 0.8rem 50% rgba(0,0,0,.2); background-size: 1rem 1rem }
 	.goodsInfo h1{background-color:rgba(255,255,255,0.9);padding:1rem 0; padding-bottom:0.5rem;font-size:0.9rem}
@@ -775,7 +768,6 @@ Template Type: type_0
 	-o-transform: rotate(-45deg);
 	top:0.4rem;
 	}
- 
 	/* 购买模块 */
 	.goodsBuy{padding:0 0.5rem;margin:0.7rem 0;background-color:#fff; }
 	.goodsBuy .info{display:block;color:#999;padding:0.63rem 0 0.47rem;border-bottom:1px solid #f3f3f3}
@@ -873,11 +865,8 @@ Template Type: type_0
 	.s-detail .list li .tit span{ float:left; color:#333}
 	.s-detail .list li p{ line-height:1.5rem;   display:block; padding:0 0.5rem}
 	.s-detail .list li .star{ width:5.8rem; height:auto; vertical-align:middle}
-	
 	.s-detail .commentsList{ background:#FFF;    padding:0.5rem; }
 	.s-detail .commentsList td{ padding:5px 0}
-	
-	 
 	.s-detail .m-recommend li{-webkit-border-radius:0.13rem;border-radius:0.13rem; margin-bottom:0.52rem; width:49%; float:left}
 	.s-detail .m-recommend a{display:block}
 	.s-detail .m-recommend .summary{background-color:#fff;position:relative;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center}
@@ -887,12 +876,9 @@ Template Type: type_0
 	.s-detail .m-recommend .reviews blockquote{padding:0.5rem 0;border-bottom:1px solid #e9e9e9}
 	.s-detail .m-recommend .reviews blockquote:last-child{border:0}
 	.s-detail .m-recommend .reviews .user{color:#333;margin-right:1rem}
-	
-	
 /* ====================
      购物车页面
 ==================== */
-	
 	/* 购物车为空 */
 	.empty-cart .cart-logo {height:5.3rem;margin:3rem auto;-webkit-background-size:5.3rem 4.9rem;-moz-background-size:5.3rem 4.9rem;background-size:5.3rem 4.9rem; }
 	.empty-cart p.message {font-size:14px;margin-bottom:30px;text-align:center}
@@ -906,14 +892,10 @@ Template Type: type_0
 	.cart-step ul{display:table;width:100%;margin:0;padding:0;border-collapse:collapse; vertical-align:middle}
 	.cart-step ul li{display:table-cell; line-height:2.4rem; position:relative }
 	.cart-step ul .cur{  border-bottom:1px solid #50944a; color:#50944a  }
- 
 	/* 购物浮动条 */
-	 
 	.toolbar {background:#fff;position:fixed;bottom:0;width:100%;height:2.67rem;font-size:0.8rem;overflow:hidden}
 	.toolbar p {width:55%;height:2.67rem; padding-left:0.5rem;display:-webkit-box;-webkit-box-align:center}
 	.toolbar a{display:block; text-align:center; line-height:2.67rem;position: absolute;right: 0;top:0; width: 40%;height: 100%;border: 0;font-size: 1rem;border-radius: 1px;-webkit-border-radius: 1px;color: #FFF; background:#ec5151}
-	
-	
 	/* 购物车商品列表 */
 	.itemlist{ padding:0.8rem 0;    border:1px solid #ddd; background:#FFF}
 	.itemlist li{ padding:0.9rem  ;position:relative; border-bottom:1px solid #ddd  }
@@ -932,26 +914,19 @@ Template Type: type_0
 	.itemlist .inputBg{ vertical-align:middle}
 	.itemlist li .inputBg{ width:20%; text-align:center}
 	.itemlist li p{ color:#999}
-	
 	/* div表格化 */
 	.table_box{}
 	.table_box { }
 	.table_box dl{ padding:0.5rem 0; display:table; width:100% }
 	.table_box dd{display:table-cell; }
 	.table_box dd .inputBg{ }
-	
-	
 	/* 文字 */
     .f6{ font-size:0.8rem; color:#1CA2E1;  height:1.8rem; line-height:1.8rem; padding:0; margin-right:2.8rem; display:inline-block; border:none ; background:none; vertical-align:top; }
-	
 	/* 合作登录 */
 	.hezuo .t{ height:2.4rem; line-height:2.4rem}
 	.hezuo .b { display:block}
 	.hezuo .b a{ display:inline-block; margin:0 0.7rem 0.5rem 0; }
 	.hezuo .b img{ width:3.2rem; height:3.2rem; }
-	
-	
-	
 	/* 登录注册切换模块 */
 	.loginBox{ margin:10px auto;   }
 	.loginBox .hd{ height:2.7rem; line-height:2.5rem; font-size:1.1rem; overflow:hidden;   }
@@ -963,10 +938,8 @@ Template Type: type_0
 	.loginBox .bd ul li{ border-bottom:1px dotted #ddd;  }
 	.loginBox .bd li a{ -webkit-tap-highlight-color:rgba(0,0,0,0); }  /* 去掉链接触摸高亮 */
 	.readMore{ display:block; height:30px; line-height:30px; margin:10px auto 20px auto;  text-align:center; text-decoration:underline;}
-	
-	
 	/* 订单确认页 */
-	.order_status{ background:#FFF; font-size:1.6rem; margin:0 auto; padding:5px; text-align:center;}
+	.order_detail .order_status{ background:#FFF; font-size:1.6rem; margin:0 auto; padding:5px; text-align:center;}
 	.order_status .status_1, .order_status .status_7, .order_status .status_9{ color:red; }
 	.order_status .status_2{ color:#ffb24c; }
 	.order_status .status_3, .order_status .status_4, .order_status .status_5{ color:#4d9546; }
@@ -978,7 +951,6 @@ Template Type: type_0
 	-webkit-background-size:2.4rem 0.4rem;
 	-moz-background-size:2.4rem 0.4rem;
 	background-size:2.4rem 0.4rem;}
-	
 	/* 订单确认页通用表格 */
 	.order_box .table_box dl{ border-bottom:1px solid #f3f3f3; padding:0.2rem 0; }
 	.order_box .line_no dl{ border-bottom:none; padding:0.4rem 0}
@@ -986,7 +958,6 @@ Template Type: type_0
 	.order_box .in{ color:#333; font-size:0.8rem; padding:0.8rem 0 0 0}
 	.order_box .in .f1{ font-size:1.1rem}
 	.order_box .in .ico_14{ display:inline-block; width:1rem; height:1rem;-webkit-background-size:1rem 1rem;-moz-background-size:1rem 1rem;background-size:1rem 1rem;}
-	
 	/* 订单确认页表格_中间模块 */
 	.order_box .table_box2 dl{ padding:0; position:relative}
  
@@ -997,7 +968,6 @@ Template Type: type_0
 	.table_box2  input.radio{width:auto;}
 	.table_box2 .span1{ font-size:0.8rem; background:#ec5151; color:#FFF; display:inline-block; padding:0 0.2rem}
 	.table_box2 .dd3{ text-align:right}
-	
 	.table_box2  i{	background-image: -webkit-linear-gradient(left,transparent 70%,#666 70%,#666 100%),-webkit-linear-gradient(top,transparent 70%,#666 70%,#666 100%);
 		background-image: -moz-linear-gradient(left,transparent 70%,#666 70%,#666 100%),-moz-linear-gradient(top,transparent 70%,#666 70%,#666 100%);
 		background-image: -o-linear-gradient(left,transparent 70%,#666 70%,#666 100%),-o-linear-gradient(top,transparent 70%,#666 70%,#666 100%);
@@ -1010,7 +980,6 @@ Template Type: type_0
 		-moz-transform: rotate(45deg);
 		-o-transform: rotate(45deg);
 		top:1rem; right:0.5rem; }
-		
 	.table_box2 .modRadio{ background-color: #B3B3B3; border-radius: 2px;color: #FFFFFF;display: inline-block;height: 19px;line-height: 19px;overflow: hidden;padding: 1px; text-align: center; width: 38px;}
 	.table_box2 .modRadio .fl { margin-left: 1px;}
 	.table_box2 .modRadio i {  background: none repeat scroll 0 0 #FFFFFF;border-radius: 2px;display: inline-block;height: 17px;margin: 1px 1px 0 0;width: 17px;
@@ -1032,31 +1001,21 @@ Template Type: type_0
 	.f4_b{ color: #ec5151;display: inline-block; }
 	
 	.select_city select{}
-	
-	
 /* ====================
      文章页面
 ==================== */
-	
 	.art_content{ background:#FFF;overflow:hidden; padding:1rem;}
 	.art_content>h2{margin-bottom:0.5rem; text-align:right; color:#999; line-height:1.8rem; font-weight:normal; font-size:0.8rem}
 	.art_content>h2 span{font-size:1rem;color:#333; float:left; font-weight:bold }
 	.art_content img{box-sizing:border-box;width:100%; height:auto}
-	 
-
-
-
 /* ====================
      会员中心页
 ==================== */
-
-
 .user_top {
 height: 9.6rem;
 overflow: hidden; 
 background:#ffbf6b;
-position:relative
-
+position:relative;
 }
 .user_top dt {
 float: left;
@@ -1124,12 +1083,13 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.15);
 .user_top .quan3{ position:absolute; right:5rem; top:4.5rem; width:2rem; height:2rem;border-radius: 3rem; background:rgba(255,255,255,0.05);
 box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 }
-
-	
+/*订单列表*/
+ul.order_list_tab{width:100%;text-align:center;font-size:1.4rem;}
+ul.order_list_tab li{float:left; width:25%;background-color:#fff;}
+ul.order_list_tab li.active{color: #4d9546;border-bottom: solid 2px #4d9546;}
 /* ====================
      其他页
 ==================== */
-
 	/* 提示信息 */
 	.info a{ color:#fff;border:0;height:2.5rem; line-height:2.5rem; margin:1rem 10%; width:80%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#50944a; text-align: center}	
 	/* 文章列表 / 会员中心功能列表样式 */
@@ -1155,9 +1115,7 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 	.share2{ float:right}	
 	.share2 a{ float:left}	
 	.share2  span{ float:left; padding-top:0.8rem}
-	
-	
- 
+
 	.share ul{ -webkit-flex-flow: row;}
 	.share ul li{ -webkit-box-flex: 1;-moz-box-flex: 1;-ms-box-flex: 1;box-flex: 1; float: left; width:50%; height:3rem;line-height:3rem; position:relative}
 	.share ul li span{ position:absolute; left:2.5rem; top:0rem; z-index:1}
@@ -1210,17 +1168,14 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 
 .inputBg_touch {height:24px; border:1px #DDD solid; width:90%;}
 
-
 /* ====================
  新增样式 by Leah
 ==================== */
 .gift{ float:left;}
 .gift dd{ clear: both; text-align: center;}
-
 /* ====================
  品牌页 by Leah
 ==================== */
-
 .waterfallCon {
     margin-left: auto;
     margin-right: auto;

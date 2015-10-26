@@ -1374,7 +1374,7 @@ nation=大雁塔&mode=driving&region=西安&output=html';
 	} 
 	public function orders($user_id, $size = 10, $start = 0) {
 		include_once(ROOT_PATH . 'includes/lib_transaction.php');
-		$orders = get_user_orders($user_id, $size, $start);
+		$orders = get_user_orders($user_id, '', $size, $start);
 		return $orders;
 	} 
 	public function kuaidi($invoice_no, $shipping_name) {

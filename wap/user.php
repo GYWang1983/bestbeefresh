@@ -86,7 +86,7 @@ elseif ($act == 'order_list')
         $_LANG['ps'][PS_PAYED] = '已付款';
         $_LANG['confirm_cancel'] = '您确认要取消该订单吗？取消后此订单将视为无效订单';
         $_LANG['cancel'] = '取消订单';
-        $orders = get_user_orders($_SESSION['user_id'], $page_num, ($page_num * ($page - 1)));
+        $orders = get_user_orders($_SESSION['user_id'], '', $page_num, ($page_num * ($page - 1)));
         if (!empty($orders))
         {
             foreach ($orders as $key => $val)
