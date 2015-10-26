@@ -475,7 +475,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
 
 <!-- {/if} --> 
 
-<!-- {if $step eq "done"} --> 
+<!-- {if $step eq "done" or $step eq "pay"} --> 
 <!-- 订单提交成功 -->
 <style type="text/css">
 /* 本例子css */

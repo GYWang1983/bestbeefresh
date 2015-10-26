@@ -1790,11 +1790,71 @@ elseif ($_REQUEST['step'] == 'done')
     unset($_SESSION['direct_shopping']);
 }
 /*------------------------------------------------------ */
+//-- 对于未支付成功的订单再次发起支付
+/*------------------------------------------------------ */
+elseif ($_REQUEST['step'] == 'pay')
+{
+	$order_id = intval($_POST['order_id']);
+	if (empty($order_id))
+	{
+		show_message($GLOBALS['_LANG']['order_exist']);
+	}
+	
+	$order = order_info($order_id);
+	if (empty($order))
+	{
+		show_message($GLOBALS['_LANG']['order_exist']);
+	}
+	if ($order['user_id'] != $_SESSION['user_id'])
+	{
+		show_message($GLOBALS['_LANG']['no_priv']);
+	}
+	if ($order['order_status'] != OS_UNCONFIRMED && $order['pay_status'] != PS_UNPAYED)
+	{
+		show_message('订单不需要支付');
+	}
+	if ($order['order_amount'] == 0)
+	{
+		show_message('订单不需要支付');
+	}
+	
+	$pay_id = intval($_POST['pay_id']) > 0 ? intval($_POST['pay_id']) : $order['pay_id'];
+	if (empty($pay_id))
+	{
+		show_message('未选择支付方式');
+	}
+
+	$payment = payment_info($pay_id);
+	
+	if ($order['pay_id'] != $pay_id)
+	{
+		// TODO：暂不考虑支付手续费变化
+		$order['pay_id'] = $pay_id;
+		update_order($order_id, array(
+			'pay_id'   => $pay_id,
+			'pay_name' => $payment['pay_name']
+		));
+	}
+
+	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+	$pay_obj    = new $payment['pay_code'];
+	$pay_online = $pay_obj->get_code($order, unserialize_config($payment['pay_config']));
+	
+	$smarty->assign('pay_online', $pay_online);
+	
+	$total = array(
+		'amount_formated' => $order['formated_order_amount'],
+	);
+	
+	$smarty->assign('order',      $order);
+	$smarty->assign('total',      $total);
+}
+/*------------------------------------------------------ */
 //-- 已提交支付请求
 /*------------------------------------------------------ */
 elseif ($_REQUEST['step'] == 'paid')
 {
-	$order_id = trim($_POST['order_id']);	
+	$order_id = trim($_POST['order_id']);
 	if (!empty($order_id))
 	{
 		$sql = 'UPDATE ' . $GLOBALS['ecs']->table('order_info') .

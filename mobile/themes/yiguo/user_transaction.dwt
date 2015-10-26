@@ -441,7 +441,9 @@ jQuery(function($){
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
           <td align="center">
-            <form name="refund" method="post" action="user.php">
+            <form name="refund" method="post" action="flow.php">
+              <input type="hidden" name="order_id" value="{$order.order_id}" />
+              <input type="hidden" name="step" value="pay" />
             <!--{if $payment_list}-->            
               {$lang.change_payment}: <br/>
               <select name="pay_id" style="margin:6px 0">
@@ -450,30 +452,41 @@ jQuery(function($){
                 <!--{/foreach}-->
               </select>
               <br/>
-              <input type="hidden" id="order_id" value="{$order.order_id}" />
-              <input type="button" id="goto_pay" class="c-btn3" value="去付款" />
+              <input type="submit" name="goto_pay" class="c-btn3" value="去付款" />
             <!--{/if}-->
             <!--{if $payment}-->
-              <input type="hidden" id="pay_id" value="{$payment.pay_id}" />
-              <input type="hidden" id="order_id" value="{$order.order_id}" />
-              <input type="button" id="goto_pay" class="c-btn3" value="使用 {$payment.pay_name} 付款" />
+              <input type="hidden" name="pay_id" value="{$payment.pay_id}" />
+              <input type="submit" name="goto_pay" class="c-btn3" value="使用 {$payment.pay_name} 付款" />
             <!--{/if}-->
             </form>
           </td>
         </tr>
       </table>
       <!-- {elseif $order.order_cs eq CS_PAID} -->
-      <form name="refund" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
-        <input type="hidden" name="act" value="cancel_order" />
-        <input type="hidden" name="order_id" value="{$order.order_id}" />
-        <input type="submit" name="refund" class="c-btn3" value="申请退款" />
-      </form>
-      <!-- {elseif $order.order_cs eq CS_ADDED} -->
-      <form name="cancel" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
-        <input type="hidden" name="act" value="cancel_order" />
-        <input type="hidden" name="order_id" value="{$order.order_id}" />
-        <input type="submit" name="cancel" class="c-btn3" value="取消订单" />
-      </form>
+      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
+        <tr>
+          <td align="center">
+            <form name="refund" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
+              <input type="hidden" name="act" value="cancel_order" />
+              <input type="hidden" name="order_id" value="{$order.order_id}" />
+              <input type="submit" name="refund" class="c-btn3" value="申请退款" />
+            </form>
+          </td>
+        </tr>
+      </table>
+      <!-- {/if} -->
+      <!-- {if $order.order_cs eq CS_ADDED} -->
+      <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
+        <tr>
+          <td align="center">
+            <form name="cancel" method="post" action="user.php" onsubmit="return confirm('您确定要取消订单吗？')">
+              <input type="hidden" name="act" value="cancel_order" />
+              <input type="hidden" name="order_id" value="{$order.order_id}" />
+              <input type="submit" name="cancel" class="c-btn3" value="取消订单" />
+            </form>
+          </td>
+        </tr>
+      </table>            
       <!-- {/if} -->   
     </section>
     <!--{/if} --> 
