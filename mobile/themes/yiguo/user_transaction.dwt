@@ -158,11 +158,12 @@
       <section class="order_box padd1 radius10 single_item">
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
       	<tr style="border-bottom:1px #CCCCCC dashed">
+      	  <td style="width:65px;padding-right:0px;">订单编号：</td>
       	  <td class="order_sn"></td>
-          <td class="order_status"></td>
+          <td class="order_status"><div class="order_status_desc"></div></td>
         </tr>
         <tr>
-          <td colspan="2" class="order_content"></td>
+          <td colspan="3" class="order_content"></td>
         </tr>
       </table>
     </section>

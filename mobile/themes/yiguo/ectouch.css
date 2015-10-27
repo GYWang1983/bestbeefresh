@@ -1084,9 +1084,12 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.15);
 box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 }
 /*订单列表*/
-ul.order_list_tab{width:100%;text-align:center;font-size:1.4rem;}
+ul.order_list_tab{width:100%;text-align:center;font-size:1.1rem;}
 ul.order_list_tab li{float:left; width:25%;background-color:#fff;}
 ul.order_list_tab li.active{color: #4d9546;border-bottom: solid 2px #4d9546;}
+.order_list .order_sn{font-weight:bold;}
+.order_list .order_status_desc{text-align:right;margin-right:10px;font-size:14px;}
+.order_list td.thumb{width:65px;}
 /* ====================
      其他页
 ==================== */

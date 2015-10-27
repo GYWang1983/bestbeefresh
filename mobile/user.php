@@ -1128,6 +1128,7 @@ elseif ($action == 'order_list')
 elseif ($action == 'async_order_list')
 {
     include_once(ROOT_PATH . 'include/lib_transaction.php');
+    include_once(ROOT_PATH . 'include/lib_order.php');
     
     $start = $_POST['last'];
     $limit = $_POST['amount'];
@@ -1152,20 +1153,18 @@ elseif ($action == 'async_order_list')
     if(is_array($orders)){
         foreach($orders as $vo){
             //获取订单第一个商品的图片
-            $img = $db->getOne("SELECT g.goods_thumb FROM " .$ecs->table('order_goods'). " as og left join " .$ecs->table('goods'). " g on og.goods_id = g.goods_id WHERE og.order_id = ".$vo['order_id']." limit 1");
+            $goods = $db->getRow("SELECT g.goods_thumb, og.goods_name FROM " .$ecs->table('order_goods'). " as og left join " .$ecs->table('goods'). " g on og.goods_id = g.goods_id WHERE og.order_id = ".$vo['order_id']." limit 1");            
             //$tracking = ($vo['shipping_id'] > 0) ? '<a href="user.php?act=order_tracking&order_id='.$vo['order_id'].'" class="c-btn3">订单跟踪</a>':'';
+            $order_cs = get_order_custom_status($vo);
             $asyList[] = array(
-                'order_status' => '订单状态：'.$vo['order_status'],
+            	'order_sn' => $vo['order_sn'],
+            	'order_cs' => $order_cs,
+            	'order_status_desc' => "<font class='status_{$order_cs}'>" . $_LANG['cs'][$order_cs] . '</font>',
                 //'order_handler' => $vo['handler'],
-                'order_content' => '<a href="user.php?act=order_detail&order_id='.$vo['order_id'].'"><table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table_no_border">
-            <tr>
-                <td><img src="'.$config['site_url'].$img.'" width="50" height="50" /></td>
-                <td>订单编号：'.$vo['order_sn'].'<br>
-                订单金额：'.$vo['total_fee'].'<br>
-                下单时间：'.$vo['order_time'].'</td>
-                <td style="position:relative"><span class="new-arr"></span></td>
-            </tr>
-          </table></a>',
+                'order_content' => "<a href=\"user.php?act=order_detail&order_id=$vo[order_id]\"><table width='100%' border=0 cellpadding=5 cellspacing=0 class='ectouch_table_no_border'>
+<tr><td class='thumb'><img src=\"{$config[site_url]}{$goods[goods_thumb]}\" width=50 height=50 /></td>
+<td>$goods[goods_name] ...<br>总金额：$vo[total_fee_format]<br>下单时间：$vo[order_time_format]</td>
+<td style=\"position:relative\"><span class=\"new-arr\"></span></td></tr></table></a>",
                 //'order_tracking' => $tracking
             );
         }

@@ -333,16 +333,12 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
             $row['handler'] = '<span style="color:red">'.$GLOBALS['_LANG']['os'][$row['order_status']] .'</span>';
         }
 
-        $row['shipping_status'] = ($row['shipping_status'] == SS_SHIPPED_ING) ? SS_PREPARING : $row['shipping_status'];
-        $row['order_status'] = $GLOBALS['_LANG']['os'][$row['order_status']] . ',' . $GLOBALS['_LANG']['ps'][$row['pay_status']] . ',' . $GLOBALS['_LANG']['ss'][$row['shipping_status']];
+        //$row['shipping_status'] = ($row['shipping_status'] == SS_SHIPPED_ING) ? SS_PREPARING : $row['shipping_status'];
+        //$row['order_status'] = $GLOBALS['_LANG']['os'][$row['order_status']] . ',' . $GLOBALS['_LANG']['ps'][$row['pay_status']] . ',' . $GLOBALS['_LANG']['ss'][$row['shipping_status']];
 
-        $arr[] = array('order_id'       => $row['order_id'],
-                       'order_sn'       => $row['order_sn'],
-                       'order_time'     => local_date($GLOBALS['_CFG']['time_format'], $row['add_time']),
-                       'order_status'   => $row['order_status'],
-		       'shipping_id'	=> $row['shipping_id'],
-                       'total_fee'      => price_format($row['total_fee'], false),
-                       'handler'        => $row['handler']);
+        $row['total_fee_format'] = price_format($row['total_fee'], false);
+        $row['order_time_format'] = local_date($GLOBALS['_CFG']['time_format'], $row['add_time']);
+        $arr[] = $row;
     }
 
     return $arr;
