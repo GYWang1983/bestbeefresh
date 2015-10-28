@@ -3423,7 +3423,7 @@ function get_order_lock_deadline($basetime = NULL)
 }
 
 /**
- * 计算订单最晚取货时间
+ * 计算订单取货时间
  *
  * @param $paytime 支付时间
  * @return Array
@@ -3432,8 +3432,10 @@ function get_order_pickup_time($paytime)
 {
 	global $_CFG;
 
+	$locktime = get_order_lock_deadline($paytime);
+	
 	$tz = timezone_open(date_default_timezone_get());
-	$start = new DateTime('@' . $paytime);
+	$start = new DateTime('@' . $locktime);
 	$start->setTimezone($tz);
 
 	if (strcmp($_CFG['order_lock_time'], $_CFG['shop_open_time']) > 0)
