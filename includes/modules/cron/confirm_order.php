@@ -57,9 +57,10 @@ if (!empty($orders))
 	
 	$os = array(
 		'order_status' => OS_CONFIRMED,
+		'shipping_status' => SS_PREPARING,
 		'confirm_time' => $now,
 	);
-	
+
 	$pickup_time = get_order_pickup_time($locktime);
 	$code_obj = array(
 		'create_time'  => $now,
