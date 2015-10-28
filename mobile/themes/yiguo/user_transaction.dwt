@@ -388,7 +388,26 @@ jQuery(function($){
         <!--{/if}-->
       </table>
       </section>
-
+      
+      <!--取货码 {if $order.order_cs eq CS_UNPICK}-->
+      <script type="text/javascript" src="{$ectouch_themes}/js/jquery.qrcode.min.js"></script>
+      <section class="order_box padd1 radius10">
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
+          <tr>
+            <td class="pickup_time">取货时间：{$order.pickup_time_start} ~ {$order.pickup_time_end}</td>
+          </tr>
+          <tr>
+            <td><div class="pickup_code"></div></td>
+          </tr>
+        </table>
+      </section>
+      <script>
+      $(function() {
+        $('.pickup_code').qrcode('{$order.pickup_code}');
+      });
+      </script>
+      <!--{/if}-->
+      
       <section class="order_box padd1 radius10">
         <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>

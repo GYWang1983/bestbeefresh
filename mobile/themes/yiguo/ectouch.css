@@ -944,6 +944,8 @@ Template Type: type_0
 	.order_status .status_2{ color:#ffb24c; }
 	.order_status .status_3, .order_status .status_4, .order_status .status_5{ color:#4d9546; }
 	.order_status .status_6, .order_status .status_8{ color:#000; }
+	.order_detail .pickup_time{border-bottom:1px #CCCCCC dashed;font-size:18px;padding:2px 5px;}
+	.order_detail .pickup_code{width: 75%;margin: 0 auto;margin-top:5px;}
 	
 	.order_box{ background:#FFF; font-size:0.8rem; margin:5px auto; padding:5px; }
 	.order_box .in{ display:block;
