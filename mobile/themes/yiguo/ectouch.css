@@ -1098,7 +1098,7 @@ ul.order_list_tab li.active{color: #4d9546;border-bottom: solid 2px #4d9546;}
 	/* 提示信息 */
 	.info a{ color:#fff;border:0;height:2.5rem; line-height:2.5rem; margin:1rem 10%; width:80%;-webkit-box-flex:1;display:block;-webkit-user-select:none; font-size:0.9rem;background:#50944a; text-align: center}	
 	/* 文章列表 / 会员中心功能列表样式 */
-	.list_box { background:#FFF; font-size:0.8rem;word-break:break-all; word-wrap:break-word;}
+	.list_box {background:#FFF; font-size:0.8rem;word-break:break-all;word-wrap:break-word;margin:5px 0;padding-top:0;padding-bottom:0;}
 	.list_box img { width:100%; height: 100%}
 	.list_box a{ border-bottom:1px solid #f3f3f3; padding:0.7rem 0;display:block; line-height:23px;}
 	.list_box a:last-child{ border-bottom:none}

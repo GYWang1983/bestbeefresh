@@ -566,19 +566,19 @@ function get_user_default($user_id)
 {
     $user_bonus = get_user_bonus();
 
-    $sql = "SELECT pay_points, user_money, credit_line, last_login, is_validated FROM " .$GLOBALS['ecs']->table('users'). " WHERE user_id = '$user_id'";
-    $row = $GLOBALS['db']->getRow($sql);
-    $info = array();
+    $sql = "SELECT pay_points, user_money, credit_line, last_login, is_validated, mobile_phone FROM " .$GLOBALS['ecs']->table('users'). " WHERE user_id = '$user_id'";
+    $info = $GLOBALS['db']->getRow($sql);
+    //$info = array();
     $info['username']  = stripslashes($_SESSION['user_name']);
     $info['shop_name'] = $GLOBALS['_CFG']['shop_name'];
-    $info['integral']  = $row['pay_points']; //不显示"积分" by wang
+    $info['integral']  = $info['pay_points']; //不显示"积分" by wang
     /* 增加是否开启会员邮件验证开关 */
-    $info['is_validate'] = ($GLOBALS['_CFG']['member_email_validate'] && !$row['is_validated'])?0:1;
-    $info['credit_line'] = $row['credit_line'];
+    //$info['is_validate'] = ($GLOBALS['_CFG']['member_email_validate'] && !$row['is_validated'])?0:1;
+    //$info['credit_line'] = $row['credit_line'];
     $info['formated_credit_line'] = price_format($info['credit_line'], false);
 
     //如果$_SESSION中时间无效说明用户是第一次登录。取当前登录时间。
-    $last_time = !isset($_SESSION['last_time']) ? $row['last_login'] : $_SESSION['last_time'];
+    $last_time = !isset($_SESSION['last_time']) ? $info['last_login'] : $_SESSION['last_time'];
 
     if ($last_time == 0)
     {
@@ -586,18 +586,18 @@ function get_user_default($user_id)
     }
 
     $info['last_time'] = local_date($GLOBALS['_CFG']['time_format'], $last_time);
-    $info['surplus']   = $row['user_money']; //不显示价格格式 by wang
+    $info['surplus']   = $info['user_money']; //不显示价格格式 by wang
     $info['bonus']     = $user_bonus['bonus_count']; //不是红包格式 //by wang
 
     $sql = "SELECT COUNT(*) FROM " .$GLOBALS['ecs']->table('order_info').
-            " WHERE user_id = '" .$user_id. "' AND add_time > '" .local_strtotime('-1 months'). "'";
+            " WHERE user_id = $user_id AND order_status = " . OS_CONFIRMED . " AND shipping_status != " . SS_RECEIVED;
     $info['order_count'] = $GLOBALS['db']->getOne($sql);
 
-    include_once(ROOT_PATH . 'include/lib_order.php');
+    /*include_once(ROOT_PATH . 'include/lib_order.php');
     $sql = "SELECT order_id, order_sn ".
             " FROM " .$GLOBALS['ecs']->table('order_info').
             " WHERE user_id = '" .$user_id. "' AND shipping_time > '" .$last_time. "'". order_query_sql('shipped');
-    $info['shipped_order'] = $GLOBALS['db']->getAll($sql);
+    $info['shipped_order'] = $GLOBALS['db']->getAll($sql);*/
 
     return $info;
 }

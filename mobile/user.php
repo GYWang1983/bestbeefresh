@@ -102,13 +102,13 @@ if ($action == 'default')
     }
 	$info = get_user_default($user_id);
 	
-	$sql = "SELECT wxid FROM " .$GLOBALS['ecs']->table('users'). " WHERE user_id = '$user_id'";
+	/*$sql = "SELECT wxid FROM " .$GLOBALS['ecs']->table('users'). " WHERE user_id = '$user_id'";
     $wxid = $GLOBALS['db']->getOne($sql);
 	if(!empty($wxid)){
 		$weixinInfo = $GLOBALS['db']->getRow("SELECT nickname, headimgurl FROM wxch_user WHERE wxid = '$wxid'");
 		$info['avatar'] = empty($weixinInfo['headimgurl']) ? '':$weixinInfo['headimgurl'];
 		$info['username'] = empty($weixinInfo['nickname']) ? $info['username']:$weixinInfo['nickname'];
-	}
+	}*/
     $smarty->assign('info',        $info);
     $smarty->assign('user_notice', $_CFG['user_notice']);
     $smarty->assign('prompt',      get_user_prompt($user_id));
@@ -1121,6 +1121,7 @@ elseif ($action == 'order_list')
     $smarty->assign('merge',  $merge);
     $smarty->assign('pager',  $pager);
     $smarty->assign('orders', $orders);
+    $smarty->assign('status', intval($_GET['status']));
     $smarty->display('user_transaction.dwt');
 }
 

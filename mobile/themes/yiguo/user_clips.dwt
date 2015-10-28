@@ -17,39 +17,35 @@
 <body>
 <!-- *用户中心默认显示页面 start--> 
 <!-- {if $action eq 'default'} -->
-<header id="header">
-  <div class="header_l header_return"> <a class="ico_10" href="./"> 返回 </a> </div>
-  <h1> 会员中心 </h1>
-</header>
 <dl class="user_top">
   <dt> {if $info.avatar neq ''}<img src="{$info.avatar}">{else}<img src="{$ectouch_themes}/images/get_avatar.png">{/if} </dt>
   <dd>
-    <p>{$info.username}</p>
-    <p><span>{$rank_name}</span></p>
+    <p>{$info.mobile_phone}</p>
+    <!--<p><span>{$rank_name}</span></p>-->
   </dd>
   <div class="user_top_list">
     <ul>
-      <li> <a href="user.php?act=order_list"> <strong>{$info.order_count}</strong> <img  src="{$ectouch_themes}/images/ico_user_01.png"> <span>30天订单</span> </a> </li>
+      <li> <a href="user.php?act=order_list&status=2"> <strong>{$info.order_count}</strong> <img  src="{$ectouch_themes}/images/ico_user_01.png"> <span>待取货</span> </a> </li>
+      <li> <a class="fragment" href="user.php?act=bonus"> <strong>{$info.bonus}</strong> <img  src="{$ectouch_themes}/images/ico_user_04.png"> <span>优惠券</span> </a> </li>
       <li> <a href="javascript:;"> <strong>{$info.integral}</strong> <img  src="{$ectouch_themes}/images/ico_user_02.png"> <span>积分</span> </a> </li>
-      <li> <a href="javascript:;"> <strong>{$info.surplus}</strong> <img  src="{$ectouch_themes}/images/ico_user_03.png"> <span>余额</span> </a> </li>
-      <li> <a class="fragment" href="user.php?act=bonus"> <strong>{$info.bonus}</strong> <img  src="{$ectouch_themes}/images/ico_user_04.png"> <span>红包</span> </a> </li>
+      <!--<li> <a href="javascript:;"> <strong>{$info.surplus}</strong> <img  src="{$ectouch_themes}/images/ico_user_03.png"> <span>余额</span> </a> </li>-->
     </ul>
   </div>
   <div class="quan1"></div>
   <div class="quan2"></div>
   <div class="quan3"></div>
 </dl>
-<div class="blank3"></div>
-<section class="wrap">
-  <div class="list_box padd1 radius10" style="padding-top:0;padding-bottom:0;"> <a href="user.php?act=profile" class="clearfix"> <span>{$lang.label_profile}</span><i></i> </a> <a href="user.php?act=order_list" class="clearfix"> <span>{$lang.label_order}</span><i></i> </a> <a href="user.php?act=address_list"  class="clearfix"> <span>{$lang.label_address}</span><i></i> </a> <a href="user.php?act=collection_list"  class="clearfix"> <span>{$lang.label_collection}</span><i></i> </a> </div>
-  <div class="blank3"></div>
-  <div class="list_box padd1 radius10" style="padding-top:0;padding-bottom:0;"> <a href="user.php?act=message_list" class="clearfix"> <span>{$lang.label_message}</span><i></i> </a> <a href="user.php?act=affiliate" class="clearfix"> <span>{$lang.label_affiliate}</span><i></i> </a> <a href="user.php?act=comment_list"  class="clearfix"> <span>{$lang.label_comment}</span><i></i> </a> </div>
-  <div class="blank3"></div>
-  <div class="list_box padd1 radius10" style="padding-top:0;padding-bottom:0;"> 
-    <!-- <a href="user.php?act=track_packages" class="clearfix">
-				<span>{$lang.label_track_packages}</span><i></i>
-			</a>  --> 
-    <a href="user.php?act=logout" class="clearfix"> <span>退出登录</span><i></i> </a> </div>
+<section>
+  <div class="list_box padd1 radius10">
+    <a href="user.php?act=profile" class="clearfix"> <span>{$lang.label_profile}</span><i></i> </a>
+    <a href="user.php?act=order_list" class="clearfix"> <span>{$lang.label_order}</span><i></i> </a>
+    <a href="user.php?act=collection_list"  class="clearfix"> <span>{$lang.label_collection}</span><i></i> </a>
+  </div>
+  <!--{if !is_wechat_browser() }-->
+  <div class="list_box padd1 radius10"> 
+    <a href="user.php?act=logout" class="clearfix"> <span>退出登录</span><i></i> </a>
+  </div>
+  <!--{/if}-->
 </section>
 
 <!-- {/if} --> 
