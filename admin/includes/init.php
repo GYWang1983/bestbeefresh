@@ -221,7 +221,7 @@ else
 }
 
 /* 验证通行证信息 */
-if(isset($_GET['ent_id']) && isset($_GET['ent_ac']) &&  isset($_GET['ent_sign']) && isset($_GET['ent_email']))
+/*if(isset($_GET['ent_id']) && isset($_GET['ent_ac']) &&  isset($_GET['ent_sign']) && isset($_GET['ent_email']))
 {
     $ent_id = trim($_GET['ent_id']);
     $ent_ac = trim($_GET['ent_ac']);
@@ -244,7 +244,7 @@ if(isset($_GET['ent_id']) && isset($_GET['ent_ac']) &&  isset($_GET['ent_sign'])
         clear_cache_files();
         ecs_header("Location: ./index.php\n");
     }
-}
+}*/
 
 /* 验证管理员身份 */
 if ((!isset($_SESSION['admin_id']) || intval($_SESSION['admin_id']) <= 0) &&
@@ -263,19 +263,7 @@ if ((!isset($_SESSION['admin_id']) || intval($_SESSION['admin_id']) <= 0) &&
         if (!$row)
         {
             // 没有找到这个记录
-            setcookie($_COOKIE['ECSCP']['admin_id'],   '', 1);
-            setcookie($_COOKIE['ECSCP']['admin_pass'], '', 1);
-
-            if (!empty($_REQUEST['is_ajax']))
-            {
-                make_json_error($_LANG['priv_error']);
-            }
-            else
-            {
-                ecs_header("Location: privilege.php?act=login\n");
-            }
-
-            exit;
+            goto_login(TRUE);
         }
         else
         {
@@ -292,36 +280,17 @@ if ((!isset($_SESSION['admin_id']) || intval($_SESSION['admin_id']) <= 0) &&
             }
             else
             {
-                setcookie($_COOKIE['ECSCP']['admin_id'],   '', 1);
-                setcookie($_COOKIE['ECSCP']['admin_pass'], '', 1);
-
-                if (!empty($_REQUEST['is_ajax']))
-                {
-                    make_json_error($_LANG['priv_error']);
-                }
-                else
-                {
-                    ecs_header("Location: privilege.php?act=login\n");
-                }
-
-                exit;
+            	goto_login(TRUE);
             }
         }
     }
     else
     {
-        if (!empty($_REQUEST['is_ajax']))
-        {
-            make_json_error($_LANG['priv_error']);
-        }
-        else
-        {
-            ecs_header("Location: privilege.php?act=login\n");
-        }
-
-        exit;
+        goto_login();
     }
 }
+
+/* 微信登录 */
 
 $smarty->assign('token', $_CFG['token']);
 
@@ -332,16 +301,7 @@ if ($_REQUEST['act'] != 'login' && $_REQUEST['act'] != 'signin' &&
     if (!empty($_SERVER['HTTP_REFERER']) &&
         strpos(preg_replace('/:\d+/', '', $_SERVER['HTTP_REFERER']), $admin_path) === false)
     {
-        if (!empty($_REQUEST['is_ajax']))
-        {
-            make_json_error($_LANG['priv_error']);
-        }
-        else
-        {
-            ecs_header("Location: privilege.php?act=login\n");
-        }
-
-        exit;
+        goto_login();
     }
 }
 
@@ -349,7 +309,6 @@ if ($_REQUEST['act'] != 'login' && $_REQUEST['act'] != 'signin' &&
 if ($_REQUEST['act'] == 'phpinfo' && function_exists('phpinfo'))
 {
     phpinfo();
-
     exit;
 }
 
@@ -383,4 +342,93 @@ else
     ob_start();
 }
 
+
+// 跳转到登录页面
+function goto_login($clear_cookie = FALSE)
+{
+	global $_LANG, $_CFG;
+	
+	if (is_wechat_browser())
+	{		
+		$callback = $_CFG['site_url'] . $_SERVER['REQUEST_URI'];
+		$user = weixin_oauth($callback);
+	}
+	
+	if (empty($user))
+	{
+		if ($clear_cookie)
+		{
+			setcookie($_COOKIE['ECSCP']['admin_id'],   '', 1);
+			setcookie($_COOKIE['ECSCP']['admin_pass'], '', 1);
+		}
+		
+		if (!empty($_REQUEST['is_ajax']))
+		{
+			make_json_error($_LANG['priv_error']);
+		}
+		else
+		{
+			ecs_header("Location: privilege.php?act=login\n");
+		}
+		
+		exit;
+	}
+}
+
+// 检查是否是微信浏览器访问 
+function is_wechat_browser(){
+	return strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false;
+}
+
+// 微信登录
+function weixin_oauth($callback) {
+	global $ecs, $db, $_CFG;
+
+	$rs = $db->getRow("SELECT * FROM `wxch_config` WHERE `id` = 1");
+	$param ['appid'] = $rs['appid'];
+
+	$oauth = intval($_REQUEST['oauth']);
+	if ($oauth == 0) {
+
+		$param ['redirect_uri'] = $callback . (strpos($callback, '?') > 0 ? '&' : '?') . 'oauth=1';
+		$param ['response_type'] = 'code';
+		$param ['scope'] = 'snsapi_base';  //'snsapi_userinfo';
+		$url = 'https://open.weixin.qq.com/connect/oauth2/authorize?' . http_build_query ( $param ) . '#wechat_redirect';
+		ecs_header("Location: $url\n");
+		exit;
+
+	} elseif ($oauth == 1) {
+
+		$param ['secret'] = $rs['appsecret'];
+		$param ['code'] = $_REQUEST['code'];
+		$param ['grant_type'] = 'authorization_code';
+
+		$url = 'https://api.weixin.qq.com/sns/oauth2/access_token?' . http_build_query ( $param );
+		$content = file_get_contents ( $url );
+		$token = json_decode ( $content, true );
+
+		$sql = "SELECT * FROM " . $ecs->table('admin_user') ."WHERE wxid = '" . $token['openid'] . "'";
+		$user_info =$db->getRow($sql);
+		
+		if (empty($user_info)) {
+			return false;
+		} else {
+			
+			//login
+			set_admin_session($user_info['user_id'], $user_info['user_name'], $user_info['action_list'], $user_info['last_login']);
+			$_SESSION['openid'] = $token['openid'];
+        	// 更新最后登录时间和IP
+        	$db->query("UPDATE " .$ecs->table('admin_user').
+                 " SET last_login='" . gmtime() . "', last_ip='" . real_ip() . "'".
+                 " WHERE user_id='$_SESSION[admin_id]'");
+
+        	// set cookie
+            $time = gmtime() + 3600 * 24 * 365;
+            setcookie('ECSCP[admin_id]', $user_info['user_id'], $time);
+            setcookie('ECSCP[admin_pass]', md5($user_info['password'] . $_CFG['hash_code']), $time);
+		}
+
+		return $user_info;
+	}
+}
 ?>

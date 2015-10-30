@@ -84,20 +84,11 @@ elseif ($_REQUEST['act'] == 'signin')
 
     $sql="SELECT `ec_salt` FROM ". $ecs->table('admin_user') ."WHERE user_name = '" . $_POST['username']."'";
     $ec_salt =$db->getOne($sql);
-    if(!empty($ec_salt))
-    {
-         /* 检查密码是否正确 */
-         $sql = "SELECT user_id, user_name, password, last_login, action_list, last_login,suppliers_id,ec_salt".
-            " FROM " . $ecs->table('admin_user') .
-            " WHERE user_name = '" . $_POST['username']. "' AND password = '" . md5(md5($_POST['password']).$ec_salt) . "'";
-    }
-    else
-    {
-         /* 检查密码是否正确 */
-         $sql = "SELECT user_id, user_name, password, last_login, action_list, last_login,suppliers_id,ec_salt".
-            " FROM " . $ecs->table('admin_user') .
-            " WHERE user_name = '" . $_POST['username']. "' AND password = '" . md5($_POST['password']) . "'";
-    }
+    $pwd = empty($ec_salt) ? md5($_POST['password']) : md5(md5($_POST['password']).$ec_salt);
+    
+    $sql = "SELECT user_id, user_name, password, last_login, action_list, last_login,suppliers_id,ec_salt".
+    		" FROM " . $ecs->table('admin_user') .
+    		" WHERE user_name = '$_POST[username]' AND password = '$pwd'";
     $row = $db->getRow($sql);
     if ($row)
     {
