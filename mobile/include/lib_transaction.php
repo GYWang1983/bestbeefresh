@@ -292,7 +292,7 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
     	$condition = 'AND ' . $condition;
     }
     
-    $sql = "SELECT order_id, order_sn, order_status, shipping_id, shipping_status, pay_status, add_time, " .
+    $sql = "SELECT order_id, order_sn, order_status, shipping_id, shipping_status, pay_status, add_time, pay_time, " .
            "(goods_amount + shipping_fee + insure_fee + pay_fee + pack_fee + card_fee + tax - discount) AS total_fee ".
            " FROM " .$GLOBALS['ecs']->table('order_info') .
            " WHERE user_id = '$user_id' $condition ORDER BY add_time DESC";
@@ -338,6 +338,7 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
 
         $row['total_fee_format'] = price_format($row['total_fee'], false);
         $row['order_time_format'] = local_date($GLOBALS['_CFG']['time_format'], $row['add_time']);
+        $row['pay_time_format'] = local_date($GLOBALS['_CFG']['time_format'], $row['pay_time']);
         $arr[] = $row;
     }
 

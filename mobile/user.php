@@ -109,7 +109,20 @@ if ($action == 'default')
 		$info['avatar'] = empty($weixinInfo['headimgurl']) ? '':$weixinInfo['headimgurl'];
 		$info['username'] = empty($weixinInfo['nickname']) ? $info['username']:$weixinInfo['nickname'];
 	}*/
+	
+	//检查是否有取货码
+	$sql = "SELECT * FROM " . $ecs->table('pickup_code') . 
+    	" WHERE user_id = $user_id AND status = 1 AND abandon_time > " . time() .
+    	" ORDER BY create_time ASC LIMIT 1";
+    $pcode = $db->getRow($sql);    	
+    if (!empty($pcode))
+    {
+    	$pcode['start_time_formated'] = date('Y-m-d H:i', $pcode['start_time']);
+    	$pcode['end_time_formated'] = date('Y-m-d H:i', $pcode['end_time']);
+    }
+
     $smarty->assign('info',        $info);
+    $smarty->assign('pcode',       $pcode);
     $smarty->assign('user_notice', $_CFG['user_notice']);
     $smarty->assign('prompt',      get_user_prompt($user_id));
     $smarty->display('user_clips.dwt');
@@ -1157,6 +1170,21 @@ elseif ($action == 'async_order_list')
             $goods = $db->getRow("SELECT g.goods_thumb, og.goods_name FROM " .$ecs->table('order_goods'). " as og left join " .$ecs->table('goods'). " g on og.goods_id = g.goods_id WHERE og.order_id = ".$vo['order_id']." limit 1");            
             //$tracking = ($vo['shipping_id'] > 0) ? '<a href="user.php?act=order_tracking&order_id='.$vo['order_id'].'" class="c-btn3">订单跟踪</a>':'';
             $order_cs = get_order_custom_status($vo);
+            
+            if ($order_cs != CS_ADDED && $order_cs != CS_PAYING)
+            {
+            	//已付款订单，下单时间为付款时间
+            	$vo['order_time_format'] = $vo['pay_time_format'];
+            }
+            
+            $ptime_html = '';
+            if ($order_cs == CS_UNPICK || $order_cs == CS_CONFIRMED)
+            {
+            	//显示取货时间
+            	$ptime = get_order_pickup_time($vo['pay_time']);
+            	$ptime_html = '<br>请在以下时间段内取货：<br>' . date('m/d H:i', $ptime[start]) . ' ~ ' . date('m/d H:i', $ptime[end]);
+            }
+            
             $asyList[] = array(
             	'order_sn' => $vo['order_sn'],
             	'order_cs' => $order_cs,
@@ -1164,7 +1192,7 @@ elseif ($action == 'async_order_list')
                 //'order_handler' => $vo['handler'],
                 'order_content' => "<a href=\"user.php?act=order_detail&order_id=$vo[order_id]\"><table width='100%' border=0 cellpadding=5 cellspacing=0 class='ectouch_table_no_border'>
 <tr><td class='thumb'><img src=\"{$config[site_url]}{$goods[goods_thumb]}\" width=50 height=50 /></td>
-<td>$goods[goods_name] ...<br>总金额：$vo[total_fee_format]<br>下单时间：$vo[order_time_format]</td>
+<td>$goods[goods_name] ...<br>总金额：$vo[total_fee_format]<br>下单时间：$vo[order_time_format]{$ptime_html}</td>
 <td style=\"position:relative\"><span class=\"new-arr\"></span></td></tr></table></a>",
                 //'order_tracking' => $tracking
             );
