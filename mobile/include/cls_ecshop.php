@@ -49,9 +49,15 @@ class ECS
      *
      * @return  string
      */
-    function table($str)
+	function table($str, $alias = NULL)
     {
-        return '`' . $this->db_name . '`.`' . $this->prefix . $str . '`';
+        $table = '`' . $this->db_name . '`.`' . $this->prefix . $str . '`';
+        if (!empty($alias))
+        {
+        	$table .= " AS $alias";
+        }
+        
+        return $table;
     }
 
     /**
