@@ -490,7 +490,7 @@ class cls_template
 
                 case 'insert' :
                     $t = $this->get_para(substr($tag, 7), false);
-										$k = preg_replace_callback("/(\'\\$[^,]+)/" , function ($match) {
+		    $k = preg_replace_callback("/(\'\\$[^,]+)/" , function ($match) {
                         return stripslashes(trim($match[1], "'"));
                     }, var_export($t, true));
                     
@@ -1121,7 +1121,7 @@ class cls_template
             }
 
             /* 在头部加入版本信息 */
-            $source = preg_replace('/<head>/i', "<head>\r\n<meta name=\"Generator\" content=\"" . APPNAME .' ' . VERSION . "\" />",  $source);
+            //$source = preg_replace('/<head>/i', "<head>\r\n<meta name=\"Generator\" content=\"" . APPNAME .' ' . VERSION . "\" />",  $source);
 
             /* 修正css路径 */
             $source = preg_replace('/(<link\shref=["|\'])(?:\.\/|\.\.\/)?(css\/)?([a-z0-9A-Z_]+\.css["|\']\srel=["|\']stylesheet["|\']\stype=["|\']text\/css["|\'])/i','\1' . $tmp_dir . '\2\3', $source);
