@@ -2887,6 +2887,20 @@ function get_free_more_desc($free_more) {
 		return '';
 	}
 
-	return '买' . $arr[0] . '送' . $arr[1];
+	return '买' . trim($arr[0]) . '送' . trim($arr[1]);
+}
+
+function get_free_more_number($free_more, $number)
+{
+	if (empty($free_more)) {
+		return 0;
+	}
+	
+	$arr = explode(':', $free_more);
+	if (count($arr) < 2) {
+		return 0;
+	}
+	
+	return floor($number / intval($arr[0])) * intval($arr[1]);
 }
 ?>

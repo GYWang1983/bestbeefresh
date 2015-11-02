@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<base target="_blank" />
+<title>取货</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection" content="telephone=no" />
+<link href="styles/mobile.css" rel="stylesheet" type="text/css" />
+{* 包含脚本文件 *}
+{insert_scripts files="../js/jquery-1.9.1.min.js"}
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript" src="../mobile/weixin/wxjsconfig.php?api=scanQRCode"></script>
+</head>
+<body>
+<div class="container pickup">
+  <div class="row center">
+    <button type="button" class="scan" disabled="false">扫码取货</button>
+  </div>
+  <div class="row goods_list">
+    <div>取货列表</div>
+    <ul>
+    <!--
+      <li>
+        <div class="goods_sn">ECS201129</div>
+        <div class="goods_name">ZESPRI奇异果(普通金果)6个</div>
+        <div class="goods_number">x 2</div>
+      </li>
+      <li>
+        <div class="goods_sn">ECS201139</div>
+        <div class="goods_name">甘肃 特级高原富士苹果9个/袋 约2kg</div>
+        <div class="goods_number">x 4</div>
+      </li>
+    -->
+    </ul>
+  </div>
+  <div class="row user">
+    <span>取货人手机号: </span><span class="mobile"></span>
+  </div>
+  <div class="row order_list">
+    <div>订单列表</div>
+    <dl>
+    <!--
+      <dt><a class="order_sn" href="#">2015102174986</a><span class="pay_time">2015-10-22 20:30</span></dt>
+      <dd><div class="goods">ECS201129</div></dd>
+      <dd><div class="goods">ECS201129</div></dd>
+      <dt><a class="order_sn" href="#">2015102174986</a><span class="pay_time">2015-10-22 20:30</span></dt>
+      <dd><div class="goods">ECS201129</div></dd>
+      <dd><div class="goods">ECS201129</div></dd>
+    -->
+    </dl>
+  </div>
+  <div class="row message" style="display:none;">取货完成</div>
+  <div class="row center">
+    <input type="hidden" id="pickup_code" value=""></button>
+    <button type="button" class="confirm" style="display:none;">确认取货</button>
+  </div>
+<div>
+</body>
+<script>
+$(function(){
+	//test
+    //query_order('1fd3de79c98de8bc36167724e13d8fefd8265be4');
+	
+	wx.ready(function(){
+		$('button.scan').removeAttr('disabled');
+	});
+	
+	$('button.scan').click(function(){
+		clear_all();
+		wx.scanQRCode({
+			'needResult': 1,
+			'scanType': ['qrCode', 'barCode'],
+			'success': function (res) {
+				query_order(res.resultStr);
+			}
+		});
+	});
+	
+	$('button.confirm').click(function(){
+		
+		if (confirm('确认取货？') == false) {
+			return;
+		}
+		
+		$.post('pickup.php', {
+	        'act':  'pickup',
+	        'code': $('#pickup_code').val()
+	    }, function(response) {
+	        if (response.errcode != 0) {
+	        	$('.message').addClass('error');
+	        }
+	        $('.message').text(response.msg).show();
+	        $('button.confirm').hide();
+	    }, 'json');
+	});
+});
+
+
+function query_order(pickup_code)
+{
+	$.post('pickup.php', {
+		'act':  'query',
+		'code': pickup_code
+	}, function(response) {
+		if (response.errcode != 0) {
+		    $('.message').text(response.msg).addClass('error').show();
+		} else {
+			$('#pickup_code').val(pickup_code);
+			list_goods(response.goods);
+			list_order(response.orders);
+			$('.user .mobile').text(response.mobile);
+			$('button.confirm').show();
+		}
+	}, 'json');
+}
+
+function list_goods(goods) {
+	for (var id in goods) {
+		var g = goods[id];
+		var item = '<li><div class="goods_sn">' + g['goods_sn'] + '</div><div class="goods_name">' + g['goods_name'] + '</div><div class="goods_number">x ' + g['goods_number'] + '</div></li>';
+		$(item).appendTo('.goods_list ul');
+	}
+}
+
+function list_order(orders) {
+	for (var i in orders) {
+		var o = orders[i];
+		var oItem = '<dt><a class="order_sn" href="order.php?act=info&order_id=' + o['order_id'] + '">' + o['order_sn'] + '</a><span class="pay_time">' + o['pay_time'] + '</span></dt>';
+		$(oItem).appendTo('.order_list dl');
+		for (j in o['goods']) {
+			var g = o['goods'][j];
+			var gItem = '<dd><div class="goods">' + g['goods_sn'] + ' ' + g['goods_name'] + ' ' + g['free_more_desc'] + ' [x' + g['goods_number'] + ']</div></dd>';
+			$(gItem).appendTo('.order_list dl');
+		}
+	}
+}
+
+function clear_all() {
+	$('#pickup_code').val('');
+    $('.goods_list ul').empty();
+    $('.order_list dl').empty();
+    $('.user .mobile').text('');
+    $('button.confirm').hide();
+    $('.message').text('').removeClass('error').hide();
+}
+</script>
+</html>

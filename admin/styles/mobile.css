@@ -1,0 +1,16 @@
+
+div.row{width:100%;margin:10px 0;}
+
+.center{text-align:center;}
+
+/* 取货 */
+.pickup button{width:75%; height:60px; font-size:24px;}
+.pickup  ul{list-style:none;padding:5px;margin:5px 0;}
+.pickup  dl{margin:5px 0;}
+.pickup  dd{margin-left:20px;}
+.pickup .goods_list .goods_sn{float:left;width:27%;font-size:16px;}
+.pickup .goods_list .goods_name{float:left;width:73%;font-size:16px;}
+.pickup .goods_list .goods_number{clear:both;width:100%;text-align:right;color:red;font-size:18px;font-weight:bold;border-bottom:dashed 1px #666;margin-bottom:5px;}
+.pickup .order_list .pay_time{float:right;font-size:14px;color:#333;}
+.pickup .message{width:100%;text-align:center;margin-top:20px;font-size:24px;font-weight:bolder;}
+.pickup .message.error{color:#f00;}
