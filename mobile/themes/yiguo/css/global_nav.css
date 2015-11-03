@@ -1,12 +1,3 @@
-
-@font-face {font-family: 'global-nav__iconfont';
-  src: url('iconfont.eot');
-  src: url('iconfont.eot?#iefix') format('embedded-opentype'),
-  url('iconfont.woff') format('woff'),
-  url('iconfont.ttf') format('truetype'),
-  url('iconfont.svg#uxiconfont') format('svg');
-}
-
 .global-nav{
 	position: fixed;
 	bottom: 0;
@@ -32,13 +23,8 @@
 	border-top: 1px solid #e5e5e5;
 	background-color: #fff;
 }
-.global-nav__nav-item{
-	-webkit-box-flex:1;
-	-webkit-flex:1;
-	-ms-flex:1;
-	flex:1;
-	overflow: hidden;
-}
+.global-nav__nav-item{-webkit-box-flex:1;-webkit-flex:1;-ms-flex:1;flex:1;overflow: hidden;}
+.global-nav__nav-item i{font-size:24px;font-style:normal;}
 .global-nav__nav-link{
 	position: relative;
 	display: block;
@@ -52,11 +38,6 @@
 }
 .global-nav__nav-link:active{
 	color: #ff7171;
-}
-.global-nav__iconfont{
-	font-family:"global-nav__iconfont";
-	font-size:24px;
-	font-style:normal;
 }
 .global-nav__nav-tit{
 	display: block;

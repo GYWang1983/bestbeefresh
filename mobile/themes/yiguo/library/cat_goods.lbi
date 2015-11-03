@@ -1,11 +1,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!--循环分类下商品 begin-->
-<div class="blank2"></div>
 <section class="item_show_box1 box1 region">
 <!-- {foreach name=goods from=$cat_goods item=goods}-->
     <div class="goodsItem" id="goods{$goods.id}">
         <div class="thumb">
-            <img src="{$site_url}{$goods.thumb}" alt="{$goods.name|escape:html}" />
+            <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.name|escape:html}" />
         </div>
         <div class="desc">
             <div class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></div>
@@ -16,12 +15,14 @@
             <span class="price"> {$goods.shop_price} </span> 
             <!--{/if}-->
             </div>
+            <!--{if $goods.free_more_desc}-->
             <div class="freemore">{$goods.free_more_desc}</div>
+            <!--{/if}-->
         </div>
         <div class="cart" data="{$goods.id}">
-            <div class="inc">+</div>
+            <div class="btn icon-plus"></div>
             <div class="num">0</div>
-            <div class="dec">-</div>
+            <div class="btn icon-minus"></div>
         </div>
     </div>
 <!-- {/foreach} -->

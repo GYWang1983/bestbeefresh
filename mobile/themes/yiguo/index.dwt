@@ -9,7 +9,8 @@
 <meta name="format-detection" content="telephone=no" />
 <link href="{$ectouch_themes}/images/touch-icon.png" rel="apple-touch-icon-precomposed" />
 <link href="{$ectouch_themes}/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-<link href="{$ectouch_themes}/ectouch.css?v=2014" rel="stylesheet" type="text/css" />
+<link href="{$ectouch_themes}/ectouch.css" rel="stylesheet" type="text/css" />
+<link href="{$ectouch_themes}/css/iconfont.css?v=20151103" type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="{$ectouch_themes}/js/TouchSlide.js"></script>
 {insert_scripts files='common.js,transport_jquery.js'}
 <script type="text/javascript">
@@ -26,14 +27,11 @@ var cart = {insert name='cart_detail_number'};
   </header>
 </div>
 <!--头部e-->
-<div class="blank2"> </div>
 <!--content s-->
 <div id=content class="wrap">
 <!-- TemplateBeginEditable name="中部主区域" -->
 <!-- #BeginLibraryItem "/library/cat_goods.lbi" -->
-
 <!--循环分类下商品 begin-->
-<div class="blank2"></div>
 <section class="item_show_box1 box1 region">
     <header>
         <span>
@@ -109,40 +107,11 @@ var cart = {insert name='cart_detail_number'};
   </div>
 </div>
 </div>
-<script type="text/javascript" src="{$ectouch_themes}/js/jquery.min.js"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.json.js"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.mmenu.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/ectouch.js"></script>
-<script type="text/javascript">
-window.onload = function(){
-  $('#menu').css('display','');
-}
-$(function() {
-	$('nav#menu').mmenu();
-	$('#get_search_box').click(function(){
-		$(".mm-page").children('div').hide();
-		$("#main-search").css('position','fixed').css('top','0px').css('width','100%').css('z-index','999').show();
-		//$('#keywordBox').focus();
-	});
-	$("#main-search .close").click(function(){
-		$(".mm-page").children('div').show();
-		$("#main-search").hide();
-	});
-	
-	$(".cart .inc").click(function(e) {
-	   var goods_id = $(e.target).parents('.cart').attr('data');
-	   addToCart(goods_id);
-	});
-	
-	$(".cart .dec").click(function(e) {
-	   var goods_id = $(e.target).parents('.cart').attr('data');
-       decFromCart(goods_id);
-    });
-    
-    for (var good_id in cart) {
-        $('#goods' + good_id + ' .cart .num').text(cart[good_id]);
-    }
-});
-</script>
+<script type="text/javascript" src="{$ectouch_themes}/js/index.js"></script>
 </body>
 </html>
