@@ -146,7 +146,7 @@
     <!--#订单列表界面 start--> 
     <!-- {if $action eq 'order_list'} -->
     <header id="header">
-      <div class="header_l header_return"> <a class="ico_10" href="user.php"> 返回 </a> </div>
+      <div class="header_l header_return"> <a class="ico_10" href="index.php"> 返回 </a> </div>
       <h1> {$lang.label_order} </h1>
       <ul class="order_list_tab">
         <li data="0" <!--{if $status eq 0}class="active"{/if}-->>全部</li>
