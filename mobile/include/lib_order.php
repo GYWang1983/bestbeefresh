@@ -456,17 +456,9 @@ function order_info($order_id, $order_sn = '')
         if (!empty($order['receive_time']))
         {
         	$order['formated_receive_time']       = local_date($GLOBALS['_CFG']['time_format'], $order['receive_time']);
-        }
-        
+        }        
     }
-	// 增加地区 by wang
-	/*$sql = "select region_name from ".$GLOBALS['ecs']->table('region') . " where region_id in(".$order['province'].",". $order['city'].",".$order['district'].")";
-	$address = $GLOBALS['db']->getAll($sql);
-	foreach($address as $vo){
-		$region .= $vo['region_name'];
-	}
-	$order['address'] = $region.$order['address'];*/
-	// 增加地区 by wang end
+
     return $order;
 }
 
@@ -662,11 +654,11 @@ function order_fee($order, $goods, $consignee = NULL)
     $total['card_fee_formated'] = price_format($total['card_fee'], false);
 
     /* 红包 */
-
     if (!empty($order['bonus_id']))
     {
         $bonus          = bonus_info($order['bonus_id']);
-        $total['bonus'] = $bonus['type_money'];
+        $total['bonus'] = $bonus['amount'];
+        $order['bonus'] = $bonus['amount'];
     }
     $total['bonus_formated'] = price_format($total['bonus'], false);
 
@@ -1414,15 +1406,16 @@ function address_info($address_id)
  */
 function user_bonus($user_id, $goods_amount = 0)
 {
-    $day    = getdate();
-    $today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+    //$day    = getdate();
+    //$today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+	$today = time();
 
-    $sql = "SELECT t.type_id, t.type_name, t.type_money, b.bonus_id " .
+    $sql = "SELECT t.type_id, t.type_name, b.amount, b.bonus_id, b.expire_time, t.min_goods_amount " .
             "FROM " . $GLOBALS['ecs']->table('bonus_type') . " AS t," .
                 $GLOBALS['ecs']->table('user_bonus') . " AS b " .
             "WHERE t.type_id = b.bonus_type_id " .
             "AND t.use_start_date <= '$today' " .
-            "AND t.use_end_date >= '$today' " .
+            "AND b.expire_time >= '$today' " .
             "AND t.min_goods_amount <= '$goods_amount' " .
             "AND b.user_id<>0 " .
             "AND b.user_id = '$user_id' " .
@@ -1442,16 +1435,47 @@ function bonus_info($bonus_id, $bonus_sn = '')
             "FROM " . $GLOBALS['ecs']->table('bonus_type') . " AS t," .
                 $GLOBALS['ecs']->table('user_bonus') . " AS b " .
             "WHERE t.type_id = b.bonus_type_id ";
-    if ($bonus_id > 0)
-    {
-        $sql .= "AND b.bonus_id = '$bonus_id'";
-    }
-    else
+    if (!empty($bonus_sn))
     {
         $sql .= "AND b.bonus_sn = '$bonus_sn'";
     }
+    else
+    {
+    	$sql .= "AND b.bonus_id = '$bonus_id'";
+    }
 
     return $GLOBALS['db']->getRow($sql);
+}
+
+/**
+ * 检查红包是否有效
+ * @param array $bonus_info
+ * @param integer $time
+ * @return boolean
+ */
+function is_bonus_available($bonus_info, $time = 0)
+{
+	if (empty($bonus_info))
+	{
+		return false;
+	}
+	if ($bonus_info['used_time'] > 0)
+	{
+		return false;
+	}
+	
+	$time = empty($time) ?: time();
+	if ($bonus_info['use_start_date'] > $time)
+	{
+		return false;
+	}
+	
+	if ($bonus_info['expire_time'] < $time || $bonus_info['use_end_date'] < $time)
+	{
+		return false;
+	}
+	
+	return true;
 }
 
 /**
@@ -2612,7 +2636,7 @@ function send_order_bonus($order_id)
     if ($bonus_list)
     {
         /* 用户信息 */
-        $sql = "SELECT u.user_id, u.user_name, u.email " .
+        $sql = "SELECT u.user_id, u.user_name, u.mobile_phone " .
                 "FROM " . $GLOBALS['ecs']->table('order_info') . " AS o, " .
                           $GLOBALS['ecs']->table('users') . " AS u " .
                 "WHERE o.order_id = '$order_id' " .
@@ -2627,15 +2651,15 @@ function send_order_bonus($order_id)
             $count += $bonus['number'];
             $money .= price_format($bonus['type_money']) . ' [' . $bonus['number'] . '], ';
 
+            $add_time = time();
+            $expire_time = min($bonus['use_end_date'], $add_time + $bonus['use_time_limit']);
+            
             /* 修改用户红包 */
-            $sql = "INSERT INTO " . $GLOBALS['ecs']->table('user_bonus') . " (bonus_type_id, user_id) " .
-                    "VALUES('$bonus[type_id]', '$user[user_id]')";
+            $sql = "INSERT INTO " . $GLOBALS['ecs']->table('user_bonus') . " (bonus_type_id, user_id,amount,add_time,expire_time,from_order_id) " .
+                    "VALUES('$bonus[type_id]','$user[user_id]','$bonus[type_money]','$add_time','$expire_time','$order_id')";
             for ($i = 0; $i < $bonus['number']; $i++)
             {
-                if (!$GLOBALS['db']->query($sql))
-                {
-                    return $GLOBALS['db']->errorMsg();
-                }
+                $GLOBALS['db']->query($sql);
             }
         }
 
@@ -2664,26 +2688,9 @@ function send_order_bonus($order_id)
  */
 function return_order_bonus($order_id)
 {
-    /* 取得订单应该发放的红包 */
-    $bonus_list = order_bonus($order_id);
-
-    /* 删除 */
-    if ($bonus_list)
-    {
-        /* 取得订单信息 */
-        $order = order_info($order_id);
-        $user_id = $order['user_id'];
-
-        foreach ($bonus_list AS $bonus)
-        {
-            $sql = "DELETE FROM " . $GLOBALS['ecs']->table('user_bonus') .
-                    " WHERE bonus_type_id = '$bonus[type_id]' " .
-                    "AND user_id = '$user_id' " .
-                    "AND order_id = '0' LIMIT " . $bonus['number'];
+    $sql = "DELETE FROM " . $GLOBALS['ecs']->table('user_bonus') . " WHERE from_order_id = '$order_id' AND used_time = 0";
             $GLOBALS['db']->query($sql);
         }
-    }
-}
 
 /**
  * 取得订单应该发放的红包
@@ -2692,42 +2699,46 @@ function return_order_bonus($order_id)
  */
 function order_bonus($order_id)
 {
-    /* 查询按商品发的红包 */
-    $day    = getdate();
-    $today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+	$list = array();
+	
+	$order = order_info($order_id);
+	
+	if (!empty($order) && $order['order_status'] == OS_CONFIRMED 
+		&& ($order['shipping_status'] == SS_RECEIVED || $order['shipping_status'] == SS_SHIPPED))
+	{
+	    
+		$order_time = $order['pay_time'];
+		$amount     = $order['money_paid'];
+		
+		if ($amount > 0)
+		{
+			/* 查询按商品发的红包 */
+		    $sql = "SELECT b.*, SUM(o.goods_number) AS number " .
+		            "FROM " . $GLOBALS['ecs']->table('order_goods') . " AS o, " .
+		                      $GLOBALS['ecs']->table('goods') . " AS g, " .
+		                      $GLOBALS['ecs']->table('bonus_type') . " AS b " .
+		            " WHERE o.order_id = '$order_id' " .
+		            " AND o.is_gift = 0 " .
+		            " AND o.goods_id = g.goods_id " .
+		            " AND g.bonus_type_id = b.type_id " .
+		            " AND b.send_type = '" . SEND_BY_GOODS . "' " .
+		            " AND b.send_start_date <= '$order_time' " .
+		            " AND b.send_end_date >= '$order_time' " .
+		            " GROUP BY b.type_id ";
+		    $list = $GLOBALS['db']->getAll($sql);	    
+		
+		    /* 查询按订单发的红包 */
+		    $sql = "SELECT b.*, 1 AS number " .
+		            "FROM " . $GLOBALS['ecs']->table('bonus_type') . ' AS b' .
+		            "WHERE send_type = '" . SEND_BY_ORDER . "' " .
+		            "AND min_amount <= $amount AND max_amount >= $amount " .
+		            "AND send_start_date <= '$order_time' " .
+		            "AND send_end_date >= '$order_time' ";
+		    $list = array_merge($list, $GLOBALS['db']->getAll($sql));
+		} 
+	}
 
-    $sql = "SELECT b.type_id, b.type_money, SUM(o.goods_number) AS number " .
-            "FROM " . $GLOBALS['ecs']->table('order_goods') . " AS o, " .
-                      $GLOBALS['ecs']->table('goods') . " AS g, " .
-                      $GLOBALS['ecs']->table('bonus_type') . " AS b " .
-            " WHERE o.order_id = '$order_id' " .
-            " AND o.is_gift = 0 " .
-            " AND o.goods_id = g.goods_id " .
-            " AND g.bonus_type_id = b.type_id " .
-            " AND b.send_type = '" . SEND_BY_GOODS . "' " .
-            " AND b.send_start_date <= '$today' " .
-            " AND b.send_end_date >= '$today' " .
-            " GROUP BY b.type_id ";
-    $list = $GLOBALS['db']->getAll($sql);
-
-    /* 查询定单中非赠品总金额 */
-    $amount = order_amount($order_id, false);
-
-    /* 查询订单日期 */
-    $sql = "SELECT add_time " .
-            " FROM " . $GLOBALS['ecs']->table('order_info') .
-            " WHERE order_id = '$order_id' LIMIT 1";
-    $order_time = $GLOBALS['db']->getOne($sql);
-
-    /* 查询按订单发的红包 */
-    $sql = "SELECT type_id, type_money, IFNULL(FLOOR('$amount' / min_amount), 1) AS number " .
-            "FROM " . $GLOBALS['ecs']->table('bonus_type') .
-            "WHERE send_type = '" . SEND_BY_ORDER . "' " .
-            "AND send_start_date <= '$order_time' " .
-            "AND send_end_date >= '$order_time' ";
-    $list = array_merge($list, $GLOBALS['db']->getAll($sql));
-
-    return $list;
+	return $list;
 }
 
 /**

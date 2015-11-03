@@ -69,6 +69,14 @@
       <input name="use_end_date" type="text" id="use_end_date" size="22" value='{$bonus_arr.use_end_date}' readonly="readonly" /><input name="selbtn4" type="button" id="selbtn4" onclick="return showCalendar('use_end_date', '%Y-%m-%d', false, false, 'selbtn4');" value="{$lang.btn_select}" class="button"/>    </td>
   </tr>
   <tr>
+    <td class="label">使用期限</td>
+    <td>
+      <input name="use_day_limit" type="number" id="use_day_limit" size="3" value='{$bonus_arr.use_day_limit}' style="width:50px;"/>天
+      <input name="use_hour_limit" type="number" id="use_hour_limit" size="2" value='{$bonus_arr.use_hour_limit}' style="width:50px;"/>小时
+      <input name="use_minuts_limit" type="number" id="use_minuts_limit" size="2" value='{$bonus_arr.use_minuts_limit}' style="width:50px;"/>分钟
+    </td>
+  </tr>
+  <tr>
     <td class="label">&nbsp;</td>
     <td>
       <input type="submit" value="{$lang.button_submit}" class="button" />
@@ -133,8 +141,8 @@ function gObj(obj)
 function showunit(get_value)
 {
   gObj("1").style.display =  (get_value == 2) ? "" : "none";
-  document.forms['theForm'].elements['selbtn1'].disabled  = (get_value != 1 && get_value != 2);
-  document.forms['theForm'].elements['selbtn2'].disabled  = (get_value != 1 && get_value != 2);
+  //document.forms['theForm'].elements['selbtn1'].disabled  = (get_value != 1 && get_value != 2);
+  //document.forms['theForm'].elements['selbtn2'].disabled  = (get_value != 1 && get_value != 2);
 
   return;
 }

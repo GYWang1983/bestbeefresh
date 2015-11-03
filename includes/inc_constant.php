@@ -97,7 +97,7 @@ define('PS_REFUND',                 4); // 已退款
 
 /* 综合状态 */
 define('CS_ADDED',              	1); // 待付款
-define('CS_PAYING',             	2); // 已付款
+define('CS_PAYING',             	2); // 付款中
 define('CS_PAID',             		3); // 已付款
 define('CS_CONFIRMED',              4); // 已确认
 define('CS_UNPICK',              	5); // 待取货
@@ -162,6 +162,9 @@ define('GBS_FAIL',                  4); // 团购失败
 define('BONUS_NOT_MAIL',            0);
 define('BONUS_MAIL_SUCCEED',        1);
 define('BONUS_MAIL_FAIL',           2);
+define('BONUS_NOT_SMS',             0);
+define('BONUS_SMS_SUCCEED',         1);
+define('BONUS_SMS_FAIL',            2);
 
 /* 商品活动类型 */
 define('GAT_SNATCH',                0);

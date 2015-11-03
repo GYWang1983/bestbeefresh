@@ -117,7 +117,7 @@ function get_profile($user_id)
     $infos['user_name'] = addslashes($infos['user_name']);
 
     $row = $user->get_profile_by_name($infos['user_name']); //获取用户帐号信息
-    $_SESSION['email'] = $row['email'];    //注册SESSION
+    //$_SESSION['email'] = $row['email'];    //注册SESSION
 
     /* 会员等级 */
     if ($infos['user_rank'] > 0)
@@ -141,20 +141,21 @@ function get_profile($user_id)
         $info['rank_name'] = $GLOBALS['_LANG']['undifine_rank'];
     }
 
-    $cur_date = date('Y-m-d H:i:s');
+    //$cur_date = date('Y-m-d H:i:s');
+    $now = time();
 
     /* 会员红包 */
     $bonus = array();
-    $sql = "SELECT type_name, type_money ".
+    $sql = "SELECT t1.type_name, t2.amount ".
            "FROM " .$GLOBALS['ecs']->table('bonus_type') . " AS t1, " .$GLOBALS['ecs']->table('user_bonus') . " AS t2 ".
-           "WHERE t1.type_id = t2.bonus_type_id AND t2.user_id = '$user_id' AND t1.use_start_date <= '$cur_date' ".
-           "AND t1.use_end_date > '$cur_date' AND t2.order_id = 0";
+           "WHERE t1.type_id = t2.bonus_type_id AND t2.user_id = '$user_id' ".
+           "AND t2.expire_time > '$now' AND t2.order_id = 0";
     $bonus = $GLOBALS['db']->getAll($sql);
     if ($bonus)
     {
         for ($i = 0, $count = count($bonus); $i < $count; $i++)
         {
-            $bonus[$i]['type_money'] = price_format($bonus[$i]['type_money'], false);
+            $bonus[$i]['amount'] = price_format($bonus[$i]['amount'], false);
         }
     }
 
@@ -209,57 +210,46 @@ function add_bonus($user_id, $bouns_sn)
     if (empty($user_id))
     {
         $GLOBALS['err']->add($GLOBALS['_LANG']['not_login']);
-
         return false;
     }
 
     /* 查询红包序列号是否已经存在 */
-    $sql = "SELECT bonus_id, bonus_sn, user_id, bonus_type_id FROM " .$GLOBALS['ecs']->table('user_bonus') .
-           " WHERE bonus_sn = '$bouns_sn'";
+    $sql = "SELECT * FROM " . $GLOBALS['ecs']->table('user_bonus') . ' AS ub, ' . $GLOBALS['ecs']->table('bonus_type') . ' AS bt ' .
+        " WHERE ub.bonus_type_id = bt.type_id AND ub.bonus_sn = '$bouns_sn'";
     $row = $GLOBALS['db']->getRow($sql);
-    if ($row)
+    if (!empty($row))
     {
+    	$now = time();
+    	if ($now > $row['send_end_date'] || $now > $row['use_end_date'])
+    	{
+    		$GLOBALS['err']->add($GLOBALS['_LANG']['bonus_use_expire']);
+    		return false;
+    	}
+    	
         if ($row['user_id'] == 0)
         {
-            //红包没有被使用
-            $sql = "SELECT send_end_date, use_end_date ".
-                   " FROM " . $GLOBALS['ecs']->table('bonus_type') .
-                   " WHERE type_id = '" . $row['bonus_type_id'] . "'";
-
-            $bonus_time = $GLOBALS['db']->getRow($sql);
-
-            $now = gmtime();
-            if ($now > $bonus_time['use_end_date'])
-            {
-                $GLOBALS['err']->add($GLOBALS['_LANG']['bonus_use_expire']);
-                return false;
-            }
-
-            $sql = "UPDATE " .$GLOBALS['ecs']->table('user_bonus') . " SET user_id = '$user_id' ".
+			$expire_time = min($row['use_end_date'], $now + $row['use_time_limit']);
+            $sql = "UPDATE " .$GLOBALS['ecs']->table('user_bonus') . " SET user_id = '$user_id', add_time='$now', expire_time'$expire_time' ".
                    "WHERE bonus_id = '$row[bonus_id]'";
             $result = $GLOBALS['db'] ->query($sql);
-            if ($result)
+            if (!$result)
             {
-                 return true;
+                 $GLOBALS['err']->add($GLOBALS['db']->errorMsg());
+            	return false;
             }
-            else
-            {
-                return $GLOBALS['db']->errorMsg();
-            }
+            
+            return true;
+        }
+        elseif ($row['user_id'] == $user_id)
+        {
+			//红包已经添加过了。
+            $GLOBALS['err']->add($GLOBALS['_LANG']['bonus_is_used']);
+            return false;
         }
         else
         {
-            if ($row['user_id']== $user_id)
-            {
-                //红包已经添加过了。
-                $GLOBALS['err']->add($GLOBALS['_LANG']['bonus_is_used']);
-            }
-            else
-            {
-                //红包被其他人使用过了。
-                $GLOBALS['err']->add($GLOBALS['_LANG']['bonus_is_used_by_other']);
-            }
-
+            //红包被其他人使用过了。
+            $GLOBALS['err']->add($GLOBALS['_LANG']['bonus_is_used_by_other']);
             return false;
         }
     }
@@ -292,7 +282,7 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
     	$condition = 'AND ' . $condition;
     }
     
-    $sql = "SELECT order_id, order_sn, order_status, shipping_status, pay_status, add_time, " .
+    $sql = "SELECT order_id, order_sn, order_status, shipping_id, shipping_status, pay_status, add_time, pay_time, " .
            "(goods_amount + shipping_fee + insure_fee + pay_fee + pack_fee + card_fee + tax - discount) AS total_fee ".
            " FROM " .$GLOBALS['ecs']->table('order_info') .
            " WHERE user_id = '$user_id' $condition ORDER BY add_time DESC";
@@ -333,15 +323,13 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
             $row['handler'] = '<span style="color:red">'.$GLOBALS['_LANG']['os'][$row['order_status']] .'</span>';
         }
 
-        $row['shipping_status'] = ($row['shipping_status'] == SS_SHIPPED_ING) ? SS_PREPARING : $row['shipping_status'];
-        $row['order_status'] = $GLOBALS['_LANG']['os'][$row['order_status']] . ',' . $GLOBALS['_LANG']['ps'][$row['pay_status']] . ',' . $GLOBALS['_LANG']['ss'][$row['shipping_status']];
+        //$row['shipping_status'] = ($row['shipping_status'] == SS_SHIPPED_ING) ? SS_PREPARING : $row['shipping_status'];
+        //$row['order_status'] = $GLOBALS['_LANG']['os'][$row['order_status']] . ',' . $GLOBALS['_LANG']['ps'][$row['pay_status']] . ',' . $GLOBALS['_LANG']['ss'][$row['shipping_status']];
 
-        $arr[] = array('order_id'       => $row['order_id'],
-                       'order_sn'       => $row['order_sn'],
-                       'order_time'     => local_date($GLOBALS['_CFG']['time_format'], $row['add_time']),
-                       'order_status'   => $row['order_status'],
-                       'total_fee'      => price_format($row['total_fee'], false),
-                       'handler'        => $row['handler']);
+        $row['total_fee_format'] = price_format($row['total_fee'], false);
+        $row['order_time_format'] = local_date($GLOBALS['_CFG']['time_format'], $row['add_time']);
+        $row['pay_time_format'] = local_date($GLOBALS['_CFG']['time_format'], $row['pay_time']);
+        $arr[] = $row;
     }
 
     return $arr;
@@ -359,7 +347,8 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
 function cancel_order($order_id, $user_id = 0)
 {
     /* 查询订单信息，检查状态 */
-    $sql = "SELECT user_id, order_id, order_sn , surplus , integral , bonus_id, order_status, shipping_status, pay_status FROM " .$GLOBALS['ecs']->table('order_info') ." WHERE order_id = '$order_id'";
+    $sql = "SELECT user_id, order_id, order_sn , surplus , integral , bonus_id, order_status, shipping_status, pay_status, pay_id, money_paid " .
+    		" FROM " .$GLOBALS['ecs']->table('order_info') ." WHERE order_id = '$order_id'";
     $order = $GLOBALS['db']->GetRow($sql);
 
     if (empty($order))
@@ -372,48 +361,39 @@ function cancel_order($order_id, $user_id = 0)
     if ($user_id > 0 && $order['user_id'] != $user_id)
     {
         $GLOBALS['err'] ->add($GLOBALS['_LANG']['no_priv']);
-
         return false;
     }
 
-    // 订单状态只能是“未确认”或“已确认”
-    if ($order['order_status'] != OS_UNCONFIRMED && $order['order_status'] != OS_CONFIRMED)
+    // 订单状态只能是“未确认”
+    if ($order['order_status'] != OS_UNCONFIRMED)
     {
         $GLOBALS['err']->add($GLOBALS['_LANG']['current_os_not_unconfirmed']);
-
         return false;
     }
-
-    //订单一旦确认，不允许用户取消
-    if ( $order['order_status'] == OS_CONFIRMED)
+    
+    // 如果已付款，走退款流程
+    if ($order['pay_status'] == PS_PAYED && $order['money_paid'] > 0)
     {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['current_os_already_confirmed']);
+    	$payment = payment_info($order['pay_id']);
+    	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+    	
+    	$pay_obj = new $payment['pay_code'];
+    	$result  = $pay_obj->refund($order, unserialize_config($payment['pay_config']));
 
-        return false;
-    }
-
-    // 发货状态只能是“未发货”
-    if ($order['shipping_status'] != SS_UNSHIPPED)
-    {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['current_ss_not_cancel']);
-
-        return false;
-    }
-
-    // 如果付款状态是“已付款”、“付款中”，不允许取消，要取消和商家联系
-    if ($order['pay_status'] != PS_UNPAYED)
-    {
-        $GLOBALS['err']->add($GLOBALS['_LANG']['current_ps_not_cancel']);
-
-        return false;
+    	if (!$result)
+    	{
+    		$GLOBALS['err']->add('退款失败，请联系客服处理。');
+    		return false;
+    	}
     }
 
     //将用户订单设置为取消
-    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = '".OS_CANCELED."' WHERE order_id = '$order_id'";
+    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = " . OS_CANCELED . ", pay_status = " . PS_UNPAYED .
+    		" WHERE order_id = '$order_id'";
     if ($GLOBALS['db']->query($sql))
     {
         /* 记录log */
-        order_action($order['order_sn'], OS_CANCELED, $order['shipping_status'], PS_UNPAYED,$GLOBALS['_LANG']['buyer_cancel'],'buyer');
+        order_action($order['order_sn'], OS_CANCELED, $order['shipping_status'], PS_UNPAYED, $GLOBALS['_LANG']['buyer_cancel'], 'buyer');
         /* 退货用户余额、积分、红包 */
         if ($order['user_id'] > 0 && $order['surplus'] > 0)
         {
@@ -441,7 +421,7 @@ function cancel_order($order_id, $user_id = 0)
             'bonus_id'  => 0,
             'bonus'     => 0,
             'integral'  => 0,
-            'integral_money'    => 0,
+            'integral_money' => 0,
             'surplus'   => 0
         );
         update_order($order['order_id'], $arr);
@@ -1078,19 +1058,20 @@ function save_order_address($address, $user_id)
  * @param   int         $num             列表显示条数
  * @param   int         $start           显示起始位置
  *
- * @return  array       $arr             红保列表
+ * @return  array       $arr             红包列表
  */
 function get_user_bouns_list($user_id, $num = 10, $start = 0)
 {
-    $sql = "SELECT u.bonus_sn, u.order_id, b.type_name, b.type_money, b.min_goods_amount, b.use_start_date, b.use_end_date ".
+    $sql = "SELECT u.bonus_sn, u.order_id, b.type_name, u.amount, b.min_goods_amount, b.use_start_date, u.expire_time ".
            " FROM " .$GLOBALS['ecs']->table('user_bonus'). " AS u ,".
            $GLOBALS['ecs']->table('bonus_type'). " AS b".
            " WHERE u.bonus_type_id = b.type_id AND u.user_id = '" .$user_id. "'";
     $res = $GLOBALS['db']->selectLimit($sql, $num, $start);
     $arr = array();
 
-    $day = getdate();
-    $cur_date = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+    //$day = getdate();
+    //$cur_date = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+    $cur_date = time();
 
     while ($row = $GLOBALS['db']->fetchRow($res))
     {
@@ -1102,7 +1083,7 @@ function get_user_bouns_list($user_id, $num = 10, $start = 0)
             {
                 $row['status'] = $GLOBALS['_LANG']['not_start'];
             }
-            else if ($row['use_end_date'] < $cur_date)
+            else if ($row['expire_time'] < $cur_date)
             {
                 $row['status'] = $GLOBALS['_LANG']['overdue'];
             }
@@ -1117,7 +1098,7 @@ function get_user_bouns_list($user_id, $num = 10, $start = 0)
         }
 
         $row['use_startdate']   = local_date($GLOBALS['_CFG']['date_format'], $row['use_start_date']);
-        $row['use_enddate']     = local_date($GLOBALS['_CFG']['date_format'], $row['use_end_date']);
+        $row['use_enddate']     = local_date($GLOBALS['_CFG']['date_format'], $row['expire_time']);
 
         $arr[] = $row;
     }

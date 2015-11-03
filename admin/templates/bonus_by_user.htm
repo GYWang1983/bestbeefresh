@@ -31,8 +31,9 @@
 <div class="main-div">
 <form name="theForm" action="bonus.php" method="post" onsubmit="return validate();">
 <div class="form-div">
-<img src="images/icon_search.gif" border="0" alt="SEARCH" />{$lang.keywords}
-      <input type="text" name="keyword" size="30" />
+<img src="images/icon_search.gif" border="0" alt="SEARCH" />
+      {$lang.keywords}<input type="text" name="keyword" size="30" />&nbsp;
+      手机号<input type="text" name="mobile_phone" size="15" />
       <input type="button" name="search" value="{$lang.button_search}" onclick="searchUser();" />
 </div>
 <div class="list-div">
@@ -85,10 +86,8 @@ function searchUser()
 
   /* 填充列表 */
   var keywords = Utils.trim(eles['keyword'].value);
-  if (keywords != '')
-  {
-    Ajax.call('bonus.php?is_ajax=1&act=search_users', 'keywords=' + keywords, searchUserResponse, "GET", "JSON");
-  }
+  var mobile   = Utils.trim(eles['mobile_phone'].value);
+  Ajax.call('bonus.php?is_ajax=1&act=search_users', 'keywords=' + keywords + '&mobile_phone=' + mobile, searchUserResponse, "POST", "JSON");
 }
 
 function searchUserResponse(result)
@@ -102,7 +101,7 @@ function searchUserResponse(result)
     {
       var opt = document.createElement('OPTION');
       opt.value = result.content[i].user_id;
-      opt.text  = result.content[i].user_name;
+      opt.text  = result.content[i].user_name + '[' + result.content[i].mobile_phone + ']';
       eles['user_search[]'].options.add(opt);
     }
   }

@@ -967,7 +967,7 @@ Template Type: type_0
 	.table_box2 .dd2{ color:#999; font-size:0.8rem; text-align:left; width:90%; height:2.5rem; line-height: normal; vertical-align:middle; border:none}
 	.table_box2 .dl_box p{ line-height:36px;}
 	.table_box2  input{ color:#999;  text-align:left; width:90%; border:none; background:#fff ; padding:0; height:24px;  }
-	.table_box2  input.radio{width:auto;}
+	.table_box2  input.radio{width:auto;vertical-align:middle;}
 	.table_box2 .span1{ font-size:0.8rem; background:#ec5151; color:#FFF; display:inline-block; padding:0 0.2rem}
 	.table_box2 .dd3{ text-align:right}
 	.table_box2  i{	background-image: -webkit-linear-gradient(left,transparent 70%,#666 70%,#666 100%),-webkit-linear-gradient(top,transparent 70%,#666 70%,#666 100%);

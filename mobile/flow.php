@@ -97,10 +97,10 @@ if ($_REQUEST['step'] == 'add_to_cart')
                 $spe_arr[$row['attr_id']]['name']     = $row['attr_name'];
                 $spe_arr[$row['attr_id']]['attr_id']     = $row['attr_id'];
                 $spe_arr[$row['attr_id']]['values'][] = array(
-                                                            'label'        => $row['attr_value'],
-                                                            'price'        => $row['attr_price'],
-                                                            'format_price' => price_format($row['attr_price'], false),
-                                                            'id'           => $row['goods_attr_id']);
+                	'label'        => $row['attr_value'],
+                    'price'        => $row['attr_price'],
+                    'format_price' => price_format($row['attr_price'], false),
+                    'id'           => $row['goods_attr_id']);
             }
             $i = 0;
             $spe_array = array();
@@ -501,7 +501,6 @@ elseif ($_REQUEST['step'] == 'checkout')
      * 计算订单的费用
      */
     $total = order_fee($order, $cart_goods, $consignee);
-
     $smarty->assign('total', $total);
     $smarty->assign('shopping_money', sprintf($_LANG['shopping_money'], $total['formated_goods_price']));
     $smarty->assign('market_price_desc', sprintf($_LANG['than_market_price'], $total['formated_market_price'], $total['formated_saving'], $total['save_rate']));
@@ -1141,11 +1140,12 @@ elseif ($_REQUEST['step'] == 'change_bonus')
     $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
 
     /* 获得收货人信息 */
-    $consignee = get_consignee($_SESSION['user_id']);
+    //$consignee = get_consignee($_SESSION['user_id']);
 
     /* 对商品信息赋值 */
     $cart_goods = cart_goods($flow_type); // 取得商品列表，计算合计
-
+	$cart_amount = cart_amount(false, $flow_type);
+	
     if (empty($cart_goods) || !check_consignee_info($consignee, $flow_type))
     {
         $result['error'] = $_LANG['no_goods_in_cart'];
@@ -1155,19 +1155,28 @@ elseif ($_REQUEST['step'] == 'change_bonus')
         /* 取得购物流程设置 */
         $smarty->assign('config', $_CFG);
 
+        $bonus_id = intval($_REQUEST['bonus']);
+        
         /* 取得订单信息 */
         $order = flow_order_info();
-        $bonus = bonus_info(intval($_GET['bonus']));
-        
-        if ((!empty($bonus) && $bonus['user_id'] == $_SESSION['user_id']) || $_GET['bonus'] == 0)
+        if ($bonus_id > 0)
         {
-            $order['bonus_id'] = intval($_GET['bonus']);
+	        $bonus = bonus_info($bonus_id);
+	        if (is_bonus_available($bonus) && $bonus['user_id'] == $_SESSION['user_id'] && $cart_amount >= $bonus['min_goods_amount'])
+	        {
+	            $order['bonus_id'] = $bonus['bonus_id'];
+	        }
+	        else
+	        {
+	            $order['bonus_id'] = 0;
+	            $result['error'] = $_LANG['invalid_bonus'];
+	        }
         }
         else
         {
-            $order['bonus_id'] = 0;
-            $result['error'] = $_LANG['invalid_bonus'];
+        	$order['bonus_id'] = 0;
         }
+
         /* 计算订单的费用 */
         $total = order_fee($order, $cart_goods, $consignee);
         $smarty->assign('total', $total);
@@ -1177,7 +1186,7 @@ elseif ($_REQUEST['step'] == 'change_bonus')
         {
             $smarty->assign('is_group_buy', 1);
         }
-        $result['type_money'] = $total['bonus_formated'];
+        $result['bonus_formated'] = ($total['bonus'] == 0 ? '不使用' : $total['bonus_formated']);
         $result['content'] = $smarty->fetch('library/order_total.lbi');
     }
 
@@ -1425,11 +1434,10 @@ elseif ($_REQUEST['step'] == 'done')
     }
 
     /* 检查红包是否存在 */
-    if ($order['bonus_id'] > 0)
+if ($order['bonus_id'] > 0)
     {
         $bonus = bonus_info($order['bonus_id']);
-
-        if (empty($bonus) || $bonus['user_id'] != $user_id || $bonus['order_id'] > 0 || $bonus['min_goods_amount'] > cart_amount(true, $flow_type))
+        if (!is_bonus_available($bonus) || $bonus['user_id'] != $user_id || $bonus['min_goods_amount'] > cart_amount(false, $flow_type))
         {
             $order['bonus_id'] = 0;
         }
@@ -1439,16 +1447,10 @@ elseif ($_REQUEST['step'] == 'done')
         $bonus_sn = trim($_POST['bonus_sn']);
         $bonus = bonus_info(0, $bonus_sn);
         $now = gmtime();
-        if (empty($bonus) || $bonus['user_id'] > 0 || $bonus['order_id'] > 0 || $bonus['min_goods_amount'] > cart_amount(true, $flow_type) || $now > $bonus['use_end_date'])
+        if (is_bonus_available($bonus) && $bonus['user_id'] == 0 && $bonus['min_goods_amount'] <= cart_amount(false, $flow_type))
         {
-        }
-        else
-        {
-            if ($user_id > 0)
-            {
-                $sql = "UPDATE " . $ecs->table('user_bonus') . " SET user_id = '$user_id' WHERE bonus_id = '$bonus[bonus_id]' LIMIT 1";
-                $db->query($sql);
-            }
+            include_once(ROOT_PATH . 'includes/lib_transaction.php');
+            add_bonus($user_id, $bonus_sn);
             $order['bonus_id'] = $bonus['bonus_id'];
             $order['bonus_sn'] = $bonus_sn;
         }
@@ -1813,8 +1815,13 @@ elseif ($_REQUEST['step'] == 'pay')
 	{
 		show_message('订单不需要支付');
 	}
+	
+	//TODO: 需要重新计算订单金额，重新处理余额、积分、红包
+	
+	
 	if ($order['order_amount'] == 0)
 	{
+		//TODO: 修改为已支付状态
 		show_message('订单不需要支付');
 	}
 	

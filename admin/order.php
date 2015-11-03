@@ -288,15 +288,16 @@ elseif ($_REQUEST['act'] == 'info')
         $user['rank_name'] = $db->getOne($sql);
 
         // 用户红包数量
-        $day    = getdate();
-        $today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+        //$day    = getdate();
+        //$today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+        $now = time();
         $sql = "SELECT COUNT(*) " .
                 "FROM " . $ecs->table('bonus_type') . " AS bt, " . $ecs->table('user_bonus') . " AS ub " .
                 "WHERE bt.type_id = ub.bonus_type_id " .
                 "AND ub.user_id = '$order[user_id]' " .
                 "AND ub.order_id = 0 " .
-                "AND bt.use_start_date <= '$today' " .
-                "AND bt.use_end_date >= '$today'";
+                "AND bt.use_start_date <= '$now' " .
+                "AND ub.expire_time >= '$now'";
         $user['bonus_count'] = $db->getOne($sql);
         $smarty->assign('user', $user);
 
@@ -1857,13 +1858,14 @@ elseif ($_REQUEST['act'] == 'step_post')
             {
                 /* 如果选择了红包，先使用红包支付 */
                 if ($_POST['bonus_id'] > 0)
-                {
-                    /* todo 检查红包是否可用 */
-                    $order['bonus_id']      = $_POST['bonus_id'];
-                    $bonus                  = bonus_info($_POST['bonus_id']);
-                    $order['bonus']         = $bonus['type_money'];
-
-                    $order['order_amount']  -= $order['bonus'];
+                {                    
+                    $bonus = bonus_info($_POST['bonus_id']);
+                    if (is_bonus_available($bonus))
+                    {
+                    	$order['bonus_id']      = $_POST['bonus_id'];
+                    	$order['bonus']         = $bonus['type_money'];
+                    	$order['order_amount']  -= $order['bonus'];
+                    }
                 }
 
                 /* 使用红包之后待付款金额仍大于0 */
@@ -1963,18 +1965,11 @@ elseif ($_REQUEST['act'] == 'step_post')
             {
                 if ($old_order['bonus_id'] > 0)
                 {
-                    $sql = "UPDATE " . $ecs->table('user_bonus') .
-                            " SET used_time = 0, order_id = 0 " .
-                            "WHERE bonus_id = '$old_order[bonus_id]' LIMIT 1";
-                    $db->query($sql);
+                	unuse_bonus($old_order['bonus_id']);
                 }
-
                 if ($order['bonus_id'] > 0)
                 {
-                    $sql = "UPDATE " . $ecs->table('user_bonus') .
-                            " SET used_time = '" . gmtime() . "', order_id = '$order_id' " .
-                            "WHERE bonus_id = '$order[bonus_id]' LIMIT 1";
-                    $db->query($sql);
+                	use_bonus($order['bonus_id'], $order_id);
                 }
             }
         }

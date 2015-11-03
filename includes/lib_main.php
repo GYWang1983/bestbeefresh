@@ -33,13 +33,9 @@ function update_user_info()
 
     /* 查询会员信息 */
     $time = date('Y-m-d');
-    $sql = 'SELECT u.user_money,u.email, u.pay_points, u.user_rank, u.rank_points, '.
-            ' IFNULL(b.type_money, 0) AS user_bonus, u.last_login, u.last_ip'.
+    $sql = 'SELECT u.user_money,u.mobile_phone, u.pay_points, u.user_rank, u.rank_points, '.
+            ' u.last_login, u.last_ip'.
             ' FROM ' .$GLOBALS['ecs']->table('users'). ' AS u ' .
-            ' LEFT JOIN ' .$GLOBALS['ecs']->table('user_bonus'). ' AS ub'.
-            ' ON ub.user_id = u.user_id AND ub.used_time = 0 ' .
-            ' LEFT JOIN ' .$GLOBALS['ecs']->table('bonus_type'). ' AS b'.
-            " ON b.type_id = ub.bonus_type_id AND b.use_start_date <= '$time' AND b.use_end_date >= '$time' ".
             " WHERE u.user_id = '$_SESSION[user_id]'";
     if ($row = $GLOBALS['db']->getRow($sql))
     {
@@ -47,7 +43,7 @@ function update_user_info()
         $_SESSION['last_time']   = $row['last_login'];
         $_SESSION['last_ip']     = $row['last_ip'];
         $_SESSION['login_fail']  = 0;
-        //$_SESSION['email']       = $row['email'];
+        $_SESSION['mobile']      = $row['mobile_phone'];
 
         /*判断是否是特殊等级，可能后台把特殊会员组更改普通会员组*/
         if($row['user_rank'] >0)
@@ -1721,10 +1717,12 @@ function get_user_bonus($user_id = 0)
         $user_id = $_SESSION['user_id'];
     }
 
-    $sql = "SELECT SUM(bt.type_money) AS bonus_value, COUNT(*) AS bonus_count ".
+    $now = time();
+    $sql = "SELECT SUM(ub.amount) AS bonus_value, COUNT(*) AS bonus_count ".
             "FROM " .$GLOBALS['ecs']->table('user_bonus'). " AS ub, ".
                 $GLOBALS['ecs']->table('bonus_type') . " AS bt ".
-            "WHERE ub.user_id = '$user_id' AND ub.bonus_type_id = bt.type_id AND ub.order_id = 0";
+            "WHERE ub.user_id = '$user_id' AND ub.bonus_type_id = bt.type_id AND ub.order_id = 0 " .
+    		"AND bt.use_start_date < $now AND ub.expire_time > $now";
     $row = $GLOBALS['db']->getRow($sql);
 
     return $row;

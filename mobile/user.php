@@ -1151,7 +1151,7 @@ elseif ($action == 'async_order_list')
     switch ($status)
     {
     case 1:
-    	$cond = 'pay_status IN (' . PS_UNPAYED . ',' . PS_PAYING . ')';
+    	$cond = 'pay_status IN (' . PS_UNPAYED . ',' . PS_PAYING . ') AND order_status = ' . OS_UNCONFIRMED;
     	break;
     case 2:
     	$cond = 'pay_status = ' . PS_PAYED . ' AND shipping_status != ' . SS_RECEIVED . ' AND order_status IN (' . OS_CONFIRMED . ',' . OS_UNCONFIRMED . ')';

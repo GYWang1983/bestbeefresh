@@ -367,7 +367,8 @@ function changeIntegralResponse(obj)
  */
 function changeBonus(val)
 {
-  Ajax.call('flow.php?step=change_bonus', 'bonus=' + val, changeBonusResponse, 'GET', 'JSON');
+	$.post('flow.php?step=change_bonus', {'bonus':val}, changeBonusResponse, 'json');
+	//Ajax.call('flow.php?step=change_bonus', 'bonus=' + val, changeBonusResponse, 'GET', 'JSON');
 }
 
 /* *
@@ -386,7 +387,7 @@ function changeBonusResponse(obj)
   }
   else
   {
-	document.getElementById('selected4').innerHTML = obj.type_money; 
+	document.getElementById('selected4').innerHTML = obj.bonus_formated; 
 	document.getElementById('bonus_box').style.display="none";
     orderSelectedResponse(obj.content);
   }

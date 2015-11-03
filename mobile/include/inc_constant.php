@@ -162,6 +162,9 @@ define('GBS_FAIL',                  4); // 团购失败
 define('BONUS_NOT_MAIL',            0);
 define('BONUS_MAIL_SUCCEED',        1);
 define('BONUS_MAIL_FAIL',           2);
+define('BONUS_NOT_SMS',             0);
+define('BONUS_SMS_SUCCEED',         1);
+define('BONUS_SMS_FAIL',            2);
 
 /* 商品活动类型 */
 define('GAT_SNATCH',                0);

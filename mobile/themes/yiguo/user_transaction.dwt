@@ -101,26 +101,20 @@
       </script>
     <header id="header">
       <div class="header_l header_return"> <a class="ico_10" href="user.php"> 返回 </a> </div>
-      <h1> {$lang.label_bonus} </h1>
+      <h1>我的优惠券</h1>
     </header>
     <section class="wrap bonus_list">
 	  <section class="order_box padd1 radius10 single_item">
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
-          <th align="center">序号</th>
-          <th align="center">名称</th>
-          <th align="center">金额</th>
-          <th align="center">最小订单</th>
-          <th align="center">截止日期</th>
+          <th align="left">优惠券</th>
+          <th align="center">截止时间</th>
           <th align="center">状态</th>
         </tr>
         <!-- {if $bonus} --> 
         <!--{foreach from=$bonus item=item}-->
         <tr>
-          <td align="center">{$item.bonus_sn|default:N/A}</td>
-          <td align="center">{$item.type_name}</td>
-          <td align="center">{$item.type_money}</td>
-          <td align="center">{$item.min_goods_amount}</td>
+          <td align="left">{$item.amount}元（满{$item.min_goods_amount}元可用）</td>
           <td align="center">{$item.use_enddate}</td>
           <td align="center">{$item.status}</td>
         </tr>
@@ -132,12 +126,11 @@
         <!-- {/if} -->
       </table>
       </section>
-
 	  <section class="order_box padd1 radius10">
       <form name="addBouns" action="user.php" method="post" onSubmit="return addBonus()" style="text-align:center">
-        <input  placeholder="{$lang.bonus_number}" name="bonus_sn" type="text" class="inputBg_touch" style="margin-bottom:10px" />
+        <input  placeholder="优惠券序列号" name="bonus_sn" type="text" class="inputBg_touch" style="margin-bottom:10px" />
         <input type="hidden" name="act" value="act_add_bonus" class="inputBg" />
-        <input type="submit" class="c-btn3"   value="{$lang.add_bonus}" />
+        <input type="submit" class="c-btn3" value="添加优惠券" />
       </form>
       </section>
     </section>

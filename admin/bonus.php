@@ -220,8 +220,8 @@ if ($_REQUEST['act'] == 'insert')
     $use_startdate  = local_strtotime($_POST['use_start_date']);
     $use_enddate    = local_strtotime($_POST['use_end_date']);
 
-    /* 插入数据库。 */
-    $sql = "INSERT INTO ".$ecs->table('bonus_type')." (type_name, type_money,send_start_date,send_end_date,use_start_date,use_end_date,send_type,min_amount,min_goods_amount)
+    /* 插入数据库 */
+    $sql = "INSERT INTO ".$ecs->table('bonus_type')." (type_name, type_money,send_start_date,send_end_date,use_start_date,use_end_date,send_type,min_amount,min_goods_amount,use_time_limit)
     VALUES ('$type_name',
             '$_POST[type_money]',
             '$send_startdate',
@@ -229,7 +229,8 @@ if ($_REQUEST['act'] == 'insert')
             '$use_startdate',
             '$use_enddate',
             '$_POST[send_type]',
-            '$min_amount','" . floatval($_POST['min_goods_amount']) . "')";
+            '$min_amount','" . floatval($_POST['min_goods_amount']) . "'," .
+            get_use_time_limit() . ")";
 
     $db->query($sql);
     /* 记录管理员操作 */
@@ -265,6 +266,10 @@ if ($_REQUEST['act'] == 'edit')
     $bonus_arr['use_start_date']    = local_date('Y-m-d', $bonus_arr['use_start_date']);
     $bonus_arr['use_end_date']      = local_date('Y-m-d', $bonus_arr['use_end_date']);
 
+    $bonus_arr['use_day_limit']     = floor($bonus_arr['use_time_limit'] / 86400);
+    $bonus_arr['use_hour_limit']    = floor(($bonus_arr['use_time_limit'] % 86400) / 3600);
+    $bonus_arr['use_minuts_limit']  = floor(($bonus_arr['use_time_limit'] % 3600) / 60);
+    
     $smarty->assign('lang',        $_LANG);
     $smarty->assign('ur_here',     $_LANG['bonustype_edit']);
     $smarty->assign('action_link', array('href' => 'bonus.php?act=list&' . list_link_postfix(), 'text' => $_LANG['04_bonustype_list']));
@@ -300,8 +305,9 @@ if ($_REQUEST['act'] == 'update')
            "use_end_date    = '$use_enddate', ".
            "send_type       = '$_POST[send_type]', ".
            "min_amount      = '$min_amount', " .
-           "min_goods_amount = '" . floatval($_POST['min_goods_amount']) . "' ".
-           "WHERE type_id   = '$type_id'";
+           "min_goods_amount = '" . floatval($_POST['min_goods_amount']) . "', ".
+           "use_time_limit  = " . get_use_time_limit() .
+           " WHERE type_id   = '$type_id'";
 
    $db->query($sql);
    /* 记录管理员操作 */
@@ -397,13 +403,13 @@ if ($_REQUEST['act'] == 'send_by_user')
                 $send_count = $db->getOne($sql);
                 if($validated_email)
                 {
-                    $sql = 'SELECT user_id, email, user_name FROM ' . $ecs->table('users').
+                    $sql = 'SELECT user_id, mobile_phone, user_name FROM ' . $ecs->table('users').
                             " WHERE user_rank = '$rank_id' AND is_validated = 1".
                             " LIMIT $start, $limit";
                 }
                 else
                 {
-                     $sql = 'SELECT user_id, email, user_name FROM ' . $ecs->table('users').
+                     $sql = 'SELECT user_id, mobile_phone, user_name FROM ' . $ecs->table('users').
                                 " WHERE user_rank = '$rank_id'".
                                 " LIMIT $start, $limit";
                 }
@@ -416,13 +422,13 @@ if ($_REQUEST['act'] == 'send_by_user')
 
                 if($validated_email)
                 {
-                    $sql = 'SELECT user_id, email, user_name FROM ' . $ecs->table('users').
+                    $sql = 'SELECT user_id, mobile_phone, user_name FROM ' . $ecs->table('users').
                         " WHERE rank_points >= " . intval($row['min_points']) . " AND rank_points < " . intval($row['max_points']) .
                         " AND is_validated = 1 LIMIT $start, $limit";
                 }
                 else
                 {
-                     $sql = 'SELECT user_id, email, user_name FROM ' . $ecs->table('users').
+                     $sql = 'SELECT user_id, mobile_phone, user_name FROM ' . $ecs->table('users').
                         " WHERE rank_points >= " . intval($row['min_points']) . " AND rank_points < " . intval($row['max_points']) .
                         " LIMIT $start, $limit";
                 }
@@ -448,23 +454,27 @@ if ($_REQUEST['act'] == 'send_by_user')
         $id_array   = array_slice($user_array, $start, $limit);
 
         /* 根据会员ID取得用户名和邮件地址 */
-        $sql = "SELECT user_id, email, user_name FROM " .$ecs->table('users').
+        $sql = "SELECT user_id, mobile_phone, user_name FROM " .$ecs->table('users').
                " WHERE user_id " .db_create_in($id_array);
         $user_list  = $db->getAll($sql);
         $count = count($user_list);
     }
 
     /* 发送红包 */
-    $loop       = 0;
+    $loop = 0;
+    $now  = time();
+    
     $bonus_type = bonus_type_info($_REQUEST['id']);
-
-    $tpl = get_mail_template('send_bonus');
-    $today = local_date($_CFG['date_format']);
-
+    check_bonus_type($bonus_type);
+	
+    //$tpl = get_mail_template('send_bonus');
+    //$today = local_date($_CFG['date_format']);
+	$expire_time = min($bonus_type['use_end_date'], $now + $bonus_type['use_time_limit']);
+	
     foreach ($user_list AS $key => $val)
     {
         /* 发送邮件通知 */
-        $smarty->assign('user_name',    $val['user_name']);
+        /*$smarty->assign('user_name',    $val['user_name']);
         $smarty->assign('shop_name',    $GLOBALS['_CFG']['shop_name']);
         $smarty->assign('send_date',    $today);
         $smarty->assign('sent_date',    $today);
@@ -475,7 +485,7 @@ if ($_REQUEST['act'] == 'send_by_user')
 
         if (add_to_maillist($val['user_name'], $val['email'], $tpl['template_subject'], $content, $tpl['is_html']))
         {
-             /* 向会员红包表录入数据 */
+        	//向会员红包表录入数据
             $sql = "INSERT INTO " . $ecs->table('user_bonus') .
                     "(bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed) " .
                     "VALUES ('$_REQUEST[id]', 0, '$val[user_id]', 0, 0, " .BONUS_MAIL_SUCCEED. ")";
@@ -483,13 +493,19 @@ if ($_REQUEST['act'] == 'send_by_user')
         }
         else
         {
-            /* 邮件发送失败，更新数据库 */
+            // 邮件发送失败，更新数据库
             $sql = "INSERT INTO " . $ecs->table('user_bonus') .
                     "(bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed) " .
                     "VALUES ('$_REQUEST[id]', 0, '$val[user_id]', 0, 0, " .BONUS_MAIL_FAIL. ")";
             $db->query($sql);
-        }
-
+        }*/
+    	
+		//TODO: 未来改为短信通知
+		
+        $sql = "INSERT INTO " . $ecs->table('user_bonus') . " (bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed,amount,add_time,expire_time) " .
+        "VALUES ('$_REQUEST[id]', 0, '$val[user_id]', 0, 0, " .BONUS_NOT_SMS. ",$bonus_type[type_money],$now,$expire_time)";
+        $db->query($sql);
+        
         if ($loop >= $limit)
         {
             break;
@@ -503,7 +519,6 @@ if ($_REQUEST['act'] == 'send_by_user')
     //admin_log(addslashes($_LANG['send_bonus']), 'add', 'bonustype');
     if ($send_count > ($start + $limit))
     {
-        /*  */
         $href = "bonus.php?act=send_by_user&start=" . ($start+$limit) . "&limit=$limit&id=$_REQUEST[id]&";
 
         if (isset($_REQUEST['send_rank']))
@@ -566,6 +581,9 @@ if ($_REQUEST['act'] == 'send_by_print')
     $bonus_typeid = !empty($_POST['bonus_type_id']) ? $_POST['bonus_type_id'] : 0;
     $bonus_sum    = !empty($_POST['bonus_sum'])     ? $_POST['bonus_sum']     : 1;
 
+    $bonus_type = bonus_type_info($_REQUEST['id']);
+    check_bonus_type($bonus_type);
+    
     /* 生成红包序列号 */
     $num = $db->getOne("SELECT MAX(bonus_sn) FROM ". $ecs->table('user_bonus'));
     $num = $num ? floor($num / 10000) : 100000;
@@ -573,7 +591,7 @@ if ($_REQUEST['act'] == 'send_by_print')
     for ($i = 0, $j = 0; $i < $bonus_sum; $i++)
     {
         $bonus_sn = ($num + $i) . str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
-        $db->query("INSERT INTO ".$ecs->table('user_bonus')." (bonus_type_id, bonus_sn) VALUES('$bonus_typeid', '$bonus_sn')");
+        $db->query("INSERT INTO ".$ecs->table('user_bonus')." (bonus_type_id,bonus_sn,amount) VALUES('$bonus_typeid', '$bonus_sn', '$bonus_type[type_money]')");
 
         $j++;
     }
@@ -633,7 +651,7 @@ if ($_REQUEST['act'] == 'gen_excel')
     }
 
     $val = array();
-    $sql = "SELECT ub.bonus_id, ub.bonus_type_id, ub.bonus_sn, bt.type_name, bt.type_money, bt.use_end_date ".
+    $sql = "SELECT ub.bonus_id, ub.bonus_type_id, ub.bonus_sn, bt.type_name, ub.amount, bt.use_end_date ".
            "FROM ".$ecs->table('user_bonus')." AS ub, ".$ecs->table('bonus_type')." AS bt ".
            "WHERE bt.type_id = ub.bonus_type_id AND ub.bonus_type_id = '$tid' ORDER BY ub.bonus_id DESC";
     $res = $db->query($sql);
@@ -642,7 +660,7 @@ if ($_REQUEST['act'] == 'gen_excel')
     while ($val = $db->fetchRow($res))
     {
         echo $val['bonus_sn'] . "\t";
-        echo $val['type_money'] . "\t";
+        echo $val['amount'] . "\t";
         if (!isset($code_table[$val['type_name']]))
         {
             if (EC_CHARSET != 'gbk')
@@ -754,10 +772,20 @@ if ($_REQUEST['act'] == 'drop_bonus_goods')
 /*------------------------------------------------------ */
 if ($_REQUEST['act'] == 'search_users')
 {
-    $keywords = json_str_iconv(trim($_GET['keywords']));
-
-    $sql = "SELECT user_id, user_name FROM " . $ecs->table('users') .
-            " WHERE user_name LIKE '%" . mysql_like_quote($keywords) . "%' OR user_id LIKE '%" . mysql_like_quote($keywords) . "%'";
+    $keywords = json_str_iconv(trim($_REQUEST['keywords']));
+	$mobile_phone = trim($_REQUEST['mobile_phone']);
+	
+	$cond = '';
+	if (!empty($keywords))
+	{
+		$cond .= " AND user_name LIKE '%" . mysql_like_quote($keywords) . "%'";
+	}
+	if (!empty($mobile_phone))
+	{
+		$cond .= " AND mobile_phone LIKE '%" . mysql_like_quote($mobile_phone) . "%'";
+	}
+	
+    $sql = "SELECT user_id, user_name, mobile_phone FROM " . $ecs->table('users') . " WHERE 1=1 $cond";
     $row = $db->getAll($sql);
 
     make_json_result($row);
@@ -1004,7 +1032,7 @@ function get_bonus_list()
     /* 分页大小 */
     $filter = page_and_size($filter);
 
-    $sql = "SELECT ub.*, u.user_name, u.email, o.order_sn, bt.type_name ".
+    $sql = "SELECT ub.*, u.user_name, u.mobile_phone, o.order_sn, bt.type_name ".
           " FROM ".$GLOBALS['ecs']->table('user_bonus'). " AS ub ".
           " LEFT JOIN " .$GLOBALS['ecs']->table('bonus_type'). " AS bt ON bt.type_id=ub.bonus_type_id ".
           " LEFT JOIN " .$GLOBALS['ecs']->table('users'). " AS u ON u.user_id=ub.user_id ".
@@ -1036,6 +1064,35 @@ function bonus_type_info($bonus_type_id)
             " WHERE type_id = '$bonus_type_id'";
 
     return $GLOBALS['db']->getRow($sql);
+}
+
+/**
+ * 检查是否可发放红包
+ * @param array $bonus_type
+ */
+function check_bonus_type($bonus_type, $return = false)
+{
+	$result = true;
+	$now  = time();
+	if (empty($bonus_type))
+	{
+		$result = '红包类型不存在';
+	}
+	elseif ($bonus_type['send_start_date'] > $now)
+	{
+		$result = '还没到红包发放开始日期，不能发放';
+	}
+	elseif ($bonus_type['send_end_date'] < $now || $bonus_type['use_end_date'] < $now)
+	{
+		$result = '红包已过期，不能发放';
+	}
+	
+	if (!$return && $result !== true)
+	{
+		sys_msg($result, 1);
+	}
+	
+	return $result;
 }
 
 /**
@@ -1113,4 +1170,12 @@ function add_to_maillist($username, $email, $subject, $content, $is_html)
     return true;
 }
 
+function get_use_time_limit()
+{
+	$day    = intval($_REQUEST['use_day_limit']);
+	$hour   = intval($_REQUEST['use_hour_limit']);
+	$minuts = intval($_REQUEST['use_minuts_limit']);
+	
+	return $day * 86400 + $hour * 3600 + $minuts * 60;
+}
 ?>

@@ -501,4 +501,41 @@ function get_ad_posti_child($cat_n_child = ''){
 	 return $arr;
 }
 
+/**
+* 调用购物车商品数目
+*/
+function insert_cart_info_number()
+{
+    $sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
+           " WHERE ".get_cart_cond()." AND rec_type = '" . CART_GENERAL_GOODS . "'";
+    $number = $GLOBALS['db']->getOne($sql);
+    return intval($number);
+}
+
+
+function insert_cart_detail_number()
+{
+	$sql = 'SELECT goods_id, SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
+	" WHERE ". get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' GROUP BY goods_id";
+	$rs = $GLOBALS['db']->getAll($sql);
+	
+	if (empty($rs)) {
+		return '{}';
+	}
+	
+	$cart = array();
+	foreach ($rs as $good) {
+		$cart[$good['goods_id']] = $good['number'];
+	}
+	
+	return json_encode($cart);
+}
+
+function insert_cart_goods_number($goods_id)
+{	
+	$sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
+	" WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' AND goods_id = $goods_id";
+	$num = $GLOBALS['db']->getOne($sql);
+	return $num ?: 0;
+}
 ?>

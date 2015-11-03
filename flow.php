@@ -1714,8 +1714,7 @@ elseif ($_REQUEST['step'] == 'done')
     if ($order['bonus_id'] > 0)
     {
         $bonus = bonus_info($order['bonus_id']);
-
-        if (empty($bonus) || $bonus['user_id'] != $user_id || $bonus['order_id'] > 0 || $bonus['min_goods_amount'] > cart_amount(true, $flow_type))
+        if (!is_bonus_available($bonus) || $bonus['user_id'] != $user_id || $bonus['min_goods_amount'] > cart_amount(false, $flow_type))
         {
             $order['bonus_id'] = 0;
         }
@@ -1725,16 +1724,10 @@ elseif ($_REQUEST['step'] == 'done')
         $bonus_sn = trim($_POST['bonus_sn']);
         $bonus = bonus_info(0, $bonus_sn);
         $now = gmtime();
-        if (empty($bonus) || $bonus['user_id'] > 0 || $bonus['order_id'] > 0 || $bonus['min_goods_amount'] > cart_amount(true, $flow_type) || $now > $bonus['use_end_date'])
+        if (is_bonus_available($bonus) && $bonus['user_id'] == 0 && $bonus['min_goods_amount'] <= cart_amount(false, $flow_type))
         {
-        }
-        else
-        {
-            if ($user_id > 0)
-            {
-                $sql = "UPDATE " . $ecs->table('user_bonus') . " SET user_id = '$user_id' WHERE bonus_id = '$bonus[bonus_id]' LIMIT 1";
-                $db->query($sql);
-            }
+            include_once(ROOT_PATH . 'includes/lib_transaction.php');
+            add_bonus($user_id, $bonus_sn);
             $order['bonus_id'] = $bonus['bonus_id'];
             $order['bonus_sn'] = $bonus_sn;
         }

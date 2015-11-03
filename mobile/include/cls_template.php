@@ -659,7 +659,9 @@ class cls_template
                     	}
                     	$p = 'date(' . $f . ',' . $p . ')';
                     	break;
-                    	
+                    case 'money':
+                    	$p = 'price_format(' . $p . ', false)';
+                    	break;	
                     default:
                         # code...
                         break;
