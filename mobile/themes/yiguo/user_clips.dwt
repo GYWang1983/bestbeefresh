@@ -10,9 +10,10 @@
 <link href="{$ectouch_themes}/images/touch-icon.png" rel="apple-touch-icon-precomposed" />
 <link href="{$ectouch_themes}/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 <link href="{$ectouch_themes}/ectouch.css" rel="stylesheet" type="text/css" />
+<link href="{$ectouch_themes}/css/iconfont.css?v=20151103" type="text/css" rel="stylesheet"/>
 {* 包含脚本文件 *}
-{insert_scripts files='transport.js,common.js,user.js'}
-<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.4.4.min.js"></script>
+{insert_scripts files='transport_jquery.js,common.js,user.js'}
+<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
 </head>
 <body>
 <!-- *用户中心默认显示页面 start--> 
@@ -158,7 +159,7 @@ jQuery(function($){
 
 <!--*收藏商品列表页面 start--> 
 <!--{if $action eq 'collection_list'} --> 
-{insert_scripts files='transport.js,utils.js'}
+{insert_scripts files='utils.js'}
 <header id="header">
   <div class="header_l header_return"> <a class="ico_10" href="user.php"> 返回 </a> </div>
   <h1> {$lang.label_collection} </h1>

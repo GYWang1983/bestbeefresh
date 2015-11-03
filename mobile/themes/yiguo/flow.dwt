@@ -10,11 +10,11 @@
 <link href="{$ectouch_themes}/images/touch-icon.png" rel="apple-touch-icon-precomposed" />
 <link href="{$ectouch_themes}/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 <link href="{$ectouch_themes}/ectouch.css" rel="stylesheet" type="text/css" />
+<link href="{$ectouch_themes}/css/iconfont.css?v=20151103" type="text/css" rel="stylesheet"/>
 {* 包含脚本文件 *}
-{insert_scripts files='common.js,shopping_flow.js'}
-{insert_scripts files='transport.js,utils.js'}
+{insert_scripts files='common.js,shopping_flow.js,transport_jquery.js,utils.js'}
 <script type="text/javascript" src="{$ectouch_themes}/js/TouchSlide.js"></script>
-<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/ectouch.js"></script>
 <!--{if is_wechat_browser() }-->
 <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
@@ -82,8 +82,7 @@
           <!-- {/if} -->
           <div class="b"> <em class="price">{$goods.goods_price}</em> <span style="jianju">x </span> <span class="txt"> 
             <!-- {if $goods.goods_id gt 0 && $goods.is_gift eq 0 && $goods.parent_id eq 0} 普通商品可修改数量 -->
-            <input class="inputBg" type="number" min="1" max="1000" name="goods_number[{$goods.rec_id}]" id="goods_number_{$goods.rec_id}" value="{$goods.goods_number}" size="4"   onkeyup="changenum({$goods.rec_id})"/>
-            {insert_scripts files='transport.js'} 
+            <input class="inputBg" type="number" min="1" max="1000" name="goods_number[{$goods.rec_id}]" id="goods_number_{$goods.rec_id}" value="{$goods.goods_number}" size="4"   onkeyup="changenum({$goods.rec_id})"/> 
             <script>
 			function changenum(rec_id){
 			var goods_number = parseInt(document.getElementById('goods_number_'+rec_id).value);				  	   
@@ -191,7 +190,6 @@
 </section>
 <!-- {/if} --> 
 <!-- {if $smarty.session.user_id gt 0} --> 
-{insert_scripts files='transport.js'} 
 <script type="text/javascript" charset="utf-8">
         function collect_to_flow(goodsId)
         {
