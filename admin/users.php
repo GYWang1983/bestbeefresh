@@ -677,6 +677,7 @@ function user_list()
     {
         /* 过滤条件 */
         $filter['keywords'] = empty($_REQUEST['keywords']) ? '' : trim($_REQUEST['keywords']);
+        $filter['mobile_phone'] = empty($_REQUEST['mobile_phone']) ? '' : trim($_REQUEST['mobile_phone']);
         if (isset($_REQUEST['is_ajax']) && $_REQUEST['is_ajax'] == 1)
         {
             $filter['keywords'] = json_str_iconv($filter['keywords']);
@@ -692,6 +693,10 @@ function user_list()
         if ($filter['keywords'])
         {
             $ex_where .= " AND user_name LIKE '%" . mysql_like_quote($filter['keywords']) ."%'";
+        }
+        if ($filter['mobile_phone'])
+        {
+        	$ex_where .= " AND mobile_phone LIKE '%" . mysql_like_quote($filter['mobile_phone']) ."%'";
         }
         if ($filter['rank'])
         {
@@ -720,7 +725,7 @@ function user_list()
 
         /* 分页大小 */
         $filter = page_and_size($filter);
-        $sql = "SELECT user_id, user_name, email, is_validated, user_money, frozen_money, rank_points, pay_points, reg_time ".
+        $sql = "SELECT user_id, user_name, mobile_phone, is_validated, user_money, frozen_money, rank_points, pay_points, reg_time ".
                 " FROM " . $GLOBALS['ecs']->table('users') . $ex_where .
                 " ORDER by " . $filter['sort_by'] . ' ' . $filter['sort_order'] .
                 " LIMIT " . $filter['start'] . ',' . $filter['page_size'];
