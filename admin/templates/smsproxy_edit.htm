@@ -11,7 +11,7 @@
     <td class="label">{$lang.proxy_desc}</td>
     <td><textarea name="proxy_desc" cols="60" rows="8">{$proxy.proxy_desc|escape}</textarea></td>
   </tr>
-  {foreach from=$proxy.pay_config item=config key=key}
+  {foreach from=$proxy.proxy_config item=config key=key}
   <tr>
     <td class="label">
       {if $config.desc}

@@ -267,7 +267,7 @@ elseif (isset($_POST['Submit']))
                "SET proxy_name = '$_POST[proxy_name]'," .
                "    proxy_desc = '$_POST[proxy_desc]'," .
                "    proxy_config = '$proxy_config', " .
-               "    is_text    =  '$_POST[is_text]' ".
+               "    is_text    =  '$_POST[is_text]', ".
                "    is_voice   =  '$_POST[is_voice]' ".
                "WHERE proxy_code = '$_POST[proxy_code]' LIMIT 1";
         $db->query($sql);
@@ -288,8 +288,8 @@ elseif (isset($_POST['Submit']))
                    "SET proxy_name = '$_POST[proxy_name]'," .
                    "    proxy_desc = '$_POST[proxy_desc]'," .
                    "    proxy_config = '$proxy_config'," .
-                   "    is_text    =  '$_POST[is_text]' ".
-               	   "    is_voice   =  '$_POST[is_voice]' ".
+                   "    is_text    =  '$_POST[is_text]', ".
+               	   "    is_voice   =  '$_POST[is_voice]', ".
                    "    enabled = '1' " .
                    "WHERE proxy_code = '$_POST[proxy_code]' LIMIT 1";
             $db->query($sql);
