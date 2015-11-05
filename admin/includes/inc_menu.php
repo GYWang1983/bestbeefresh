@@ -106,6 +106,7 @@ $modules['11_system']['05_area_list']               = 'area_manage.php?act=list'
 //$modules['11_system']['06_plugins']                 = 'plugins.php?act=list';
 $modules['11_system']['07_cron_schcron']            = 'cron.php?act=list';
 $modules['11_system']['08_friendlink_list']         = 'friend_link.php?act=list';
+$modules['11_system']['09_smsproxy_list']           = 'smsproxy.php?act=list';
 $modules['11_system']['sitemap']                    = 'sitemap.php';
 $modules['11_system']['check_file_priv']            = 'check_file_priv.php?act=check';
 $modules['11_system']['captcha_manage']             = 'captcha_manage.php?act=main';

@@ -264,6 +264,7 @@ $_LANG['04_mail_settings'] = '邮件服务器设置';
 $_LANG['05_area_list'] = '地区列表';
 $_LANG['07_cron_schcron'] = '计划任务';
 $_LANG['08_friendlink_list'] = '友情链接';
+$_LANG['09_smsproxy_list']   = '短信平台';
 $_LANG['shipping_area_list'] = '配送区域';
 $_LANG['sitemap'] = '站点地图';
 $_LANG['check_file_priv'] = '文件权限检测';
