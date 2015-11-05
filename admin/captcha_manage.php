@@ -54,6 +54,14 @@ if ($_REQUEST['act'] == 'main')
     {
         $captcha_check['message']    = 'checked="checked"';
     }
+    if ($captcha & CAPTCHA_GET_PASSWORD)
+    {
+    	$captcha_check['reset_password']    = 'checked="checked"';
+    }
+    if ($captcha & CAPTCHA_REBIND)
+    {
+    	$captcha_check['rebind']    = 'checked="checked"';
+    }
     if ($captcha & CAPTCHA_LOGIN_FAIL)
     {
         $captcha_check['login_fail_yes']    = 'checked="checked"';
@@ -83,6 +91,8 @@ if ($_REQUEST['act'] == 'save_config')
     $captcha = empty($_POST['captcha_admin'])       ? $captcha : $captcha | CAPTCHA_ADMIN;
     $captcha = empty($_POST['captcha_login_fail'])  ? $captcha : $captcha | CAPTCHA_LOGIN_FAIL;
     $captcha = empty($_POST['captcha_message'])     ? $captcha : $captcha | CAPTCHA_MESSAGE;
+    $captcha = empty($_POST['captcha_reset_password'])     ? $captcha : $captcha | CAPTCHA_GET_PASSWORD;
+    $captcha = empty($_POST['captcha_rebind'])      ? $captcha : $captcha | CAPTCHA_REBIND;
 
     $captcha_width = empty($_POST['captcha_width'])     ? 145 : intval($_POST['captcha_width']);
     $captcha_height = empty($_POST['captcha_height'])   ? 20 : intval($_POST['captcha_height']);
