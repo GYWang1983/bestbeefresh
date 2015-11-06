@@ -48,6 +48,16 @@
                 <input placeholder="{$lang.label_password}"  name="password" type="password" class="inputBg" />
               </dd>
             </dl>
+            <!-- 判断是否启用验证码{if $login_captcha} -->
+            <dl>
+              <dd>
+                <input placeholder="请输入验证码" class="inputBg" name="captcha" id="captcha" type="text" />
+              </dd>
+              <dd>
+              <img src="captcha.php?{$rand}" alt="captcha" style="height:34px;vertical-align: middle; margin-left:5px;" onClick="this.src='captcha.php?'+Math.random()" />
+              </dd>
+            </dl>
+            <!--{/if}-->
             <dl>
               <dd>
                 <input type="checkbox" value="1" name="remember" id="remember" style="vertical-align:middle; zoom:200%;" /><label for="remember"> 一个月内免登录</label>
@@ -79,6 +89,7 @@
       	<!--{if $enabled_sms_signin eq 1} 支持手机短信功能-->
         <form action="user.php" method="post" name="formUser" onsubmit="return register2();">
           <input type="hidden" name="flag" id="flag" value="register" />
+          <div class="hd" id="alert" style="color:red;display:none;">{$message}</div>
           <div class="table_box">
             <dl>
               <dd>
@@ -87,15 +98,25 @@
             </dl>
             <dl>
               <dd>
-                <input placeholder="请输入帐号密码" class="inputBg" name="password" id="mobile_pwd" type="password" />
+                <input placeholder="请设置登录密码" class="inputBg" name="password" id="mobile_pwd" type="password" />
               </dd>
             </dl>
+            <!-- 判断是否启用验证码{if $register_captcha} -->
+            <dl>
+              <dd>
+                <input placeholder="请输入图片上的文字" class="inputBg" name="captcha" id="captcha" type="text" />
+              </dd>
+              <dd>
+              <img src="captcha.php?{$rand}" alt="captcha" style="height:34px;vertical-align: middle; margin-left:5px;" onClick="this.src='captcha.php?'+Math.random()" />
+              </dd>
+            </dl>
+            <!--{/if}-->
             <dl>
               <dd>
                 <input placeholder="请输入验证码" class="inputBg" name="mobile_code" id="mobile_code" type="text" />
               </dd>
               <dd>
-              <input id="zphone" name="sendsms" type="button" value="获取手机验证码" onClick="sendSms();" class="c-btn3" />
+              <input id="zphone" name="sendsms" type="button" value="获取手机验证码" onClick="send_sms('register');" class="c-btn3" />
               </dd>
             </dl>
             <dl>
@@ -227,7 +248,9 @@ jQuery(function($){
 </section>
 <script type="text/javascript">
 jQuery(function($){
-    $('#btn_send_sms').click(send_bind_sms);
+    $('#btn_send_sms').click(function(
+        send_sms('wxbind');
+    ));
 })
 </script>
 <!--{/if}--> 

@@ -61,7 +61,7 @@ if ($captcha_enable && gd_version() > 0)
 	}
 
 	/* 检查验证码 */
-	include_once(ROOT_PATH . 'includes/cls_captcha.php');
+	include_once(ROOT_PATH . 'include/cls_captcha.php');
 
 	$validator = new captcha();
 	if (!$validator->check_word($_POST['captcha']))
@@ -73,6 +73,14 @@ if ($captcha_enable && gd_version() > 0)
 }
 
 $mobile = trim($_POST['mobile']);
+
+/* 提交的手机号是否正确 */
+if (!ismobile($mobile))
+{
+	$result['error'] = 2;
+	$result['message'] = $_LANG['invalid_mobile_phone'];
+	die($json->encode($result));
+}
 
 $old_log = '';
 if(file_exists("../request.log")){
@@ -91,14 +99,6 @@ $ip_array = explode(",", $denied_log);
 
 if(in_array(real_ip(), $ip_array)) {
 	$result['error'] = 6;
-	$result['message'] = $_LANG['invalid_mobile_phone'];
-	die($json->encode($result));
-}
-
-/* 提交的手机号是否正确 */
-if (!ismobile($mobile))
-{
-	$result['error'] = 2;
 	$result['message'] = $_LANG['invalid_mobile_phone'];
 	die($json->encode($result));
 }
@@ -124,7 +124,6 @@ if ($db->getOne($sql) > 0)
 	die($json->encode($result));
 }
 
-
 if ($step == 'register')
 {
 	/* 是否开启手机短信验证注册 */
@@ -143,16 +142,10 @@ if ($step == 'register')
     }
 
 	$verifycode = getverifycode();
-
-    $smarty->assign('shop_name',	$_CFG['shop_name']);
-    $smarty->assign('user_mobile',	$mobile);
-    $smarty->assign('verify_code',  $verifycode);
-
-    $content = $smarty->fetch('str:' . $_CFG['ecsdxt_mobile_reg_value']);
-	
+		
 	/* 发送注册手机短信验证 */
-	$ret = sendsms($mobile, $content);
-	
+	$ret = sendsms($mobile, array('verifycode'=>$verifycode), 'register');
+	var_dump($ret);
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
@@ -182,15 +175,9 @@ elseif ($step == 'getpassword')
 	}
 	
 	$verifycode = getverifycode();
-	
-	$smarty->assign('shop_name',	$_CFG['shop_name']);
-	$smarty->assign('user_mobile',	$mobile);
-	$smarty->assign('verify_code',  $verifycode);
-	
-	$content = $smarty->fetch('str:' . $_CFG['ecsdxt_mobile_changepwd_value']);
-	
+
 	/* 发送注册手机短信验证 */
-	$ret = sendsms($mobile, $content);
+	$ret = sendsms($mobile, array('verifycode'=>$verifycode), 'resetpwd');
 	
 	if($ret === true)
 	{
@@ -231,15 +218,9 @@ elseif ($step == 'rebind')
     }
 
 	$verifycode = getverifycode();
-
-    $smarty->assign('shop_name',	$_CFG['shop_name']);
-    $smarty->assign('user_mobile',	$mobile);
-    $smarty->assign('verify_code',  $verifycode);
-
-    $content = $smarty->fetch('str:' . $_CFG['ecsdxt_mobile_bind_value']);
 	
 	/* 发送注册手机短信验证 */
-	$ret = sendsms($mobile, $content);
+	$ret = sendsms($mobile, array('verifycode'=>$verifycode), 'bind');
 	
 	if($ret === true)
 	{
@@ -273,14 +254,8 @@ elseif ($step == 'wxbind')
 
 	$verifycode = getverifycode();
 
-	$smarty->assign('shop_name',	$_CFG['shop_name']);
-	$smarty->assign('user_mobile',	$mobile);
-	$smarty->assign('verify_code',  $verifycode);
-
-	$content = $smarty->fetch('str:' . $_CFG['ecsdxt_mobile_bind_value']);
-
 	/* 发送注册手机短信验证 */
-	$ret = sendsms($mobile, $content);
+	$ret = sendsms($mobile, array('verifycode'=>$verifycode), 'bind');
 
 	if($ret === true)
 	{

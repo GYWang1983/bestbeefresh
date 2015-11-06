@@ -463,10 +463,16 @@ elseif ($action == 'login')
     }
 
     $captcha = intval($_CFG['captcha']);
-    if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0 || (intval($_CFG['captcha']) & CAPTCHA_REGISTER))
+    if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
     {
-        $GLOBALS['smarty']->assign('enabled_captcha', 1);
+        $GLOBALS['smarty']->assign('login_captcha', 1);
         $GLOBALS['smarty']->assign('rand', mt_rand());
+    }
+    
+    if ($captcha & CAPTCHA_REGISTER)
+    {
+    	$GLOBALS['smarty']->assign('register_captcha', 1);
+    	$GLOBALS['smarty']->assign('rand', mt_rand());
     }
 
     $smarty->assign('next', $_REQUEST['next']);
@@ -481,7 +487,6 @@ elseif ($action == 'act_login')
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
     $back_act = isset($_POST['back_act']) ? trim($_POST['back_act']) : '';
 
-    /* 关闭验证码 by wang
     $captcha = intval($_CFG['captcha']);
     if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
     {
@@ -499,15 +504,6 @@ elseif ($action == 'act_login')
         {
             show_message($_LANG['invalid_captcha'], $_LANG['relogin_lnk'], 'user.php', 'error');
         }
-    }
-    */
-
-    //用户名是邮箱格式 by wang
-    if(is_email($username))
-    {
-        $sql ="select user_name from ".$ecs->table('users')." where email='".$username."'";
-        $username_try = $db->getOne($sql);
-        $username = $username_try ? $username_try:$username;
     }
 
     //用户名是手机格式 by wang

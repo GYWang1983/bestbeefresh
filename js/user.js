@@ -286,12 +286,14 @@ function userLogin()
   {
     msg += password_empty + '\n';
   }
+    
+  if ($("#captcha").length > 0 && $("#captcha").val().length == 0)
+  {
+	msg += '请输入图片中的验证码\n';
+  }
 
   if (msg.length > 0)
-  {
-    //alert(msg);
-    //alert("333");
-    
+  {    
 	return false;
   }
   else
