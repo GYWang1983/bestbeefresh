@@ -114,6 +114,8 @@ function __construct($config)
      */
     function send_text($mobile, $data, $step)
     {
+    	global $_CFG;
+    	
     	$rest = new REST($this->config['server_domain'], $this->config['server_port'], $this->config['soft_version']);
     	$rest->setAccount($this->config['account_sid'], $this->config['account_token']);
     	$rest->setAppId($this->config['appId']);
@@ -122,11 +124,9 @@ function __construct($config)
     		$rest->setLog(TRUE, ROOT_PATH . '/data/yuntongxun_sms.log');
     	}
     	
-    	//TODO: 
-    	$param = array($data['verifycode']);
+    	$param = array($data['verifycode'], intval($_CFG['ecsdxt_sms_validtime'] / 60), $_CFG['service_phone']);
     	
     	// 发送模板短信
-    	//echo "Sending TemplateSMS to $to <br/>";
     	$result = $rest->sendTemplateSMS($mobile, $param, $this->config[$step . '_tmpl']);
     	if($result == NULL) {
     		return array('errcode' => 1, 'errmsg'=> 'unknown error');

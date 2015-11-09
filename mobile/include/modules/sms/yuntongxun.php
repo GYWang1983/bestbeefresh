@@ -124,8 +124,7 @@ class yuntongxun
     		$rest->setLog(TRUE, ROOT_PATH . '/data/yuntongxun_sms.log');
     	}
     	
-    	//TODO: 
-    	$param = array($data['verifycode'], intval($_CFG['ecsdxt_sms_validtime'] / 60));
+    	$param = array($data['verifycode'], intval($_CFG['ecsdxt_sms_validtime'] / 60), $_CFG['service_phone']);
     	
     	// 发送模板短信
     	$result = $rest->sendTemplateSMS($mobile, $param, $this->config[$step . '_tmpl']);
