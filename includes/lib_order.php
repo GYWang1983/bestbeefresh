@@ -3445,13 +3445,21 @@ function get_order_lock_deadline($basetime = NULL)
  * 计算订单取货时间
  *
  * @param $paytime 支付时间
+ * @param $comfirm_time 订单确认时间
  * @return Array
  */
-function get_order_pickup_time($paytime)
+function get_order_pickup_time($paytime, $comfirm_time = 0)
 {
 	global $_CFG;
 
-	$locktime = get_order_lock_deadline($paytime);
+	if (empty($comfirm_time))
+	{
+		$locktime = get_order_lock_deadline($paytime);
+	}
+	else 
+	{
+		$locktime = $comfirm_time;
+	}
 	
 	$tz = timezone_open(date_default_timezone_get());
 	$start = new DateTime('@' . $locktime);

@@ -44,8 +44,17 @@ if (isset($set_modules) && $set_modules == TRUE)
     return;
 }
 
-$sql = "UPDATE " . $ecs->table('order_info') . " SET shipping_status=" . SS_SHIPPED . ", shipping_time=" . time() . 
-" WHERE shipping_status=" . SS_PREPARING;
-$db->query($sql);
+$sql = "SELECT order_id, confirm_time FROM " . $ecs->table('order_info') . " WHERE order_status = " . OS_CONFIRMED . " AND shipping_status = " . SS_PREPARING;
+$rs = $db->getAll($sql);
+
+foreach ($rs as $order)
+{
+	$pickup_time = get_order_pickup_time(0, $order['confirm_time']);
+	$db->autoExecute($ecs->table('order_info'), array(
+		'shipping_status'  => SS_SHIPPED,
+		'shipping_time'    => time(),
+		'receive_deadline' => $pickup_time['end'],
+	), 'UPDATE', 'order_id=' . $order['order_id']);
+}
 
 ?>

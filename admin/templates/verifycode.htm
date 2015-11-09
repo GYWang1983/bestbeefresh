@@ -35,7 +35,7 @@
     <td align="center">{if $verifycode.type eq 1}注册{elseif $verifycode.type eq 2}找回密码{elseif $verifycode.type eq 3}更改手机{/if}</td>
     <td align="center">{$verifycode.dateline|timestamp:'Y-m-d H:i:s'}</td>
     <td align="center">{$verifycode.verifycode}</td>
-    <td align="center">{if $verifycode.status eq 1}有效{elseif $verifycode.status eq 2}已使用{elseif $verifycode.status eq 0}过期{/if}</td>
+    <td align="center">{if $verifycode.status eq 1}有效{elseif $verifycode.status eq 2}已使用{elseif $verifycode.status eq 3}过期{/if}</td>
   </tr>
   {foreachelse}
   <tr><td class="no-records" colspan="10">{$lang.no_records}</td></tr>
