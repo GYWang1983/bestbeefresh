@@ -1,6 +1,5 @@
 
 function send_sms(type) {
-	
 	var mobile = $('#mobile_phone').val();
 	if (!check_mobile(mobile)) {
 		$('#alert').show().text('请输入正确的手机号');
@@ -22,7 +21,19 @@ function send_sms(type) {
     	{
     	case 0:
     	case 4:
-    		$('#alert').show().text('验证码已发送');
+    		var timeout = result.smsgap;
+    		$('#alert').hide();
+    		$('#message').show().text('验证码已发送至' + mobile);
+    		$('#sendsms').attr('disabled', true).val('重新发送(' + timeout +')');
+    		var clock = setInterval(function() {
+    			timeout--;
+    			if (timeout > 0) {
+    				$('#sendsms').val('重新发送(' + timeout +')');
+    			} else {
+    				$('#sendsms').removeAttr('disabled').val('重新发送');
+    				clearInterval(clock);
+    			}
+    		}, 1000);
     		break;
     	case 2:
     	case 3:

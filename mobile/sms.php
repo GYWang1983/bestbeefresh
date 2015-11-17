@@ -103,7 +103,7 @@ if(in_array(real_ip(), $ip_array)) {
 	die($json->encode($result));
 }
 
-$count = $db->getOne("SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE getip='" . real_ip() . "' AND dateline>" . gmtime() ."-60 AND status=1");
+$count = $db->getOne("SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE getip='" . real_ip() . "' AND dateline>" . time() ."-60 AND status=1");
 if ($count > 50 && !stristr($denied_log, $_G['clientip']))
 {
 	$log = real_ip().",";
@@ -116,11 +116,12 @@ if ($count > 50 && !stristr($denied_log, $_G['clientip']))
 }
 
 /* 获取验证码请求是否获取过 */
-$sql = "SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE mobile='$mobile' AND status=1 AND getip='" . real_ip() . "' AND dateline>" . gmtime() ."-".$_CFG['ecsdxt_smsgap'];
+$sql = "SELECT COUNT(id) FROM " . $ecs->table('verifycode') ." WHERE mobile='$mobile' AND status=1 AND getip='" . real_ip() . "' AND dateline>" . time() ."-".$_CFG['ecsdxt_smsgap'];
 if ($db->getOne($sql) > 0)
 {
 	$result['error'] = 4;
 	$result['message'] = sprintf($_LANG['get_verifycode_excessived'], $_CFG['ecsdxt_smsgap']);
+	$result['smsgap'] = $_CFG['ecsdxt_smsgap'];
 	die($json->encode($result));
 }
 
@@ -145,21 +146,22 @@ if ($step == 'register')
 		
 	/* 发送注册手机短信验证 */
 	$ret = sendsms($mobile, array('verifycode'=>$verifycode), 'register');
-	var_dump($ret);
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
-		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 1)";
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . time() ."', 1)";
 		$db->query($sql);
 
 		$result['error'] = 0;
 		$result['message'] = $_LANG['send_mobile_verifycode_successed'];
+		$result['smsgap'] = $_CFG['ecsdxt_smsgap'];
 		die($json->encode($result));
 	}
 	else
 	{
 		$result['error'] = 5;
-		$result['message'] = $_LANG['send_mobile_verifycode_failured'] . $ret;
+		$result['message'] = $_LANG['send_mobile_verifycode_failured'];
+		$result['detail'] = $ret;
 		die($json->encode($result));
 	}
 }
@@ -182,11 +184,12 @@ elseif ($step == 'getpassword')
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
-		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 2)";
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . time() ."', 2)";
 		$db->query($sql);
 		
 		$result['error'] = 0;
 		$result['message'] = $_LANG['send_mobile_verifycode_successed'];
+		$result['smsgap'] = $_CFG['ecsdxt_smsgap'];
 		$result['uid'] = $user_info['user_id'];
 
 		die($json->encode($result));
@@ -194,7 +197,8 @@ elseif ($step == 'getpassword')
 	else
 	{
 		$result['error'] = 5;
-		$result['message'] = $_LANG['send_mobile_verifycode_failured'] . $ret;
+		$result['message'] = $_LANG['send_mobile_verifycode_failured'];
+		$result['detail'] = $ret;
 		die($json->encode($result));
 	}
 }
@@ -225,17 +229,19 @@ elseif ($step == 'rebind')
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
-		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 3)";
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . time() ."', 3)";
 		$db->query($sql);
 
 		$result['error'] = 0;
 		$result['message'] = $_LANG['bind_mobile_verifycode_successed'];
+		$result['smsgap'] = $_CFG['ecsdxt_smsgap'];
 		die($json->encode($result));
 	}
 	else
 	{
 		$result['error'] = 5;
-		$result['message'] = $_LANG['bind_mobile_verifycode_failured'] . $ret;
+		$result['message'] = $_LANG['bind_mobile_verifycode_failured'];
+		$result['detail'] = $ret;
 		die($json->encode($result));
 	}
 }
@@ -260,17 +266,19 @@ elseif ($step == 'wxbind')
 	if($ret === true)
 	{
 		//插入获取验证码数据记录
-		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . gmtime() ."', 4)";
+		$sql = "INSERT INTO " . $ecs->table('verifycode') . "(mobile, getip, verifycode, dateline, `type`) VALUES ('" . $mobile . "', '" . real_ip() . "', '$verifycode', '" . time() ."', 4)";
 		$db->query($sql);
 
 		$result['error'] = 0;
 		$result['message'] = $_LANG['bind_mobile_verifycode_successed'];
+		$result['smsgap'] = $_CFG['ecsdxt_smsgap'];
 		die($json->encode($result));
 	}
 	else
 	{
 		$result['error'] = 5;
-		$result['message'] = $_LANG['bind_mobile_verifycode_failured'] . $ret;
+		$result['message'] = $_LANG['bind_mobile_verifycode_failured'];
+		$result['detail'] = $ret;
 		die($json->encode($result));
 	}
 }

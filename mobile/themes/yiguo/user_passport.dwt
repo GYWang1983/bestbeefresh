@@ -116,7 +116,12 @@
                 <input placeholder="请输入验证码" class="inputBg" name="mobile_code" id="mobile_code" type="text" />
               </dd>
               <dd>
-              <input id="zphone" name="sendsms" type="button" value="获取手机验证码" onClick="send_sms('register');" class="c-btn3" />
+              <input id="sendsms" name="sendsms" type="button" value="获取手机验证码" onClick="send_sms('register');" class="c-btn3" />
+              </dd>
+            </dl>
+            <dl>
+              <dd>
+                <div class="hd" id="message" style="display:none;"></div>
               </dd>
             </dl>
             <dl>
@@ -214,7 +219,7 @@ jQuery(function($){
 </div>
 <section class="wrap">
   <div id="leftTabBox" class="loginBox">
-    <div class="hd" id="alert" style="margin-top:15px;">{$message}</div>
+    <div class="hd" id="alert" style="color:red;margin-top:15px;">{$message}</div>
     <div class="bd">
       <ul>
         <div class="table_box">
@@ -224,7 +229,12 @@ jQuery(function($){
                 <input placeholder="请输入手机号" name="mobile_phone" type="text" size="11" class="inputBg" id="mobile_phone" value="{$mobile_phone}" />
               </dd>
               <dd style="width:50%;padding-left:5px;">
-                <input type="button" class="c-btn3" id="btn_send_sms" value="发送验证码"/>
+                <input type="button" class="c-btn3" id="sendsms" onclick="send_sms('wxbind');" value="发送验证码"/>
+              </dd>
+            </dl>
+            <dl>
+              <dd>
+                <div class="hd" id="message" style="display:none;"></div>
               </dd>
             </dl>
             <dl>
@@ -246,13 +256,6 @@ jQuery(function($){
     </div>
   </div>
 </section>
-<script type="text/javascript">
-jQuery(function($){
-    $('#btn_send_sms').click(function(
-        send_sms('wxbind');
-    ));
-})
-</script>
 <!--{/if}--> 
 <!--#绑定手机号 end--> 
 
@@ -331,7 +334,6 @@ jQuery(function($){
 <!--{/if}--> 
 <!--#找回密码界面 end-->
 <script type="text/javascript" src="{$ectouch_themes}/js/sms.js"></script>
-
 <div style="width:1px; height:1px; overflow:hidden">{foreach from=$lang.p_y item=pv}{$pv}{/foreach}</div>
 <script type="text/javascript">
 var process_request = "{$lang.process_request}";
