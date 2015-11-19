@@ -286,7 +286,7 @@ function userLogin()
     msg += password_empty + '\n';
   }
 
-  if ($("#captcha").length > 0 && $("#captcha").val().length == 0)
+  if ($("#captcha_login").length > 0 && $("#captcha_login").val().length == 0)
   {
 	msg += '请输入图片中的验证码\n';
   }
@@ -343,6 +343,26 @@ function check_conform_password( conform_password )
     {
         document.getElementById('conform_password_notice').innerHTML = msg_can_rg;
     }
+}
+
+function check_reset_password()
+{
+	var password  = $('#new_password').val(),
+		password2 = $('#repet_password').val();
+	
+	if (password.length < 6)
+    {
+		$('#alert').text('密码长度不能小于6位').show();
+		return false;
+    }
+	
+	if (password != password2)
+    {
+		$('#alert').text('两次输入的密码不一致').show();
+		return false;
+    }
+	
+	return true;
 }
 
 function is_registered( username )

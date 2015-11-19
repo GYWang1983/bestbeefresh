@@ -27,7 +27,7 @@ $back_act='';
 
 // 不需要登录的操作或自己验证是否登录（如ajax处理）的act
 $not_login_arr =
-array('login','act_login','register','act_register','act_edit_password','get_password','send_pwd_email','send_pwd_sms','password', 'signin', 'add_tag', 
+array('login','act_login','register','act_register','act_edit_password','get_password','send_pwd_email','reset_pwd_sms','password', 'signin', 'add_tag', 
     'collect', 'return_to_cart', 'logout', 'email_list', 'validate_email', 'send_hash_mail', 'order_query', 'is_registered', 'check_email','clear_history','qpassword_name', 
     'get_passwd_question', 'check_answer', 'oath', 'oath_login');
 
@@ -127,13 +127,10 @@ if ($action == 'default')
     $smarty->assign('prompt',      get_user_prompt($user_id));
     $smarty->display('user_clips.dwt');
 }
-
-
 //  第三方登录接口
 elseif($action == 'oath')
 {
 	$type = empty($_REQUEST['type']) ?  '' : $_REQUEST['type'];
-	
 	include_once(ROOT_PATH . 'include/website/jntoo.php');
 
 	$c = &website($type);
@@ -172,7 +169,6 @@ elseif($action == 'oath')
 		show_message('服务器尚未注册该插件！' , '首页',$ecs->url() , 'error');
 	}
 }
-
 //  处理第三方登录接口
 elseif ($action == 'oath_login') {
     $type = empty($_REQUEST['type']) ? '' : $_REQUEST['type'];
@@ -190,10 +186,8 @@ elseif ($action == 'oath_login') {
         $c->setAccessToken($access);
         $info = $c->getMessage();
         if($type =='renn' ){
-            
              $info =  $info['response'];
              $info['user_id'] = $info['id'];
-            
         }
         
         if (!$info) {
@@ -264,10 +258,11 @@ if ($action == 'register')
     $smarty->assign('extend_info_list', $extend_info_list);
 
     /* 验证码相关设置 */
-    if ((intval($_CFG['captcha']) & CAPTCHA_REGISTER) && gd_version() > 0)
+    $captcha = intval($_CFG['captcha']);
+	if ($captcha & CAPTCHA_REGISTER)
     {
-        $smarty->assign('enabled_captcha', 1);
-        $smarty->assign('rand',            mt_rand());
+    	$GLOBALS['smarty']->assign('enabled_captcha', 1);
+    	$GLOBALS['smarty']->assign('rand', mt_rand());
     }
     
     /* 短信发送设置 by carson */
@@ -298,20 +293,17 @@ elseif ($action == 'act_register')
     {
         include_once(ROOT_PATH . 'include/lib_passport.php');
 
-        //注册类型 by carson start
-        $enabled_sms = intval($_POST['enabled_sms']);
+        $back_act = isset($_POST['back_act']) ? trim($_POST['back_act']) : '';
+        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+        
+        //注册类型
+        $enabled_sms = intval($_CFG['sms_signin']);
         if($enabled_sms){
             $username = $other['mobile_phone'] = isset($_POST['mobile']) ? trim($_POST['mobile']) : '';
-            $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-            $email    = $username .'@qq.com';
         }else{
             $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-            $password = isset($_POST['password']) ? trim($_POST['password']) : '';
             $email = isset($_POST['email']) ? trim($_POST['email']) : '';
         }
-        //注册类型 by carson end
-
-        $back_act = isset($_POST['back_act']) ? trim($_POST['back_act']) : '';
 
         if(empty($_POST['agreement']))
         {
@@ -333,7 +325,21 @@ elseif ($action == 'act_register')
         }
 
         // 验证码检查
-        if ((intval($_CFG['captcha']) & CAPTCHA_REGISTER) && gd_version() > 0 && $enabled_sms <= 0)
+        if ($enabled_sms)
+        {
+        	$verifycode = trim($_POST['mobile_code']);
+        	if (empty($verifycode))
+        	{
+        		show_message('手机验证码不能为空');
+        	}
+        	
+        	include_once(ROOT_PATH . 'include/lib_sms.php');
+        	if (!check_sms_verifycode($username, $verifycode))
+        	{
+        		show_message('手机验证码不正确');
+        	}
+        }
+        elseif ((intval($_CFG['captcha']) & CAPTCHA_REGISTER) && gd_version() > 0)
         {
             if (empty($_POST['captcha']))
             {
@@ -463,15 +469,15 @@ elseif ($action == 'login')
     }
 
     $captcha = intval($_CFG['captcha']);
-    if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
+    /*if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
     {
-        $GLOBALS['smarty']->assign('login_captcha', 1);
+        $GLOBALS['smarty']->assign('enabled_captcha', 1);
         $GLOBALS['smarty']->assign('rand', mt_rand());
-    }
+    }*/
     
     if ($captcha & CAPTCHA_REGISTER)
     {
-    	$GLOBALS['smarty']->assign('register_captcha', 1);
+    	$GLOBALS['smarty']->assign('enabled_captcha', 1);
     	$GLOBALS['smarty']->assign('rand', mt_rand());
     }
 
@@ -888,7 +894,15 @@ elseif ($action == 'get_password')
     }
     else
     {
-        /* 短信发送设置 by carson */
+    	// 验证码
+    	$captcha = intval($_CFG['captcha']);
+    	if ($captcha & CAPTCHA_GET_PASSWORD)
+    	{
+    		$smarty->assign('getpwd_captcha', 1);
+    		$smarty->assign('rand', mt_rand());
+    	}
+    	
+        // 短信发送设置 by carson
         if(intval($_CFG['sms_signin']) > 0){
             $smarty->assign('enabled_sms_signin', 1);
         }
@@ -896,158 +910,54 @@ elseif ($action == 'get_password')
         $smarty->display('user_passport.dwt');
     }
 }
-
 /* 密码找回-->输入用户名界面 */
 elseif ($action == 'qpassword_name')
 {
     //显示输入要找回密码的账号表单
     $smarty->display('user_passport.dwt');
 }
-
-/* 密码找回-->根据注册用户名取得密码提示问题界面 */
-elseif ($action == 'get_passwd_question')
-{
-    if (empty($_POST['user_name']))
-    {
-        show_message($_LANG['no_passwd_question'], $_LANG['back_home_lnk'], './', 'info');
-    }
-    else
-    {
-        $user_name = trim($_POST['user_name']);
-    }
-
-    //取出会员密码问题和答案
-    $sql = 'SELECT user_id, user_name, passwd_question, passwd_answer FROM ' . $ecs->table('users') . " WHERE user_name = '" . $user_name . "'";
-    $user_question_arr = $db->getRow($sql);
-
-    //如果没有设置密码问题，给出错误提示
-    if (empty($user_question_arr['passwd_answer']))
-    {
-        show_message($_LANG['no_passwd_question'], $_LANG['back_home_lnk'], './', 'info');
-    }
-
-    $_SESSION['temp_user'] = $user_question_arr['user_id'];  //设置临时用户，不具有有效身份
-    $_SESSION['temp_user_name'] = $user_question_arr['user_name'];  //设置临时用户，不具有有效身份
-    $_SESSION['passwd_answer'] = $user_question_arr['passwd_answer'];   //存储密码问题答案，减少一次数据库访问
-
-    $captcha = intval($_CFG['captcha']);
-    if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
-    {
-        $GLOBALS['smarty']->assign('enabled_captcha', 1);
-        $GLOBALS['smarty']->assign('rand', mt_rand());
-    }
-
-    $smarty->assign('passwd_question', $_LANG['passwd_questions'][$user_question_arr['passwd_question']]);
-    $smarty->display('user_passport.dwt');
-}
-
-/* 密码找回-->根据提交的密码答案进行相应处理 */
-elseif ($action == 'check_answer')
-{
-    $captcha = intval($_CFG['captcha']);
-    if (($captcha & CAPTCHA_LOGIN) && (!($captcha & CAPTCHA_LOGIN_FAIL) || (($captcha & CAPTCHA_LOGIN_FAIL) && $_SESSION['login_fail'] > 2)) && gd_version() > 0)
-    {
-        if (empty($_POST['captcha']))
-        {
-            show_message($_LANG['invalid_captcha'], $_LANG['back_retry_answer'], 'user.php?act=qpassword_name', 'error');
-        }
-
-        /* 检查验证码 */
-        include_once('include/cls_captcha.php');
-
-        $validator = new captcha();
-        $validator->session_word = 'captcha_login';
-        if (!$validator->check_word($_POST['captcha']))
-        {
-            show_message($_LANG['invalid_captcha'], $_LANG['back_retry_answer'], 'user.php?act=qpassword_name', 'error');
-        }
-    }
-
-    if (empty($_POST['passwd_answer']) || $_POST['passwd_answer'] != $_SESSION['passwd_answer'])
-    {
-        show_message($_LANG['wrong_passwd_answer'], $_LANG['back_retry_answer'], 'user.php?act=qpassword_name', 'info');
-    }
-    else
-    {
-        $_SESSION['user_id'] = $_SESSION['temp_user'];
-        $_SESSION['user_name'] = $_SESSION['temp_user_name'];
-        unset($_SESSION['temp_user']);
-        unset($_SESSION['temp_user_name']);
-        $smarty->assign('uid',    $_SESSION['user_id']);
-        $smarty->assign('action', 'reset_password');
-        $smarty->display('user_passport.dwt');
-    }
-}
-
-/* 发送密码修改确认邮件 */
-elseif ($action == 'send_pwd_email')
-{
-    include_once(ROOT_PATH . 'include/lib_passport.php');
-
-    /* 初始化会员用户名和邮件地址 */
-    $user_name = !empty($_POST['user_name']) ? trim($_POST['user_name']) : '';
-    $email     = !empty($_POST['email'])     ? trim($_POST['email'])     : '';
-
-    //用户名和邮件地址是否匹配
-    $user_info = $user->get_user_info($user_name);
-
-    if ($user_info && $user_info['email'] == $email)
-    {
-        //生成code
-         //$code = md5($user_info[0] . $user_info[1]);
-
-        $code = md5($user_info['user_id'] . $_CFG['hash_code'] . $user_info['reg_time']);
-        //发送邮件的函数
-        if (send_pwd_email($user_info['user_id'], $user_name, $email, $code))
-        {
-            show_message($_LANG['send_success'] . $email, $_LANG['back_home_lnk'], './', 'info');
-        }
-        else
-        {
-            //发送邮件出错
-            show_message($_LANG['fail_send_password'], $_LANG['back_page_up'], './', 'info');
-        }
-    }
-    else
-    {
-        //用户名与邮件地址不匹配
-        show_message($_LANG['username_no_email'], $_LANG['back_page_up'], '', 'info');
-    }
-}
-
 /* 发送短信找回密码 */
-elseif ($action == 'send_pwd_sms')
+elseif ($action == 'reset_pwd_sms')
 {
     include_once(ROOT_PATH . 'include/lib_passport.php');
-
-    /* 初始化会员手机 */
-    $mobile = !empty($_POST['mobile']) ? trim($_POST['mobile']) : '';
+    include_once(ROOT_PATH . 'include/lib_sms.php');
     
-    $sql = "SELECT user_id FROM " . $ecs->table('users') . " WHERE mobile_phone='$mobile'";
-    $user_id = $db->getOne($sql);
-    if ($user_id > 0)
+    $mobile = !empty($_POST['mobile_phone']) ? trim($_POST['mobile_phone']) : '';
+    $verifycode = !empty($_POST['smscode']) ? trim($_POST['smscode']) : '';
+    
+    if (empty($mobile))
     {
-        //生成新密码
-        $newPwd = random(6, 1);
-        $message = "您的新密码是：" . $newPwd . "，请不要把密码泄露给其他人，如非本人操作，可不用理会！";
-        include(ROOT_PATH . 'include/cls_sms.php');
-        $sms = new sms();
-        $sms_error = array();
-        if ($sms->send($mobile, $message, $sms_error)) {
-            $sql="UPDATE ".$ecs->table('users'). "SET `ec_salt`='0',password='". md5($newPwd) ."' WHERE mobile_phone= '".$mobile."'";
-            $db->query($sql);
-            show_message($_LANG['send_success_sms'] . $mobile, $_LANG['relogin_lnk'], './user.php', 'info');
-        } else {
-            //var_dump($sms_error);
-            //发送邮件出错
-            show_message($sms_error, $_LANG['back_page_up'], './', 'info');
-        }
+    	show_message('手机号不能为空');
     }
-    else
+    
+    if (empty($verifycode))
     {
-        //不存在
-        show_message($_LANG['username_no_mobile'], $_LANG['back_page_up'], '', 'info');
+    	show_message('手机验证码不能为空');
     }
+    
+    if (!check_sms_verifycode($mobile, $verifycode, SMS_GETPASSWORD))
+    {
+    	show_message('手机验证码不正确');
+    }
+    
+    //login
+    $user_info = $user->get_profile_by_mobile($mobile);
+    if (!empty($user_info) && $user_info['status'] == 1) {
+    
+    	$user->set_session($user_info);
+    	$user->set_cookie($user_info, TRUE);
+    
+    	update_user_info();      // 更新用户信息
+    	update_user_cart();
+    	recalculate_price();     // 重新计算购物车中的商品价格
+    	
+    	//$_SESSION['reset_pwd_direct'] = 1;
+    } else {
+    	show_message('当前用户不存在或不可用');
+    }
+	
+    $smarty->assign('action', $action);
+    $smarty->display('user_passport.dwt');
 }
 
 /* 重置新密码 */
@@ -1056,7 +966,6 @@ elseif ($action == 'reset_password')
     //显示重置密码的表单
     $smarty->display('user_passport.dwt');
 }
-
 /* 修改会员密码 */
 elseif ($action == 'act_edit_password')
 {
@@ -1081,8 +990,8 @@ elseif ($action == 'act_edit_password')
         {
 			$sql="UPDATE ".$ecs->table('users'). "SET `ec_salt`='0' WHERE user_id= '".$user_id."'";
 			$db->query($sql);
-            $user->logout();
-            show_message($_LANG['edit_password_success'], $_LANG['relogin_lnk'], 'user.php?act=login', 'info');
+            //$user->logout();
+            show_message($_LANG['edit_password_success'], '用户中心', 'user.php', 'info');
         }
         else
         {
@@ -1095,7 +1004,6 @@ elseif ($action == 'act_edit_password')
     }
 
 }
-
 /* 添加一个红包 */
 elseif ($action == 'act_add_bonus')
 {
