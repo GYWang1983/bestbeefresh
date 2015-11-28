@@ -506,10 +506,11 @@ Template Type: type_0
 	.goodsItem .desc .title{font-size:14px;}
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
 	.goodsItem .desc .freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
-	.goodsItem .price{display:inline-block;margin-right:5px;line-height:25px;}
+	.goodsItem .price{display:inline-block;width:68%;line-height:25px;}
 	.goodsItem .cart {display:inline-block;width:70%;height:25px}
 	.goodsItem .cart div{display:inline-block;float:right;}
 	.goodsItem .cart .btn{width:20px;margin:0 5px;font-size:22px;color:#4d9546;}
+	.goodsItem .cart .drop-goods{color:#ccc!important;margin-left:20px;}
 	.goodsItem .cart .num{width:40px;margin:0 5px;border: solid 1px #7dbe76;text-align:center;line-height:20px;font-weight: bolder;}
 	.goodsItem img{width:100%;height:auto;}
 	.goodsItem del{height:1rem; line-height:1rem; font-size:0.4rem  }
@@ -897,8 +898,8 @@ Template Type: type_0
 	.cart-step ul .cur{  border-bottom:1px solid #50944a; color:#50944a  }
 	/* 购物浮动条 */
 	.toolbar {background:#fff;position:fixed;bottom:0;width:100%;height:2.67rem;font-size:0.8rem;overflow:hidden}
-	.toolbar p {width:55%;height:2.67rem; padding-left:0.5rem;display:-webkit-box;-webkit-box-align:center}
-	.toolbar a{display:block; text-align:center; line-height:2.67rem;position: absolute;right: 0;top:0; width: 40%;height: 100%;border: 0;font-size: 1rem;border-radius: 1px;-webkit-border-radius: 1px;color: #FFF; background:#ec5151}
+	.toolbar p {width:50%;height:2.67rem; padding-left:0.5rem;display:-webkit-box;-webkit-box-align:center}
+	.toolbar a{display:block; text-align:center; line-height:2.67rem;position: absolute;right: 0;top:0; width: 25%;height: 100%;border: 0;font-size: 1rem;border-radius: 1px;-webkit-border-radius: 1px;color: #FFF; background:#ec5151}
 	/* 购物车商品列表 */
 	.itemlist{ padding:0.8rem 0;    border:1px solid #ddd; background:#FFF}
 	.itemlist li{ padding:0.9rem  ;position:relative; border-bottom:1px solid #ddd  }

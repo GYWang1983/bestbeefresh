@@ -33,29 +33,52 @@
 </div>
 <!-- 购物车内容 --> 
 {* 包含脚本文件 *}
-  {insert_scripts files='showdiv.js'} 
+{insert_scripts files='showdiv.js'} 
 <script type="text/javascript">
-  {foreach from=$lang.password_js item=item key=key}
+{foreach from=$lang.password_js item=item key=key}
     var {$key} = "{$item}";
-  {/foreach}
-  </script>
-<div class="cart-step" id="J_cartTab">
-  <ul>
-    <li class="cur">1.购物车列表</li>
-    <li>2.确认订单</li>
-    <li>3.购买成功</li>
-  </ul>
-</div>
-<div class="blank3"></div>
+{/foreach}
+</script>
 <!-- {if $goods_list } -->
-<section class="wrap" style="padding-bottom:5rem"  >
+<section class="wrap box1">
   <form id="formCart" name="formCart" method="post" action="flow.php">
-    <ul class="radius10 itemlist">
       <!-- {foreach from=$goods_list item=goods} -->
+      <div class="goodsItem" id="goods{$goods.goods_id}">
+        <div class="thumb">
+            <img src="{$site_url}{$goods.goods_thumb}" alt="{$goods.goods_name|escape:html}" />
+        </div>
+        <div class="desc">
+            <div class="title">
+                <a href="goods.php?id={$goods.goods_id}">{$goods.goods_name|escape:html}</a>
+                <!-- {if $goods.parent_id gt 0} 配件 --> 
+                <span style="color:#FF0000">（{$lang.accessories}）</span> 
+                <!-- {/if} --> 
+                <!-- {if $goods.is_gift gt 0} 赠品 --> 
+                <span style="color:#FF0000">（{$lang.largess}）</span> 
+                <!-- {/if} --> 
+            </div>
+            <!-- {if $goods.goods_attr && $show_goods_attribute eq 1} 显示商品属性 -->
+            <div class="amount_desc">{$goods.goods_attr|nl2br}</p>
+            <!-- {/if} -->
+            <!--{if $goods.free_more_desc}-->
+            <div class="freemore">{$goods.free_more_desc}</div>
+            <!--{/if}-->
+        </div>
+        <div class="price">{$goods.goods_price}</div>
+        <!-- {if $goods.goods_id gt 0 && $goods.is_gift eq 0 && $goods.parent_id eq 0} 普通商品可修改数量 -->
+        <div class="cart" data="{$goods.goods_id}">
+            <div class="btn icon-trash drop-goods"></div>
+            <div class="btn icon-plus"></div>
+            <div class="num">{$goods.goods_number}</div>
+            <div class="btn icon-minus"></div>
+        </div>
+        <!-- {/if} -->
+    </div>
+    <!--
       <li class="new-tbl-type">
-        <div class="itemlist_l new-tbl-cell"> 
+        <div class="goodsItem new-tbl-cell"> 
           <!-- {if $goods.goods_id gt 0 && $goods.extension_code neq 'package_buy'} 商品 --> 
-          <a  href="goods.php?id={$goods.goods_id}" target="_blank"> <img class="lazy" src="{$site_url}{$goods.goods_thumb}" border="0" title="{$goods.goods_name|escape:html}" /> </a> 
+          <a class="thumb" href="goods.php?id={$goods.goods_id}"><img class="lazy" src="{$site_url}{$goods.goods_thumb}" border="0" title="{$goods.goods_name|escape:html}" /> </a> 
           <!-- {if $goods.parent_id gt 0} 配件 --> 
           <span style="color:#FF0000">（{$lang.accessories}）</span> 
           <!-- {/if} --> 
@@ -118,8 +141,8 @@
             </span> <a href="javascript:if (confirm('{$lang.drop_goods_confirm}')) location.href='flow.php?step=drop_goods&amp;id={$goods.rec_id}'; "   class="ico_08 cha"> </a> </div>
         </div>
       </li>
+      -->
       <!-- {/foreach} -->
-    </ul>
     <input type="hidden" name="step" value="update_cart" />
   </form>
 <!-- {if $favourable_list} 优惠活动 -->
@@ -176,15 +199,22 @@
 <!-- {/foreach} 循环赠品活动结束 -->
 <!-- {/if} -->
 </section>
+<div class="blank3"></div>
+<div class="blank3"></div>
 <footer class="toolbar">
   <p>合计: <em class="price" id="goods_subtotal">{$total.goods_price}</em></p>
-  <a href="flow.php?step=checkout">结算(<em class="num" id="total_number">{$total.total_number}</em>)</a> </footer>
+  <a href="flow.php?step=clear" style="right:25%;background-color:#d68828;">清空</a>
+  <a href="flow.php?step=checkout">结算(<em class="num" id="total_number">{$total.total_number}</em>)</a>
+</footer>
 <!-- {else} -->
 <section class="wrap"  >
   <div class="empty-cart">
     <div class="ico_13 cart-logo"></div>
     <p class="message">没有宝贝哦，不如去添加宝贝</p>
-    <div class="flex"> <a class="c-btn2  flex_in radius5" href="index.php" style=" background:#6bd0a2"> <i class="ico_04_b"></i> 去购物 </a> <a class="c-btn2  flex_in radius5" href="user.php?act=collection_list" style=" margin-left:0.5rem"> 查看收藏夹</a> </div>
+    <div class="flex">
+      <a class="c-btn2 flex_in radius5" href="index.php" style=" background:#6bd0a2"><i class="ico_04_b"></i> 去购物 </a>
+      <!--<a class="c-btn2  flex_in radius5" href="user.php?act=collection_list" style=" margin-left:0.5rem"> 查看收藏夹</a>-->
+    </div>
   </div>
 </section>
 <!-- {/if} --> 

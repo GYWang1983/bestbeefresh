@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ECSHOP 购物流程
  * ============================================================================
@@ -12,7 +11,6 @@
  * $Author: douqinghua $
  * $Id: flow.php 17218 2011-01-24 04:10:41Z douqinghua $
  */
-
 define('IN_ECTOUCH', true);
 
 require(dirname(__FILE__) . '/include/init.php');
@@ -40,8 +38,8 @@ $position = assign_ur_here(0, $_LANG['shopping_flow']);
 $smarty->assign('page_title',       $position['title']);    // 页面标题
 $smarty->assign('ur_here',          $position['ur_here']);  // 当前位置
 
-$smarty->assign('categories',       get_categories_tree()); // 分类树
-$smarty->assign('helps',            get_shop_help());       // 网店帮助
+//$smarty->assign('categories',       get_categories_tree()); // 分类树
+//$smarty->assign('helps',            get_shop_help());       // 网店帮助
 $smarty->assign('lang',             $_LANG);
 $smarty->assign('show_marketprice', $_CFG['show_marketprice']);
 $smarty->assign('data_dir',    DATA_DIR);       // 数据目录
@@ -423,13 +421,11 @@ elseif ($_REQUEST['step'] == 'checkout')
     }
 
     /* 检查购物车中是否有商品 */
-    $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') .
-        " WHERE " . get_cart_cond() .
-        "AND parent_id = 0 AND is_gift = 0 AND rec_type = '$flow_type'";
-
+    $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') . " WHERE " . get_cart_cond() .
+        " AND parent_id = 0 AND is_gift = 0 AND rec_type = '$flow_type'";
     if ($db->getOne($sql) == 0)
     {
-        show_message($_LANG['no_goods_in_cart'], '', '', 'warning');
+    	ecs_header("Location:./flow.php?step=cart\n");
     }
 
     /*
@@ -1881,11 +1877,9 @@ elseif ($_REQUEST['step'] == 'update_cart')
     show_message($_LANG['update_cart_notice'], $_LANG['back_to_cart'], 'flow.php');
     exit;
 }
-
 /*------------------------------------------------------ */
 //-- 删除购物车中的商品
 /*------------------------------------------------------ */
-
 elseif ($_REQUEST['step'] == 'drop_goods')
 {
     $rec_id = intval($_GET['id']);
@@ -1894,7 +1888,6 @@ elseif ($_REQUEST['step'] == 'drop_goods')
     ecs_header("Location: flow.php\n");
     exit;
 }
-
 /* 把优惠活动加入购物车 */
 elseif ($_REQUEST['step'] == 'add_favourable')
 {
@@ -2173,12 +2166,12 @@ else
         $cart_goods['total']['market_price'], $cart_goods['total']['saving'], $cart_goods['total']['save_rate']));
 
     // 显示收藏夹内的商品
-    if ($_SESSION['user_id'] > 0)
+    /*if ($_SESSION['user_id'] > 0)
     {
         require_once(ROOT_PATH . 'include/lib_clips.php');
         $collection_goods = get_collection_goods($_SESSION['user_id']);
         $smarty->assign('collection_goods', $collection_goods);
-    }
+    }*/
 
     /* 取得优惠活动 */
     $favourable_list = favourable_list($_SESSION['user_rank']);
