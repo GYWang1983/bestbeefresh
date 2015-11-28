@@ -173,7 +173,7 @@ function addToCartResponse_quick(result)
   else
   {
     var cartInfo = document.getElementById('ECS_CARTINFO');
-    var cart_url = 'flow.php?step=cart';
+    var cart_url = 'flow.php?step=checkout';
     if (cartInfo)
     {
       cartInfo.innerHTML = result.content;

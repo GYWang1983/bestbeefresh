@@ -355,7 +355,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
           </dl>
         </div>
     </section>
-    <div class="blank3"></div>
+    <div class="blank1"></div>
     <!--{if $is_exchange_goods neq 1 || $total.real_goods_count neq 0}-->
       <!--{if !is_wechat_browser() }-->
       <section class="order_box padd1 radius10" style="padding-top:0.3rem;padding-bottom:0.3rem;">
@@ -374,7 +374,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
 		  </div>
         </div>
       </section>
-      <div class="blank3"> </div>
+      <div class="blank1"> </div>
       <!--{else}-->
       <input name = "payment" type="radio" value = "{$wechat_pay_id}" checked="checked"  style="display:none"/>
       <!--{/if}-->
@@ -437,7 +437,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
 		</div>	
       </div>
     </section>
-    <div class="blank3"></div>
+    <div class="blank1"></div>
     <section class="order_box padd1 radius10" style="padding-top:0;padding-bottom:0;">
       <div class="table_box table_box3">
         <dl>
@@ -464,7 +464,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
         <!-- {/foreach} --> 
         <!-- #BeginLibraryItem "/Library/order_total.lbi" --><!-- #EndLibraryItem --> </div>
     </section>
-    <div class="blank3"></div>
+    <div class="blank1"></div>
     <input type="submit" name="submit" value="提交订单" class="c-btn3" />
     <input type="hidden" name="step" value="done" />
   </form>

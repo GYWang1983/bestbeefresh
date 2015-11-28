@@ -143,12 +143,12 @@ if (!$smarty->is_cached('goods.dwt', $cache_id))
 {
     $smarty->assign('image_width',  $_CFG['image_width']);
     $smarty->assign('image_height', $_CFG['image_height']);
-    $smarty->assign('helps',        get_shop_help()); // 网店帮助
+    //$smarty->assign('helps',        get_shop_help()); // 网店帮助
     $smarty->assign('id',           $goods_id);
     $smarty->assign('type',         0);
     $smarty->assign('cfg',          $_CFG);
     $smarty->assign('promotion',       get_promotion_info($goods_id));//促销信息
-    $smarty->assign('promotion_info', get_promotion_info());
+    //$smarty->assign('promotion_info', get_promotion_info());
 
     /* 获得商品的信息 */
     $goods = get_goods_info($goods_id);
