@@ -500,13 +500,14 @@ Template Type: type_0
 	float: left;
 	margin: 0.4rem 0.4rem 0 0;
 	padding: 0 0.6rem;font-size: 0.8rem;overflow:hidden}
-	.goodsItem{width:100%; padding:5px;border-bottom: solid 1px #aaa;height:90px;clear:both;}
+	.goodsItem{width:100%; padding:5px;border-bottom: solid 1px #aaa;min-height:90px;clear:both;}
 	.goodsItem .thumb{display:inline-block;width:25%;max-width:90px;padding:0.2rem;float:left;}
-	.goodsItem .desc{display:inline-block;width:68%;height:60px;padding-left: 0.5rem;}
+	.goodsItem .desc{display:inline-block;width:68%;padding-left: 0.5rem;}
 	.goodsItem .desc .title{font-size:14px;}
-	.goodsItem .desc .price{display:inline-block;margin-right:5px;}
+	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
 	.goodsItem .desc .freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
-	.goodsItem .cart {display:inline-block;width:70%;height:30px}
+	.goodsItem .price{display:inline-block;margin-right:5px;line-height:25px;}
+	.goodsItem .cart {display:inline-block;width:70%;height:25px}
 	.goodsItem .cart div{display:inline-block;float:right;}
 	.goodsItem .cart .btn{width:20px;margin:0 5px;font-size:22px;color:#4d9546;}
 	.goodsItem .cart .num{width:40px;margin:0 5px;border: solid 1px #7dbe76;text-align:center;line-height:20px;font-weight: bolder;}
@@ -768,6 +769,8 @@ Template Type: type_0
 	-o-transform: rotate(-45deg);
 	top:0.4rem;
 	}
+	.goodsInfo .amount_desc{display:inline-block;}
+	.goodsInfo .freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
 	/* 购买模块 */
 	.goodsBuy{padding:0 0.5rem;margin:0.7rem 0;background-color:#fff; }
 	.goodsBuy .info{display:block;color:#999;padding:0.63rem 0 0.47rem;border-bottom:1px solid #f3f3f3}
@@ -797,7 +800,7 @@ Template Type: type_0
 	-o-transform: rotate(-135deg);
 	}
 	.goodsBuy.open .info::after{-webkit-transform:rotate(180deg)}
-	.goodsBuy .fields{ display:none;overflow:hidden}
+	/*.goodsBuy .fields{ display:none;overflow:hidden}*/
 	.goodsBuy .fields ul li{ color:#999}
 	.goodsBuy .fields .ul1{background-color:#fff;overflow:hidden;padding:0.8rem 0; height:1.6rem; line-height:1.6rem;position: static;}
 	.goodsBuy .fields .ul1 li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap; float:left; width:50%;}
