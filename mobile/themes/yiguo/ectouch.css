@@ -23,7 +23,7 @@ Template Type: type_0
 	*{-webkit-tap-highlight-color:rgba(0,0,0,0);outline:0;margin:0;padding:0}
 	ul,ol{list-style:none}
 	input[type="text"],input[type="search"]{-webkit-appearance:none;-webkit-tap-highlight-color:#fff;outline:0}
-	.inputBg{height:2.4rem;width: 94%;border: solid 1px #ddd;padding:0 15px;color: #333;font-size: 0.8rem;-webkit-border-radius: 0;background:#fff;}
+	.inputBg{height:2.4rem;width: 94%;border: solid 1px #ddd;padding:0 10px;color: #333;font-size: 0.8rem;-webkit-border-radius: 0;background:#fff;}
 	.inputBg2{width: 94%;border: solid 1px #ddd;padding:3%;color: #333;font-size: 0.8rem;-webkit-border-radius: 0;-webkit-appearance: none;background:#fff;}
 	.pop-share{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:99;background:rgba(0,0,0,0.8) url(images/share.png) center 10px no-repeat;background-size:90% auto;}
 	
@@ -1269,3 +1269,5 @@ ul.order_list_tab li.active{color: #4d9546;border-bottom: solid 2px #4d9546;}
 .side img{ width:100%; height:auto;}
 
 .order{padding:0rem 0.7rem 0 0.7rem;}
+
+#captcha.inputBg, #mobile_code.inputBg{width:85%;}
