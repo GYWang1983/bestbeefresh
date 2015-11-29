@@ -1,0 +1,75 @@
+{if $full_page}
+{include file="pageheader.htm"}
+{insert_scripts files="../js/utils.js,listtable.js"}
+<form method="post" action="" name="listForm" onsubmit="return confirm(batch_drop_confirm);">
+<div class="list-div" id="listDiv">
+{/if}
+  <table cellpadding="3" cellspacing="1">
+    <tr>
+      <th><input onclick='listTable.selectAll(this, "checkboxes")' type="checkbox" />
+          <a href="javascript:listTable.sort('id'); ">{$lang.record_id}</a>{$sort_id}</th>
+      <th>{$lang.name}</th>
+      <th><a href="javascript:listTable.sort('cat_id'); ">{$lang.cat_name}</a>{$sort_cat_id}</th>
+      <th><a href="javascript:listTable.sort('attr'); ">{$lang.attr}</a>{$sort_attr}</th>
+      <th><a href="javascript:listTable.sort('place'); ">{$lang.place}</a>{$sort_place}</th>
+      <th>{$lang.price}</th>
+      <th><a href="javascript:listTable.sort('unit_amount'); ">{$lang.unit_amount}</a>{$sort_unit_amount}</th>
+      <th><a href="javascript:listTable.sort('unit_price'); ">{$lang.unit_price}</a>{$sort_unit_price}</th>
+      <th>{$lang.status}</th>
+      <th>{$lang.handler}</th>
+    </tr>
+    {foreach from=$supply_goods_list item=goods}
+    <tr>
+      <td><input type="checkbox" name="checkboxes[]" value="{$goods.id}" />{$goods.id}</td>
+      <td class="first-cell"><span onclick="javascript:listTable.edit(this, 'edit_name', {$goods.id})">{$goods.name|escape:html}</span></td>
+      <td align="center">{$goods.cat_name}</td>
+      <td>{$goods.attr}</td>
+      <td>{$goods.place}</td>
+      <td align="right">{$goods.price}</td>
+      <td align="center">{$goods.unit_amount} {$lang.unit_type[$goods.unit_type]}</td>
+      <td align="right">{$goods.unit_price}</td>
+      <td align="center"><img src="images/{if $goods.status eq 1}yes{else}no{/if}.gif" onclick="listTable.toggle(this, 'is_check', {$goods.id})" style="cursor:pointer;"/></td>
+      <td align="center">
+        <a href="supply_goods.php?act=edit&id={$goods.id}" title="{$lang.edit}">{$lang.edit}</a> |
+        <a href="javascript:void(0);" onclick="listTable.remove({$goods.id}, '{$lang.drop_confirm}')" title="{$lang.remove}">{$lang.remove}</a>
+      </td>
+    </tr>
+    {foreachelse}
+    <tr><td class="no-records" colspan="10">{$lang.no_records}</td></tr>
+    {/foreach}
+  </table>
+<table id="page-table" cellspacing="0">
+  <tr>
+    <td>
+      <input name="remove" type="submit" id="btnSubmit" value="{$lang.drop}" class="button" disabled="true" />
+      <input name="act" type="hidden" value="batch" />
+    </td>
+    <td align="right" nowrap="true">
+    {include file="page.htm"}
+    </td>
+  </tr>
+</table>
+{if $full_page}
+</div>
+</form>
+
+<script type="text/javascript" language="javascript">
+  <!--
+  listTable.recordCount = {$record_count};
+  listTable.pageCount = {$page_count};
+
+  {foreach from=$filter item=item key=key}
+  listTable.filter.{$key} = '{$item}';
+  {/foreach}
+
+  {literal}
+  onload = function()
+  {
+      // 开始检查订单
+      startCheckOrder();
+  }
+  {/literal}
+  //-->
+</script>
+{include file="pagefooter.htm"}
+{/if}

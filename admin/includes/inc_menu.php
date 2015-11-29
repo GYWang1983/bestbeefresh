@@ -35,7 +35,7 @@ $modules['02_cat_and_goods']['50_virtual_card_list']   = 'goods.php?act=list&ext
 $modules['02_cat_and_goods']['51_virtual_card_add']    = 'goods.php?act=add&extension_code=virtual_card';
 $modules['02_cat_and_goods']['52_virtual_card_change'] = 'virtual_card.php?act=change';
 $modules['02_cat_and_goods']['goods_auto']             = 'goods_auto.php?act=list';
-$modules['11_system']['website']  = 'website.php?act=list';//ecmoban
+$modules['02_cat_and_goods']['supply_goods']           = 'supply_goods.php?act=list';
 
 $modules['03_promotion']['02_snatch_list']          = 'snatch.php?act=list';
 $modules['03_promotion']['04_bonustype_list']       = 'bonus.php?act=list';
@@ -116,7 +116,7 @@ $modules['11_system']['navigator']                  = 'navigator.php?act=list';
 $modules['11_system']['file_check']                 = 'filecheck.php';
 //$modules['11_system']['fckfile_manage']             = 'fckfile_manage.php?act=list';
 $modules['11_system']['021_reg_fields']             = 'reg_fields.php?act=list';
-
+$modules['11_system']['website']                    = 'website.php?act=list';//ecmoban
 
 $modules['12_template']['02_template_select']       = 'template.php?act=list';
 $modules['12_template']['03_template_setup']        = 'template.php?act=setup';

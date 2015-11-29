@@ -36,6 +36,7 @@ if (!defined('IN_ECS'))
     $purview['51_virtual_card_add']  = 'virualcard';
     $purview['52_virtual_card_change'] = 'virualcard';
     $purview['goods_auto']           = 'goods_auto';
+    $purview['supply_goods']         = 'supply_goods';
 	$purview['website']              = 'website';//ecmoban
 
 //促销管理权限

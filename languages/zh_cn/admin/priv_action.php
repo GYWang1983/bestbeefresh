@@ -36,6 +36,7 @@ $_LANG['comment_priv'] = '用户评论管理';
 $_LANG['goods_type'] = '商品类型';
 $_LANG['tag_manage'] = '标签管理';
 $_LANG['goods_auto'] = '商品自动上下架';
+$_LANG['supply_goods'] = '供货管理';
 $_LANG['topic_manage'] = '专题管理';
 $_LANG['virualcard'] = '虚拟卡管理';
 $_LANG['picture_batch'] = '图片批量处理';

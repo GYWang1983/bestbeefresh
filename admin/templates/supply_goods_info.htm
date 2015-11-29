@@ -1,0 +1,81 @@
+{include file="pageheader.htm"}
+{insert_scripts files="validator.js,../js/transport.js,../js/region.js"}
+<div class="main-div">
+<form method="post" action="supply_goods.php" name="theForm" enctype="multipart/form-data" onsubmit="return validate()">
+<table cellspacing="1" cellpadding="3" width="100%">
+  <tr>
+    <td class="label">{$lang.name}</td>
+    <td><input type="text" name="name" maxlength="50" size="50" value="{$supply_goods.name}" />{$lang.require_field}</td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.cat_name}</td>
+    <td><select name="cat_id"><option value="0">{$lang.select_please}</option>{$cat_list}</select></td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.attr}</td>
+    <td><input type="text" name="attr" maxlength="50" value="{$supply_goods.attr}" /></td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.place}</td>
+    <td><input type="text" name="place" maxlength="20" value="{$supply_goods.place}" /></td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.unit_amount}</td>
+    <td>
+      <input type="text" name="unit_amount" maxlength="8" value="{$supply_goods.unit_amount}" />
+      <select name="unit_type">
+        <option value="1" {if $goods.unit_type eq 1}selected{/if}>kg</option>
+        <option value="2" {if $goods.unit_type eq 2}selected{/if}>个</option>
+      </select>
+      {$lang.require_field}
+    </td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.price}</td>
+    <td><input type="text" name="price" maxlength="10" value="{$supply_goods.price}" /></td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.supplier}</td>
+    <td><select name="supplier">
+      <option value="0">{$lang.select_please}</option>
+      {html_options options=$suppliers_list selected=$supply_goods.supplier}
+    </select></td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td colspan="2" align="center">
+      <input type="submit" class="button" value="{$lang.button_submit}" />
+      <input type="reset" class="button" value="{$lang.button_reset}" />
+      <input type="hidden" name="act" value="{$form_action}" />
+      <input type="hidden" name="id" value="{$supply_goods.id}" />
+    </td>
+  </tr>
+</table>
+</form>
+</div>
+{insert_scripts files="../js/utils.js,validator.js"}
+{literal}
+<script language="JavaScript">
+<!--
+document.forms['theForm'].elements['name'].focus();
+
+onload = function()
+{
+    // 开始检查订单
+    startCheckOrder();
+}
+/**
+ * 检查表单输入的数据
+ */
+function validate()
+{
+    validator = new Validator("theForm");
+    validator.required("name",  no_suppliers_name);
+    validator.required("unit_amount",  no_unit_amount);
+    return validator.passed();
+}
+//-->
+</script>
+{/literal}
+{include file="pagefooter.htm"}
