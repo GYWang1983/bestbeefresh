@@ -46,12 +46,12 @@ if ($_REQUEST['act'] == 'add')
     }
     @closedir($dir);
     $data_format_array = array(
-                                'ecshop'    => $_LANG['export_ecshop'],
-                                'taobao'    => $_LANG['export_taobao'],
-                                'paipai'    => $_LANG['export_paipai'],
-                                'paipai3'   => $_LANG['export_paipai3'],
-                                'taobao46'  => $_LANG['export_taobao46'],
-                               );
+    	'ecshop'    => $_LANG['export_ecshop'],
+        'taobao'    => $_LANG['export_taobao'],
+        'paipai'    => $_LANG['export_paipai'],
+        'paipai3'   => $_LANG['export_paipai3'],
+        'taobao46'  => $_LANG['export_taobao46'],
+    );
     $smarty->assign('data_format', $data_format_array);
     $smarty->assign('lang_list',     $lang_list);
     $smarty->assign('download_list', $download_list);
@@ -918,7 +918,7 @@ elseif ($_REQUEST['act'] == 'download')
 
 elseif ($_REQUEST['act'] == 'get_goods')
 {
-    $filter = &new stdclass;
+    $filter = new stdclass;
 
     $filter->cat_id = intval($_GET['cat_id']);
     $filter->brand_id = intval($_GET['brand_id']);
