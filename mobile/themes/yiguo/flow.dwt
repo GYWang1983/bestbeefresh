@@ -404,7 +404,6 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
            <dd class="dd2" id="selected6"> 未选择 </dd>  
           <i></i>
         </dl>
-		
 		<div class="dl_box" id="card_box" style="display:none;">
            <p> <input type="radio" class="radio"  name="card" value="0" {if $order.card_id eq 0}checked="true"{/if} onclick="selectCard(this)" />{$lang.no_card}</p>
 		    <!-- {foreach from=$card_list item=card} 循环贺卡 -->
@@ -433,7 +432,9 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <!-- {if $goods.goods_id gt 0 && $goods.extension_code eq 'package_buy'} --> 
             <a href="javascript:void(0)" onClick="setSuitShow({$goods.goods_id})" >{$goods.goods_name}<span style="color:#FF0000;">（{$lang.remark_package}）</span></a> 
             <!-- { else } --> 
-            <a href="goods.php?id={$goods.goods_id}" target="_blank" >{$goods.goods_name}</a> 
+            <a href="goods.php?id={$goods.goods_id}" target="_blank" >
+              {$goods.goods_name}{if $goods.free_more}（{$goods.free_more_desc}）{/if}
+            </a> 
             <!-- {if $goods.parent_id > 0} --> 
             <span style="color:#FF0000">（{$lang.accessories}）</span> 
             <!-- {elseif $goods.is_gift} --> 

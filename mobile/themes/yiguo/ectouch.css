@@ -505,7 +505,7 @@ Template Type: type_0
 	.goodsItem .desc{display:inline-block;width:68%;padding-left: 0.5rem;}
 	.goodsItem .desc .title{font-size:14px;}
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
-	.goodsItem .desc .freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
+	.freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
 	.goodsItem .price{display:inline-block;width:68%;line-height:25px;}
 	.goodsItem .price .amount_desc{color:#999;font-size:12px;font-weight: normal;}
 	.goodsItem .cart {display:inline-block;width:70%;height:25px}

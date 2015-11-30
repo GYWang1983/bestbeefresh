@@ -27,7 +27,7 @@
   <div class="user_top_list">
     <ul>
       <li> <a href="user.php?act=order_list&status=2"> <strong>{$info.order_count}</strong> <img  src="{$ectouch_themes}/images/ico_user_01.png"> <span>待取货</span> </a> </li>
-      <li> <a class="fragment" href="user.php?act=bonus"> <strong>{$info.bonus}</strong> <img  src="{$ectouch_themes}/images/ico_user_04.png"> <span>优惠券</span> </a> </li>
+      <li> <a class="fragment" href="user.php?act=bonus"> <strong>{$info.bonus}</strong> <img  src="{$ectouch_themes}/images/ico_user_04.png"> <span>红包</span> </a> </li>
       <li> <a href="javascript:;"> <strong>{$info.integral}</strong> <img  src="{$ectouch_themes}/images/ico_user_02.png"> <span>积分</span> </a> </li>
       <!--<li> <a href="javascript:;"> <strong>{$info.surplus}</strong> <img  src="{$ectouch_themes}/images/ico_user_03.png"> <span>余额</span> </a> </li>-->
     </ul>
@@ -49,9 +49,13 @@
   </script>
 <!--{/if}-->
   <div class="list_box padd1 radius10">
-    <a href="user.php?act=profile" class="clearfix"> <span>{$lang.label_profile}</span><i></i> </a>
+  <!--{if !is_wechat_browser() }-->
+    <a href="user.php?act=profile" class="clearfix"><span>修改密码</span><i></i> </a>
+  <!--{/if}-->
+  <!--
     <a href="user.php?act=order_list" class="clearfix"> <span>{$lang.label_order}</span><i></i> </a>
-    <a href="user.php?act=collection_list"  class="clearfix"> <span>{$lang.label_collection}</span><i></i> </a>
+    <a href="user.php?act=collection_list" class="clearfix"> <span>{$lang.label_collection}</span><i></i> </a>
+  -->
   </div>
   <!--{if !is_wechat_browser() }-->
   <div class="list_box padd1 radius10"> 

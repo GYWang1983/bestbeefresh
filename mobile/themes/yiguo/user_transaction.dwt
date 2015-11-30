@@ -325,7 +325,7 @@ jQuery(function($){
           <tr>
             <td rowspan="2" width="60" align="center" valign="middle" style="border-bottom:1px #CCCCCC dashed">
             <a href="goods.php?id={$goods.goods_id}" target="_blank"><img src="{$site_url}{$goods.goods_thumb}" width="60" height="60" /></a></td>
-            <td>{$goods.goods_name}</td>
+            <td>{$goods.goods_name}{if $goods.free_more}<br/><span class="freemore">{$goods.free_more_desc}</span>{/if}</td>
           </tr>
           <tr>
             <td style="border-bottom:1px #CCCCCC dashed">价格：{$goods.goods_price} × {$goods.goods_number}<br>小计：{$goods.subtotal}</td>

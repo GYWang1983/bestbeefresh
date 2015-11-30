@@ -83,9 +83,11 @@ $(function() {
   <div class="title">
     <h1> {$goods.goods_style_name} </h1>
   </div>
+  {if $goods.free_more}
   <div class="subtitle">
     <div class="freemore">{$goods.free_more_desc}</div>
   </div>
+  {/if}
   <ul>
     <!-- {if $cfg.show_marketprice} 市场价格-->
     <li><del>{$lang.market_price}{$goods.market_price}</del></li>

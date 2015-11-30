@@ -667,6 +667,8 @@ function get_goods_info($goods_id)
             $row['gmt_end_time'] = 0;
         }
 
+        $row['free_more_desc'] = get_free_more_desc($row['free_more']);
+        
         /* 是否显示商品库存数量 */
         $row['goods_number']  = ($GLOBALS['_CFG']['use_storage'] == 1) ? $row['goods_number'] : '';
 

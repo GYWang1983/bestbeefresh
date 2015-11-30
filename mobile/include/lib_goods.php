@@ -570,7 +570,7 @@ function get_goods_info($goods_id)
 
         /* 修正上架时间显示 */
         $row['add_time']      = local_date($GLOBALS['_CFG']['date_format'], $row['add_time']);
-
+        
         /* 促销时间倒计时 */
         $time = gmtime();
         if ($time >= $row['promote_start_date'] && $time <= $row['promote_end_date'])
@@ -582,6 +582,8 @@ function get_goods_info($goods_id)
             $row['gmt_end_time'] = 0;
         }
 
+        $row['free_more_desc'] = get_free_more_desc($row['free_more']);
+        
         /* 是否显示商品库存数量 */
         $row['goods_number']  = ($GLOBALS['_CFG']['use_storage'] == 1) ? $row['goods_number'] : '';
 

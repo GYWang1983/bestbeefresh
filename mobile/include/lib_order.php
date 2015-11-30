@@ -483,14 +483,14 @@ function order_goods($order_id)
 {
     $sql = "SELECT og.rec_id, og.goods_id, og.goods_name, og.goods_sn, og.market_price, og.goods_number, " .
             "og.goods_price, og.goods_attr, og.is_real, og.parent_id, og.is_gift, " .
-            "og.goods_price * og.goods_number AS subtotal, og.extension_code, g.goods_thumb " .
+            "og.goods_price * og.goods_number AS subtotal, og.extension_code, g.goods_thumb, og.free_more " .
             "FROM " . $GLOBALS['ecs']->table('order_goods') . " as og left join " .$GLOBALS['ecs']->table('goods'). " g on og.goods_id = g.goods_id" .
             " WHERE og.order_id = '$order_id'";
 
     $res = $GLOBALS['db']->query($sql);
-
     while ($row = $GLOBALS['db']->fetchRow($res))
     {
+    	$row['free_more_desc'] = get_free_more_desc($row['free_more']);
         if ($row['extension_code'] == 'package_buy')
         {
             $row['package_goods_list'] = get_package_goods($row['goods_id']);
@@ -873,7 +873,7 @@ function cart_goods($type = CART_GENERAL_GOODS)
 {
     $sql = "SELECT c.rec_id, c.user_id, c.goods_id, c.goods_name, g.goods_thumb, c.goods_sn, c.goods_number, " .
             "c.market_price, c.goods_price, c.goods_attr, c.is_real, c.extension_code, c.parent_id, c.is_gift, c.is_shipping, " .
-            "c.goods_price * c.goods_number AS subtotal " .
+            "c.goods_price * c.goods_number AS subtotal, c.free_more " .
             "FROM " . $GLOBALS['ecs']->table('cart') .
 			" AS c LEFT JOIN ".$GLOBALS['ecs']->table('goods').
             " AS g ON c.goods_id = g.goods_id WHERE " . get_cart_cond() .
@@ -882,15 +882,16 @@ function cart_goods($type = CART_GENERAL_GOODS)
     $arr = $GLOBALS['db']->getAll($sql);
 
     /* 格式化价格及礼包商品 */
-    foreach ($arr as $key => $value)
+	foreach ($arr as &$value)
     {
-        $arr[$key]['formated_market_price'] = price_format($value['market_price'], false);
-        $arr[$key]['formated_goods_price']  = price_format($value['goods_price'], false);
-        $arr[$key]['formated_subtotal']     = price_format($value['subtotal'], false);
-
+        $value['formated_market_price'] = price_format($value['market_price'], false);
+        $value['formated_goods_price']  = price_format($value['goods_price'], false);
+        $value['formated_subtotal']     = price_format($value['subtotal'], false);
+		$value['free_more_desc']        = get_free_more_desc($value['free_more']);
+		
         if ($value['extension_code'] == 'package_buy')
         {
-            $arr[$key]['package_goods_list'] = get_package_goods($value['goods_id']);
+            $value['package_goods_list'] = get_package_goods($value['goods_id']);
         }
     }
 
