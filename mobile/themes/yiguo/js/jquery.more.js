@@ -67,7 +67,7 @@
         },
         add_elements : function(data){
             var root = target, counter = 0;
-            if(data){
+            if(data && data.length > 0) {
                 $(data).each(function(){
                     counter++;
                     var t = template;
@@ -81,8 +81,12 @@
                     }
                     root.children(settings.template+':last').attr('id', 'more_element_'+ ((variables.last++)+1))  
                 })
-            }            
-            else  methods.remove()
+            } else {
+            	methods.remove();
+            	if ($('.single_item:visible').length == 0) {
+            		$('.has_no_item').show();
+            	}
+            }
             target.children('.more_loader_spinner').css('display','none');
             if(counter < settings.amount) methods.remove()            
         },
