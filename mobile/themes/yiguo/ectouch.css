@@ -507,6 +507,7 @@ Template Type: type_0
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
 	.goodsItem .desc .freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
 	.goodsItem .price{display:inline-block;width:68%;line-height:25px;}
+	.goodsItem .price .amount_desc{color:#999;font-size:12px;font-weight: normal;}
 	.goodsItem .cart {display:inline-block;width:70%;height:25px}
 	.goodsItem .cart div{display:inline-block;float:right;}
 	.goodsItem .cart .btn{width:20px;margin:0 5px;font-size:22px;color:#4d9546;}
@@ -734,7 +735,7 @@ Template Type: type_0
      商品详细页
 ==================== */
 	/* 商品页详细图 */
-	.goods_slider{background-color:#fff; height:auto;position:relative}
+	.goods_slider{background-color:#fff;padding-top:3rem;height:auto;position:relative}
 	.goods_slider .scroller{transition-property: transform; transition-timing-function: cubic-bezier(0, 0, 0.25, 1); transition-duration: 0ms; transform: translate3d(0px, 0px, 0px); max-width:80%; overflow:hidden; margin: 0 auto;display:-webkit-box;-webkit-box-lines:multiple}
 	.goods_slider .scroller div{width:100%; overflow:hidden;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center}
 	.goods_slider .scroller img{-webkit-user-drag:none;-webkit-user-select:none;max-width:100%;max-height:100%}
@@ -891,6 +892,7 @@ Template Type: type_0
 	.empty-cart .list .arrow {top:1px;right:20px;width:6px;height:6px;display:inline-block;position:absolute;border-top:3px solid #666;border-left:3px solid #666}
 	.empty-cart .list .arrow.right {-webkit-transform:rotate(135deg)}
 	.empty-cart i{ display:inline-block; width:0.8rem; height:0.8rem; -webkit-background-size:0.8rem 0.8rem;-moz-background-size:0.8rem 0.8rem;background-size:0.8rem 0.8rem;}
+	.empty-cart .cart-button{width:40%;margin:0 auto;}
 	/* 购物步骤 */
 	.cart-step{width:100%;text-align:center; height:2.4rem;background:#fff;}
 	.cart-step ul{display:table;width:100%;margin:0;padding:0;border-collapse:collapse; vertical-align:middle}

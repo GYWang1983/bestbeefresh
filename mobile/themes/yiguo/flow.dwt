@@ -18,10 +18,9 @@
 <script type="text/javascript" src="{$ectouch_themes}/js/ectouch.js"></script>
 <!--{if is_wechat_browser() }-->
 <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
-<script type="text/javascript" src="weixin/wxjsconfig.php?api=chooseWXPay&debug=1"></script>
+<script type="text/javascript" src="weixin/wxjsconfig.php?api=chooseWXPay"></script>
 <!-- {/if} -->
 </head>
-
 <body>
 <!-- {if $step eq "cart"} -->
 <div id="page">
@@ -207,12 +206,12 @@
   <a href="flow.php?step=checkout">结算(<em class="num" id="total_number">{$total.total_number}</em>)</a>
 </footer>
 <!-- {else} -->
-<section class="wrap"  >
+<section class="wrap">
   <div class="empty-cart">
     <div class="ico_13 cart-logo"></div>
-    <p class="message">没有宝贝哦，不如去添加宝贝</p>
-    <div class="flex">
-      <a class="c-btn2 flex_in radius5" href="index.php" style=" background:#6bd0a2"><i class="ico_04_b"></i> 去购物 </a>
+    <p class="message">没有宝贝哦，现在就去添加宝贝吧</p>
+    <div class="cart-button">
+      <a class="c-btn2 flex_in radius5" href="index.php" style="background:#6bd0a2;width:100%;"><i class="ico_04_b"></i> 去购物 </a>
       <!--<a class="c-btn2  flex_in radius5" href="user.php?act=collection_list" style=" margin-left:0.5rem"> 查看收藏夹</a>-->
     </div>
   </div>
@@ -309,55 +308,10 @@
   <!-- {/foreach} --> 
   
 </div>
-
 <!-- {/if} --> 
-
 
 <!-- {if $step eq "checkout"} 开始订单确认界面 -->
 <script>
-/*onload = function() {  
-    var sp = document.getElementsByName('shipping');
-    for (i=0;i<sp.length;i++) {
-        if (sp[i].checked){
-            oRadioValue = sp[i];
-        }
-    }
-    selectShipping(oRadioValue);
-
-    var py = document.getElementsByName('payment');
-    for (i = 0; i < py.length; i++) {
-        if (py[i].checked) {
-            oRadioValue = py[i];
-        }
-    }
-    selectPayment(oRadioValue);   
-
-    var pack = document.getElementsByName('pack');
-    for (i = 0; i < pack.length; i++) {
-        if (pack[i].checked) {
-            oRadioValue = pack[i];
-        }
-    }
-    selectPack(oRadioValue);
-      
-    var bonus = document.getElementsByName('bonus');
-    for (i = 0; i < bonus.length; i++) {
-        if (bonus[i].checked) {
-            oRadioValue = bonus[i];
-        }
-    }
-    changeBonus(oRadioValue); 
-
-    var card = document.getElementsByName('card');
-    for (i = 0; i < card.length; i++) {
-        if (card[i].checked) {
-            oRadioValue = card[i];
-        }
-    }
-    selectCard(oRadioValue); 
- 
-}*/
-
 var flow_no_payment   = "{$lang.flow_no_payment}";
 var flow_no_shipping  = "{$lang.flow_no_shipping}";
 </script>
@@ -380,7 +334,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     <section class="order_box padd1 radius5">
         <div class="table_box table_box1">
           <dl>
-            <dd class="dd1">手机号</dd>
+            <dd class="dd1" style="width:80px;">取货手机号</dd>
             <dd class="dd2">{$smarty.session.mobile}</dd>
           </dl>
         </div>
@@ -413,7 +367,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     <!--{/if}-->
     <section class="order_box padd1 radius10" style="padding-top:0.3rem;padding-bottom:0.3rem;">
       <div class="table_box table_box2" style=" margin-bottom:0.5rem"> 
-        <!-- {if $allow_use_bonus} 是否使用红包 -->
+        <!-- {if $allow_use_bonus and count($bonus_list) > 0} 是否使用红包 -->
         <dl>
           <dd class="dd1"> {$lang.use_bonus} </dd>
           <dd class="dd2" id="selected4">{if $order.bonus_id gt 0}{$order.bonus|money}{else}不使用{/if}</dd>  
@@ -486,7 +440,6 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <span style="color:#FF0000">（{$lang.largess}）</span> 
             <!-- {/if} --> 
             <!-- {/if} --> 
-            <!-- {if $goods.is_shipping} -->(<span style="color:#FF0000">{$lang.free_goods}</span>)<!-- {/if} --> 
           </dd>
           <dd class="dd2 w10 c999"> x {$goods.goods_number} </dd>
           <dd class="dd3 w30"> {$goods.formated_subtotal} </dd>

@@ -15,6 +15,7 @@
 {insert_scripts files='common.js'}
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.json.js"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/TouchSlide.js"></script>
 <script type="text/javascript">
 var cart = {insert name='cart_detail_number'};
 // 筛选商品属性
@@ -41,59 +42,39 @@ function changenum(diff) {
   <h1> 商品详情 </h1>
   <!--<div class="header_r header_search"> <a class="ico_15" href="ectouch.php?act=share&content={$goods.goods_name}&pic={$goods.original_img}"> 分享 </a> </div>-->
 </header>
-
 <!--商品图 s---> 
-<script src="{$ectouch_themes}/js/TouchSlide.js"></script>
 <section class="goods_slider">
   <div class="blank2"></div>
   <div id="slideBox" class="slideBox">
-    <div class="scroller"> 
-      <!--<div><a href="javascript:showPic()"><img src="{$goods.goods_thumb}"  alt="{$goods.goods_name}" /></a></div>-->
+    <div class="scroller">
       <ul>
-        <li><a href="javascript:showPic()"><img alt="" src="{$site_url}{$goods.original_img}"/></a></li>
-        <!--{if $pictures}--> 
-        <!-- {foreach from=$pictures item=picture name=no}--> 
-        <!-- {if $smarty.foreach.no.iteration > 1}  -->
-        <li><a href="javascript:showPic()"><img alt="" src="{$site_url}{$picture.img_url}"/></a></li>
-        <!-- {/if}--> 
-        <!--{/foreach}--> 
-        <!--{/if}-->
+      <!-- {foreach from=$pictures item=picture name=no}--> 
+        <li><img alt="" src="{$site_url}{$picture.img_url}"/></li>
+      <!--{/foreach}--> 
       </ul>
     </div>
+    <!-- {if count($pictures) > 1} --> 
     <div class="icons">
-      <ul>
-        <i class="current"></i> 
-        <!--{if $pictures}--> 
+      <ul> 
         <!-- {foreach from=$pictures item=picture name=no}--> 
         <i class="current"></i> 
         <!--{/foreach}--> 
-        <!--{/if}-->
       </ul>
     </div>
+    <!-- {/if} --> 
   </div>
-  <div class="blank2"></div>
 </section>
 <script type="text/javascript">
-TouchSlide({ 
-	slideCell:"#slideBox",
-	titCell:".icons ul", //开启自动分页 autoPage:true ，此时设置 titCell 为导航元素包裹层
-	mainCell:".scroller ul", 
-	effect:"leftLoop", 
-	autoPage:true,//自动分页
-	autoPlay:false //自动播放
+$(function() {
+    TouchSlide({ 
+	    slideCell:"#slideBox",
+	    titCell:".icons ul", //开启自动分页 autoPage:true ，此时设置 titCell 为导航元素包裹层
+	    mainCell:".scroller ul", 
+	    effect:"leftLoop", 
+	    autoPage:true,//自动分页
+	    autoPlay:false //自动播放
+    });
 });
-
-function showPic(){
-	var data = document.getElementById("slideBox").className;
-	var reCat = /ui-gallery/;
-	//str1.indexOf(str2);
-	if( reCat.test(data) ){
-		document.getElementById("slideBox").className = 'slideBox';
-	}else{
-		document.getElementById("slideBox").className = 'slideBox ui-gallery';
-		//document.getElementById("slideBox").style.position = 'fixed';
-	}
-}
 </script> 
 <!--商品图 end---> 
 <!--商品参数-->
@@ -103,7 +84,7 @@ function showPic(){
     <h1> {$goods.goods_style_name} </h1>
   </div>
   <div class="subtitle">
-    <div class="amount_desc">2个/份（约400g）</div><div class="freemore">{$goods.free_more_desc}买1送1</div>
+    <div class="freemore">{$goods.free_more_desc}</div>
   </div>
   <ul>
     <!-- {if $cfg.show_marketprice} 市场价格-->
@@ -111,9 +92,15 @@ function showPic(){
     <!--{/if}-->
     <!--{if $goods.is_promote and $goods.gmt_end_time } 促销-->
     <li><del>{$lang.shop_price}{$goods.shop_price}</del></li>
-    <li>{$lang.promote_price}<b class="price">{$goods.promote_price}</b></li> 
+    <li>{$lang.promote_price}
+      <b class="price">{$goods.promote_price}</b>
+      <span class="amount_desc"> / {$goods.amount_desc}</span>
+    </li> 
     <!--{else}-->
-    <li>{$lang.shop_price}<b class="price">{$goods.shop_price_formated}</b></li>
+    <li>{$lang.shop_price}
+      <b class="price">{$goods.shop_price_formated}</b>
+      <span class="amount_desc"> / {$goods.amount_desc}</span>
+    </li>
     <!--{/if}-->
   </ul>
   <!--{if $goods.is_promote and $goods.gmt_end_time } 促销--> 
