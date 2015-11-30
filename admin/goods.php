@@ -176,8 +176,8 @@ elseif ($_REQUEST['act'] == 'add' || $_REQUEST['act'] == 'edit' || $_REQUEST['ac
             'promote_start_date' => local_date('Y-m-d'),
             'promote_end_date'   => local_date('Y-m-d', local_strtotime('+1 month')),
             'goods_weight'  => 0,
-            'give_integral' => -1,
-            'rank_integral' => -1
+            'give_integral' => 0,
+            'rank_integral' => 0,
         );
 
         if ($code != '')
