@@ -165,13 +165,13 @@
     </section>
     <section class="wrap has_no_item" style="display:none;">
       <div class="empty-cart">
-      <div class="ico_13 cart-logo"></div>
-      <p class="message">没有查询到订单，现在就去下单吧</p>
-      <div class="cart-button">
-        <a class="c-btn2 flex_in radius5" href="index.php" style="background:#6bd0a2;width:100%;"><i class="ico_04_b"></i> 去购物 </a>
+        <div class="ico_13 cart-logo"></div>
+        <p class="message">没有查询到订单，现在就去下单吧</p>
+        <div class="cart-button">
+          <a class="c-btn2 flex_in radius5" href="index.php" style="background:#6bd0a2;width:100%;"><i class="ico_04_b"></i> 去购物 </a>
+        </div>
       </div>
-    </div>
-</section>
+    </section>
 	<script type="text/javascript" src="{$ectouch_themes}/js/jquery.more.js"></script>
     <script type="text/javascript">
     {foreach from=$lang.merge_order_js item=item key=key}
@@ -307,7 +307,7 @@ jQuery(function($){
     <!-- ==========订单详情页面,包括：订单状态，商品列表，费用总计，收货人信息，支付方式，其它信息========== --> 
     <!--{if $action eq 'order_detail'} -->
     <!--{if is_wechat_browser() }-->
-    <script type="text/javascript" src="weixin/wxjsconfig.php?api=chooseWXPay&debug=1"></script>
+    <script type="text/javascript" src="weixin/wxjsconfig.php?api=chooseWXPay"></script>
     <!-- {/if} -->
     
     <header id="header">

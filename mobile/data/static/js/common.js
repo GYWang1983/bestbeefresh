@@ -1,5 +1,3 @@
-/* $Id : common.js 4865 2007-01-31 14:04:10Z paulgao $ */
-
 /* *
  * 添加商品到购物车 
  */
@@ -42,7 +40,7 @@ function decFromCart(goodsId, parentId) {
   goods.number   = 1;
   goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
 
-  Ajax.call('flow.php?step=dec_from_cart', 'goods=' + $.toJSON(goods), decFromCartResponse, 'POST', 'JSON');
+  Ajax.call('flow.php?step=dec_from_cart', 'goods=' + $.toJSON(goods), addToCartResponse, 'POST', 'JSON');
 }
 
 /* *
@@ -138,11 +136,11 @@ function addToCartResponse(result)
 		cart[goods_id] = result.goods_number;
 		$('#goods' + goods_id + ' .cart .num').text(result.goods_number);
 	}
-	//document.getElementById('globalId').innerHTML = result.cart_number;
-    //showDiv();
+	if ($('#goods_subtotal').length > 0) {
+		$('#goods_subtotal').text(result.cart_total.goods_price);
+	}
   }
 }
-
 
 /* *
  * 处理添加商品到购物车的反馈信息
@@ -180,25 +178,6 @@ function addToCartResponse_quick(result)
     }
 
     location.href = cart_url;
-  }
-}
-
-function decFromCartResponse(result)
-{
-console.log(result);
-  if (result.error > 0)
-  {
-      alert(result.message);
-  }
-  else
-  {
-	//显示购物车数量
-	$('#carId').text(result.cart_number);
-	if (cart !== undefined) {
-		var goods_id = result.goods_id;
-		cart[goods_id] = result.goods_number;
-		$('#goods' + goods_id + ' .cart .num').text(result.goods_number);
-	}
   }
 }
 

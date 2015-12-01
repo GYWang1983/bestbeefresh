@@ -75,7 +75,7 @@ if ($_REQUEST['step'] == 'add_to_cart')
     $goods = $json->decode($_POST['goods']);
 
     /* 检查：如果商品有规格，而post的数据没有规格，把商品的规格属性通过JSON传到前台 */
-    if (empty($goods->spec) AND empty($goods->quick))
+    /*if (empty($goods->spec) AND empty($goods->quick))
     {
         $sql = "SELECT a.attr_id, a.attr_name, a.attr_type, ".
             "g.goods_attr_id, g.attr_value, g.attr_price " .
@@ -113,7 +113,7 @@ if ($_REQUEST['step'] == 'add_to_cart')
 
             die($json->encode($result));
         }
-    }
+    }*/
 
     /* 更新：如果是一步购物，先清空购物车 */
     if ($_CFG['one_step_buy'] == '1')
@@ -146,7 +146,10 @@ if ($_REQUEST['step'] == 'add_to_cart')
             $result['one_step_buy'] = $_CFG['one_step_buy'];
             $result['goods_id'] = stripslashes($goods->goods_id);
             $result['goods_number']  = insert_cart_goods_number($goods->goods_id);
-            $result['cart_number'] = insert_cart_info_number();
+            //$result['cart_number'] = insert_cart_info_number();
+            $cart_goods = get_cart_goods();
+            $result['cart_number'] = $cart_goods['total']['real_goods_count'] + $cart_goods['total']['virtual_goods_count'];
+            $result['cart_total']  = $cart_goods['total'];
         }
         else
         {
@@ -216,8 +219,11 @@ elseif ($_REQUEST['step'] == 'dec_from_cart')
 		}
 	}
 	
-	$result['cart_number']   = insert_cart_info_number();
 	$result['goods_number']  = insert_cart_goods_number($goods->goods_id);
+	//$result['cart_number']   = insert_cart_info_number();
+	$cart_goods = get_cart_goods();
+	$result['cart_number'] = $cart_goods['total']['real_goods_count'] + $cart_goods['total']['virtual_goods_count'];
+	$result['cart_total']  = $cart_goods['total'];
 	die($json->encode($result));
 }
 /**
@@ -1430,7 +1436,7 @@ elseif ($_REQUEST['step'] == 'done')
     }
 
     /* 检查红包是否存在 */
-if ($order['bonus_id'] > 0)
+    if ($order['bonus_id'] > 0)
     {
         $bonus = bonus_info($order['bonus_id']);
         if (!is_bonus_available($bonus) || $bonus['user_id'] != $user_id || $bonus['min_goods_amount'] > cart_amount(false, $flow_type))

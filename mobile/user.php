@@ -23,6 +23,7 @@ $user_id = $_SESSION['user_id'];
 $action  = isset($_REQUEST['act']) ? trim($_REQUEST['act']) : 'default';
 $affiliate = unserialize($GLOBALS['_CFG']['affiliate']);
 $smarty->assign('affiliate', $affiliate);
+$smarty->assign('config', $_CFG);
 $back_act='';
 
 // 不需要登录的操作或自己验证是否登录（如ajax处理）的act

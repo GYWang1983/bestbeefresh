@@ -1661,17 +1661,16 @@ function get_cart_goods()
         $row['subtotal']     = price_format($row['goods_price'] * $row['goods_number'], false);
         $row['goods_price']  = price_format($row['goods_price'], false);
         $row['market_price'] = price_format($row['market_price'], false);
-
         $row['free_more_desc'] = get_free_more_desc($row['free_more']);
         
         /* 统计实体商品和虚拟商品的个数 */
         if ($row['is_real'])
         {
-            $real_goods_count++;
+            $real_goods_count += $row['goods_number'];
         }
         else
         {
-            $virtual_goods_count++;
+            $virtual_goods_count += $row['goods_number'];
         }
 
         /* 查询规格 */

@@ -30,10 +30,16 @@
   </dd>
   <div class="user_top_list">
     <ul>
-      <li> <a href="user.php?act=order_list&status=2"> <strong>{$info.order_count}</strong> <img  src="{$ectouch_themes}/images/ico_user_01.png"> <span>待取货</span> </a> </li>
+      <li> <a href="user.php?act=order_list&status=2"> <strong>{$info.order_count}</strong> <img  src="{$ectouch_themes}/images/ico_user_01.png"> <span>可取货</span> </a> </li>
+      <!-- {if $config.use_bonus} -->
       <li> <a class="fragment" href="user.php?act=bonus"> <strong>{$info.bonus}</strong> <img  src="{$ectouch_themes}/images/ico_user_04.png"> <span>红包</span> </a> </li>
+      <!-- {/if} -->
+      <!-- {if $config.use_integral} -->
       <li> <a href="javascript:;"> <strong>{$info.integral}</strong> <img  src="{$ectouch_themes}/images/ico_user_02.png"> <span>积分</span> </a> </li>
-      <!--<li> <a href="javascript:;"> <strong>{$info.surplus}</strong> <img  src="{$ectouch_themes}/images/ico_user_03.png"> <span>余额</span> </a> </li>-->
+      <!-- {/if} -->
+      <!-- {if $config.use_surplus} -->
+      <li> <a href="javascript:;"> <strong>{$info.surplus}</strong> <img  src="{$ectouch_themes}/images/ico_user_03.png"> <span>余额</span> </a> </li>
+      <!-- {/if} -->
     </ul>
   </div>
 </dl>
