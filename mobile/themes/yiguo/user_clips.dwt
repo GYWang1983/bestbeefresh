@@ -19,9 +19,13 @@
 <!-- *用户中心默认显示页面 start--> 
 <!-- {if $action eq 'default'} -->
 <dl class="user_top">
-  <dt> {if $info.avatar neq ''}<img src="{$info.avatar}">{else}<img src="{$ectouch_themes}/images/get_avatar.png">{/if} </dt>
+  <dt> {if $info.avatar neq ''}<img src="{$info.avatar}">{else}<img src="{$ectouch_themes}/images/brand_logo.jpg">{/if} </dt>
   <dd>
+    <!-- {if empty($info.mobile_phone)} -->
+    <p>你还没有绑定手机号<br><a href="user.php?act=bind">现在去绑定</a></p>
+    <!-- {else} -->
     <p>{$info.mobile_phone}</p>
+    <!-- {/if} -->
     <!--<p><span>{$rank_name}</span></p>-->
   </dd>
   <div class="user_top_list">
@@ -47,6 +51,11 @@
         $('.pickup_code').qrcode('{$pcode.code}');
     });
   </script>
+<!--{else}-->
+  <section class="no-pickup-code">
+    <div class="icon-order"></div>
+    <p class="message">没有需要取货的订单</p>
+  </section>
 <!--{/if}-->
   <div class="list_box padd1 radius10">
   <!--{if !is_wechat_browser() }-->
