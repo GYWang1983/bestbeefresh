@@ -84,7 +84,7 @@ var cart = {};
 <!-- {if $favourable_list} 优惠活动 -->
 <!-- {foreach from=$favourable_list item=favourable} -->
 <form action="flow.php" method="post">
-    <section class="order_box padd1 radius10 goodsBuy "> 
+    <section class="order_box padd1 radius5 goodsBuy "> 
       <table class="ectouch_table" width="100%" border="0" cellspacing="0" cellpadding="5">
         <tr>
           <td width="25%" bgcolor="#ffffff" align="right">{$lang.label_act_name}</td>
@@ -234,7 +234,7 @@ var cart = {};
 <div class="wrap"> 
   <!-- 如果有收货地址，循环显示用户的收获地址 --> 
   <!-- {foreach from=$consignee_list item=consignee key=sn} -->
-  <section class="order_box padd1 radius10" style="padding-top:0;padding-bottom:0;">
+  <section class="order_box padd1 radius5" style="padding-top:0;padding-bottom:0;">
     <div class="table_box2 table_box">
       <form style="padding:8px;" action="flow.php" method="post" name="theForm" id="theForm" onSubmit="return checkConsignee(this)">
         <!-- #BeginLibraryItem "/Library/consignee.lbi" --><!-- #EndLibraryItem -->
@@ -274,12 +274,16 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <dd class="dd1" style="width:80px;">取货手机号</dd>
             <dd class="dd2">{$smarty.session.mobile}</dd>
           </dl>
+          <dl>
+            <dd class="dd1" style="width:80px;">提货地址</dd>
+            <dd class="dd2">{$config.shop_address}</dd>
+            <dd class="dd2 shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$config.shop_address_coord}&referer=bestbeefresh" target="_blank"></a></dd>
+          </dl>
         </div>
     </section>
-    <div class="blank1"></div>
     <!--{if $is_exchange_goods neq 1 || $total.real_goods_count neq 0}-->
       <!--{if !is_wechat_browser() }-->
-      <section class="order_box padd1 radius10" style="padding-top:0.3rem;padding-bottom:0.3rem;">
+      <section class="order_box padd1 radius5" style="padding-top:0.3rem;padding-bottom:0.3rem;">
         <div class="table_box table_box2"> 
           <dl>
             <dd class="dd1">{$lang.payment_method}</dd>
@@ -295,14 +299,13 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
 		  </div>
         </div>
       </section>
-      <div class="blank1"> </div>
       <!--{else}-->
       <input name = "payment" type="radio" value = "{$wechat_pay_id}" checked="checked"  style="display:none"/>
       <!--{/if}-->
     <!--{else}-->
     <input name = "payment" type="radio" value = "-1" checked="checked"  style="display:none"/>
     <!--{/if}-->
-    <section class="order_box padd1 radius10" style="padding-top:0.3rem;padding-bottom:0.3rem;">
+    <section class="order_box padd1 radius5" style="padding-top:0.3rem;padding-bottom:0.3rem;">
       <div class="table_box table_box2" style=" margin-bottom:0.5rem"> 
         <!-- {if $allow_use_bonus and count($bonus_list) > 0} 是否使用红包 -->
         <dl>
@@ -357,8 +360,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
 		</div>	
       </div>
     </section>
-    <div class="blank1"></div>
-    <section class="order_box padd1 radius10" style="padding-top:0;padding-bottom:0;">
+    <section class="order_box padd1 radius5" style="padding-top:0;padding-bottom:0;">
       <div class="table_box table_box3">
         <dl>
           <dd >{$lang.goods_list}<!--{if $allow_edit_cart} --><a href="flow.php" class="modify radius5">{$lang.modify}</a><!--{/if} --></dd>
@@ -384,6 +386,14 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
         </dl>
         <!-- {/foreach} --> 
         <!-- #BeginLibraryItem "/Library/order_total.lbi" --><!-- #EndLibraryItem --> </div>
+    </section>
+    <section class="order_box padd1 radius5">
+        <div class="table_box table_box1 order_attention">
+          <dl>
+            <dd class="dd1"><i class="icon-info"></i></dd>
+            <dd class="dd2">{$order_attention}</dd>
+          </dl>
+        </div>
     </section>
     <div class="blank1"></div>
     <input type="submit" name="submit" value="提交订单" class="c-btn3" />

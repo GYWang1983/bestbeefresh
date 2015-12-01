@@ -3449,7 +3449,7 @@ function get_order_lock_deadline($basetime = NULL)
  * @param $comfirm_time 订单确认时间
  * @return Array
  */
-function get_order_pickup_time($paytime, $comfirm_time = 0)
+function get_order_pickup_time($paytime = NULL, $comfirm_time = 0)
 {
 	global $_CFG;
 

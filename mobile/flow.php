@@ -40,7 +40,8 @@ $smarty->assign('ur_here',          $position['ur_here']);  // 当前位置
 
 //$smarty->assign('categories',       get_categories_tree()); // 分类树
 //$smarty->assign('helps',            get_shop_help());       // 网店帮助
-$smarty->assign('lang',             $_LANG);
+$smarty->assign('lang',   $_LANG);
+$smarty->assign('config', $_CFG);
 $smarty->assign('show_marketprice', $_CFG['show_marketprice']);
 $smarty->assign('data_dir',    DATA_DIR);       // 数据目录
 
@@ -725,6 +726,8 @@ elseif ($_REQUEST['step'] == 'checkout')
         $smarty->assign('inv_type_list', $inv_type_list);
     }
 
+    $smarty->assign('order_attention', order_attention($order));
+    
     /* 保存 session */
     $_SESSION['flow_order'] = $order;
 }
@@ -2838,5 +2841,24 @@ function cart_favourable_amount($favourable)
 
     /* 优惠范围内的商品总额 */
     return $GLOBALS['db']->getOne($sql);
+}
+
+/**
+ * 获取下单提醒说明文字
+ */
+function order_attention($order)
+{
+	global $_CFG;
+	
+	$ptime = get_order_pickup_time();
+	$tpl = new cls_template();
+	
+	
+	$tpl->assign('lock_time',  $_CFG['order_lock_time']);
+	$tpl->assign('pickup_start_time', date('Y-m-d H:i', $ptime['start']));
+	$tpl->assign('pickup_end_time', date('Y-m-d H:i', $ptime['end']));
+	$tpl->assign('limit_time', $_CFG['shipping_limit_time']);
+	
+	return $tpl->fetch('str:' . $_CFG['order_attention']);
 }
 ?>

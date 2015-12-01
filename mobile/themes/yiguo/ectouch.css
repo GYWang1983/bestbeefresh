@@ -953,7 +953,7 @@ Template Type: type_0
 	.order_detail .pickup_time{border-bottom:1px #CCCCCC dashed;font-size:17px;padding:2px 5px;}
 	.order_detail .pickup_code{width:100%;margin: 0 auto;margin-top:5px;text-align:center;}
 
-	.order_box{ background:#FFF; font-size:0.8rem; margin:5px auto; padding:5px; }
+	.order_box{ background:#FFF; font-size:0.8rem; margin:7px auto; padding:5px; }
 	.order_box .in{ display:block;
 	background:url(images/order_bg1.png) repeat-x;  
 	-webkit-background-size:2.4rem 0.4rem;
@@ -968,7 +968,11 @@ Template Type: type_0
 	.order_box .in .ico_14{ display:inline-block; width:1rem; height:1rem;-webkit-background-size:1rem 1rem;-moz-background-size:1rem 1rem;background-size:1rem 1rem;}
 	/* 订单确认页表格_中间模块 */
 	.order_box .table_box2 dl{ padding:0; position:relative}
- 
+    .order_box .shop_location{font-size:17px;text-align:right;padding-right:10px;line-height:27px;}
+    .order_box .shop_location a{color:#4d9546;}
+    .order_box .order_attention .dd1{width:40px;text-align:center;font-size:18px;font-weight:bold;color:#4d9546;}
+    .order_box .order_attention .dd2{word-break:break-word;white-space:normal;}
+    
 	.table_box2 .dd1{ width:28%; vertical-align:middle;}
 	.table_box2 .dd2{ color:#999; font-size:0.8rem; text-align:left; width:90%; height:2.5rem; line-height: normal; vertical-align:middle; border:none}
 	.table_box2 .dl_box p{ line-height:36px;}
