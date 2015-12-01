@@ -1062,7 +1062,7 @@ elseif ($action == 'async_order_list')
     	$cond = 'pay_status = ' . PS_PAYED . ' AND shipping_status != ' . SS_RECEIVED . ' AND order_status IN (' . OS_CONFIRMED . ',' . OS_UNCONFIRMED . ')';
     	break;
     case 3:
-    	$cond = 'shipping_status = ' . SS_RECEIVED . ' OR order_status IN (' . OS_CANCELED . ',' . OS_EXPIRED . ',' . OS_RETURNED . ')';
+    	$cond = '(shipping_status = ' . SS_RECEIVED . ' OR order_status IN (' . OS_CANCELED . ',' . OS_EXPIRED . ',' . OS_RETURNED . '))';
     	break;
     default:
     	$cond = '';
