@@ -149,7 +149,7 @@
       </ul>
     </header>
     <section class="wrap order_list" style="padding-top: 80px;">
-      <section class="order_box padd1 radius10 single_item">
+      <section class="order_box padd1 radius5 single_item">
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
       	<tr style="border-bottom:1px #CCCCCC dashed">
       	  <td style="width:65px;padding-right:0px;">订单编号：</td>
@@ -416,6 +416,9 @@ jQuery(function($){
         <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
             <td>订单编号：{$order.order_sn}</td>
+        </tr>
+        <tr>
+            <td>提货地址：{$config.shop_address}<span class="shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$config.shop_address_coord}&referer=bestbeefresh" target="_blank"></a></span></td>
         </tr>
         <tr>
             <td>创建时间：{$order.formated_add_time}</td>
