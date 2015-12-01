@@ -46,9 +46,12 @@
 <section class="user_center">
 <!--{if $pcode}-->
   <script type="text/javascript" src="{$ectouch_themes}/js/jquery.qrcode.min.js"></script>
-  <div class="list_box padd1 radius10">
+  <div class="list_box padd1 radius10 order_box">
     <div style="font-size:16px;">您有需要取货的订单</div>
-    <div>请在以下时间段内到门店取货</div>
+    <div>提货地址：{$config.shop_address}
+      <span class="shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$config.shop_address_coord}&referer=bestbeefresh" target="_blank" style="display:inline;"></a></span>
+    </div>
+    <div>请在以下时间段内到提货点取货</div>
     <div class="pickup_time">{$pcode.start_time_formated} ~ {$pcode.end_time_formated}</div>
     <div class="pickup_code"></div>
   </div>

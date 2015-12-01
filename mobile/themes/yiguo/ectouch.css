@@ -1095,7 +1095,7 @@ box-shadow: 0 0 0.6rem rgba(250,0,0,0.15);
 .user_top .quan3{ position:absolute; right:5rem; top:4.5rem; width:2rem; height:2rem;border-radius: 3rem; background:rgba(255,255,255,0.05);
 box-shadow: 0 0 0.6rem rgba(250,0,0,0.1);
 }
-.user_center .pickup_time{font-size:17px;text-align:center;color:#4d9546;}
+.user_center .pickup_time{font-size:16px;text-align:center;color:#4d9546;}
 .user_center .pickup_code{width:100%;margin: 0 auto;margin-top:5px;text-align:center;}
 
 .no-pickup-code{width:100%;margin:20px auto;text-align:center;}
