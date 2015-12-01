@@ -139,6 +139,16 @@ function addToCartResponse(result)
 	if ($('#goods_subtotal').length > 0) {
 		$('#goods_subtotal').text(result.cart_total.goods_price);
 	}
+	
+	//动画
+	var cartbtn = $('.global-nav i.icon-cart');
+	if (result.diff_number > 0 && cartbtn.length > 0) {
+		var ops = $('#goods' + result.goods_id + ' .thumb img');
+		if (ops.length > 0) {
+			var nps = ops.clone().css({"position":"absolute", "top": ops.offset().top, "left": ops.offset().left, "z-index": 9999999, "width":40, "height":40}).show();
+			nps.appendTo("body").animate({top:cartbtn.offset().top, left:cartbtn.offset().left, width: 20, height:20}, {duration:500, callback: function(){}, complete: function(){nps.remove()} });
+		}
+	}
   }
 }
 

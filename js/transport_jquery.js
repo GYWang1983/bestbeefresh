@@ -735,8 +735,8 @@ if ( ! Object.prototype.toJSONString) {
     })(String.prototype);
 }
 */
-Ajax.onRunning  = showLoader;
-Ajax.onComplete = hideLoader;
+//Ajax.onRunning  = showLoader;
+//Ajax.onComplete = hideLoader;
 
 /* *
  * 显示载入信息

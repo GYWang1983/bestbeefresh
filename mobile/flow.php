@@ -146,6 +146,7 @@ if ($_REQUEST['step'] == 'add_to_cart')
             $result['one_step_buy'] = $_CFG['one_step_buy'];
             $result['goods_id'] = stripslashes($goods->goods_id);
             $result['goods_number']  = insert_cart_goods_number($goods->goods_id);
+            $result['diff_number']  = $goods->number;
             //$result['cart_number'] = insert_cart_info_number();
             $cart_goods = get_cart_goods();
             $result['cart_number'] = $cart_goods['total']['real_goods_count'] + $cart_goods['total']['virtual_goods_count'];
@@ -219,8 +220,9 @@ elseif ($_REQUEST['step'] == 'dec_from_cart')
 		}
 	}
 	
-	$result['goods_number']  = insert_cart_goods_number($goods->goods_id);
-	//$result['cart_number']   = insert_cart_info_number();
+	$result['goods_number'] = insert_cart_goods_number($goods->goods_id);
+	$result['diff_number']  = -$goods->number;
+	//$result['cart_number'] = insert_cart_info_number();
 	$cart_goods = get_cart_goods();
 	$result['cart_number'] = $cart_goods['total']['real_goods_count'] + $cart_goods['total']['virtual_goods_count'];
 	$result['cart_total']  = $cart_goods['total'];
