@@ -62,7 +62,7 @@ var cart = {};
                 <!-- {/if} --> 
             </div>
             <!-- {if $goods.goods_attr && $show_goods_attribute eq 1} 显示商品属性 -->
-            <div class="amount_desc">{$goods.goods_attr|nl2br}</p>
+            <div class="amount_desc">{$goods.goods_attr|nl2br}</div>
             <!-- {/if} -->
             <!--{if $goods.free_more_desc}-->
             <div class="freemore">{$goods.free_more_desc}</div>

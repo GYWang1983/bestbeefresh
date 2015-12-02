@@ -1027,7 +1027,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     $sql = "SELECT g.goods_name, g.goods_sn, g.is_on_sale, g.is_real, ".
                 "g.market_price, g.shop_price AS org_price, g.promote_price, g.promote_start_date, ".
                 "g.promote_end_date, g.goods_weight, g.integral, g.extension_code, ".
-                "g.goods_number, g.is_alone_sale, g.is_shipping, g.free_more, ".
+                "g.goods_number, g.is_alone_sale, g.is_shipping, g.free_more, g.amount_desc, ".
                 "IFNULL(mp.user_price, g.shop_price * '$_SESSION[discount]') AS shop_price ".
             " FROM " .$GLOBALS['ecs']->table('goods'). " AS g ".
             " LEFT JOIN " . $GLOBALS['ecs']->table('member_price') . " AS mp ".
@@ -1116,8 +1116,18 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     $spec_price             = spec_price($spec);
     $goods_price            = get_final_price($goods_id, $num, true, $spec);
     $goods['market_price'] += $spec_price;
-    $goods_attr             = get_goods_attr_info($spec);
-    $goods_attr_id          = join(',', $spec);
+    
+    //商品规格
+    $goods_attr_id = join(',', $spec);
+    $goods_attr    = get_goods_attr_info($spec);
+    if (empty($goods_attr))
+    {
+    	$goods_attr = $goods['amount_desc'];
+    }
+    else
+    {
+    	$goods_attr = $goods['amount_desc'] . "\n" . $goods_attr;
+    }
 
     /* 初始化要插入购物车的基本件数据 */
     $parent = array(
