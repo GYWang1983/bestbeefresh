@@ -9,6 +9,8 @@ if (!defined('IN_ECS'))
     die('Hacking attempt');
 }
 
+include_once(ROOT_PATH . 'includes/lib_order.php');
+
 $cron_lang = ROOT_PATH . 'languages/' .$GLOBALS['_CFG']['lang']. '/cron/ship_order.php';
 if (file_exists($cron_lang))
 {
