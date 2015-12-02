@@ -54,14 +54,14 @@ if (!$smarty->is_cached('index.dwt', $cache_id))
     $smarty->assign('ur_here',         $position['ur_here']);  // 当前位置
 
     /* meta information */
-    $smarty->assign('keywords',        htmlspecialchars($_CFG['shop_keywords']));
-    $smarty->assign('description',     htmlspecialchars($_CFG['shop_desc']));
-    $smarty->assign('flash_theme',     $_CFG['flash_theme']);  // Flash轮播图片模板
+    //$smarty->assign('keywords',        htmlspecialchars($_CFG['shop_keywords']));
+    //$smarty->assign('description',     htmlspecialchars($_CFG['shop_desc']));
+    //$smarty->assign('flash_theme',     $_CFG['flash_theme']);  // Flash轮播图片模板
 
-    $smarty->assign('feed_url',        ($_CFG['rewrite'] == 1) ? 'feed.xml' : 'feed.php'); // RSS URL
+    //$smarty->assign('feed_url',        ($_CFG['rewrite'] == 1) ? 'feed.xml' : 'feed.php'); // RSS URL
 
-    $smarty->assign('categories',      get_categories_tree()); // 分类树
-    $smarty->assign('helps',           get_shop_help());       // 网店帮助
+    //$smarty->assign('categories',      get_categories_tree()); // 分类树
+    //$smarty->assign('helps',           get_shop_help());       // 网店帮助
     //$smarty->assign('top_goods',       get_top10());           // 销售排行
 
     //$smarty->assign('best_goods',      get_recommend_goods('best'));    // 推荐商品
@@ -75,7 +75,7 @@ if (!$smarty->is_cached('index.dwt', $cache_id))
     //$smarty->assign('new_articles',    index_get_new_articles());   // 最新文章
     //$smarty->assign('group_buy_goods', index_get_group_buy());      // 团购商品
     //$smarty->assign('auction_list',    index_get_auction());        // 拍卖活动
-    $smarty->assign('shop_notice',     $_CFG['shop_notice']);       // 商店公告
+    //$smarty->assign('shop_notice',     $_CFG['shop_notice']);       // 商店公告
 
     /* 首页主广告设置 */
     /*$smarty->assign('index_ad',     $_CFG['index_ad']);
@@ -107,7 +107,7 @@ if (!$smarty->is_cached('index.dwt', $cache_id))
     /* 页面中的动态内容 */
     assign_dynamic('index');
 }
-
+$smarty->assign('config', $_CFG);
 $smarty->display('index.dwt', $cache_id);
 
 /*------------------------------------------------------ */

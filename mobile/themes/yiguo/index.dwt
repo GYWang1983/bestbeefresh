@@ -16,6 +16,10 @@
 {insert_scripts files='common.js,transport_jquery.js'}
 <script type="text/javascript">
 var cart = {insert name='cart_detail_number'};
+var shop_title = '{$config.shop_title}';
+var shop_desc = '{$config.shop_desc}';
+var shop_logo = '{$config.site_url}/{$config.shop_logo}';
+var site_url = '{$config.site_url}';
 </script>
 </head>
 <body>
@@ -108,6 +112,8 @@ var cart = {insert name='cart_detail_number'};
   </div>
 </div>
 </div>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript" src="weixin/wxjsconfig.php?api=onMenuShareTimeline,onMenuShareAppMessage,onMenuShareQQ,onMenuShareWeibo,onMenuShareQZone"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.json.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.mmenu.js"></script>

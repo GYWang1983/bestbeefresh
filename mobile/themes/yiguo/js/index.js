@@ -32,4 +32,19 @@ $(function() {
     for (var good_id in cart) {
         $('#goods' + good_id + ' .cart .num').text(cart[good_id]);
     }
+    
+    var share_meta = {
+    	'title': shop_title,
+    	'desc': shop_desc,
+    	'imgUrl':shop_logo,
+    	'link':site_url
+    };
+    
+    wx.ready(function(){
+	    wx.onMenuShareTimeline(share_meta);
+	    wx.onMenuShareAppMessage(share_meta);
+	    wx.onMenuShareQQ(share_meta);
+	    wx.onMenuShareWeibo(share_meta);
+	    wx.onMenuShareQZone(share_meta);
+    });
 });
