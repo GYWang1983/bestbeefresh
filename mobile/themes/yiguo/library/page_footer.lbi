@@ -34,6 +34,14 @@
 </div>
 <!--全局导航-End-->
 <script type="text/javascript">
+
+$(function() {
+    if (self.frameElement && self.frameElement.tagName == "IFRAME") {
+        //console.log('hide ad');
+        top.location.href = self.location.href;
+    }
+});
+
 function get_search_box(){
 	try{
 		document.getElementById('get_search_box').click();

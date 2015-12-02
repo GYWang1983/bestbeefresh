@@ -11,6 +11,7 @@
 <link href="{$ectouch_themes}/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 <link href="{$ectouch_themes}/ectouch.css" rel="stylesheet" type="text/css" />
 <link href="{$ectouch_themes}/css/iconfont.css?v=20151103" type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/TouchSlide.js"></script>
 {insert_scripts files='common.js,transport_jquery.js'}
 <script type="text/javascript">
@@ -107,7 +108,6 @@ var cart = {insert name='cart_detail_number'};
   </div>
 </div>
 </div>
-<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.json.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.mmenu.js"></script>
