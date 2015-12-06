@@ -72,7 +72,7 @@ require(ROOT_PATH . 'include/lib_article.php');
 
 /* 对用户传入的变量进行转义操作。 */
 if (!get_magic_quotes_gpc()) {
-    if (!empty($_GET)) {
+    if (!empty($_GET) && empty($_GET['notify_id'])) {
         $_GET = addslashes_deep($_GET);
     }
     if (!empty($_POST)) {
@@ -260,7 +260,7 @@ if (!defined('INIT_NO_SMARTY') && gzip_enabled()) {
     ob_start();
 }
 
-if (is_wechat_browser()) {
+if (is_wechat_browser() && strpos($_CFG['site_url'], 'test.') === false) {
 
 	if (empty($_SESSION['user_id'])) {
 	 
@@ -272,7 +272,7 @@ if (is_wechat_browser()) {
 			$uri .= 'index.php';
 		}
 		
-		$callback = $_CFG['site_url'] . $uri;	 
+		$callback = $_CFG['site_url'] . $uri;
 		weixin_oauth($callback);
 		
 	} elseif (empty($_SESSION['openid'])) {

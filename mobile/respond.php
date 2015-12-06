@@ -15,14 +15,14 @@
 
 define('IN_ECTOUCH', true);
 
-/* 支付方式代码 */
-$pay_code = !empty($_REQUEST['code']) ? trim($_REQUEST['code']) : '';
-
-if ($pay_code == 'wxpay')
-{
+if ($_REQUEST['call_type'] != 'sync') {
 	define('INIT_NO_USERS', true);
 	define('INIT_NO_SMARTY', true);
 }
+
+/* 支付方式代码 */
+$pay_code = !empty($_REQUEST['code']) ? trim($_REQUEST['code']) : '';
+
 
 require(dirname(__FILE__) . '/include/init.php');
 require(ROOT_PATH . 'include/lib_payment.php');
@@ -79,7 +79,13 @@ else
             /* 根据支付方式代码创建支付类的对象并调用其响应操作方法 */
             include_once($plugin_file);
             $payment = new $pay_code();
-            $msg     = (@$payment->respond(unserialize_config($param['pay_config']))) ? $_LANG['pay_success'] : $_LANG['pay_fail'];
+            $config  = unserialize_config($param['pay_config']);
+            $config['call_type'] = $_REQUEST['call_type'];
+            
+            unset($_GET['code']);
+            unset($_GET['call_type']);
+            
+            $msg = (@$payment->respond($config)) ? $_LANG['pay_success'] : $_LANG['pay_fail'];
         }
         else
         {

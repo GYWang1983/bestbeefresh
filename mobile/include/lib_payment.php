@@ -144,14 +144,12 @@ function order_paid($log_id, $pay_status = PS_PAYED, $note = '')
     if ($log_id > 0)
     {
         /* 取得要修改的支付记录信息 */
-        $sql = "SELECT * FROM " . $GLOBALS['ecs']->table('pay_log') .
-                " WHERE log_id = '$log_id'";
+        $sql = "SELECT * FROM " . $GLOBALS['ecs']->table('pay_log') . " WHERE log_id = '$log_id'";
         $pay_log = $GLOBALS['db']->getRow($sql);
-        if ($pay_log && $pay_log['is_paid'] == 0)
+        if (!empty($pay_log) && $pay_log['is_paid'] == 0)
         {
             /* 修改此次支付操作的状态为已付款 */
-            $sql = 'UPDATE ' . $GLOBALS['ecs']->table('pay_log') .
-                    " SET is_paid = '1' WHERE log_id = '$log_id'";
+            $sql = 'UPDATE ' . $GLOBALS['ecs']->table('pay_log') . " SET is_paid = '1' WHERE log_id = '$log_id'";
             $GLOBALS['db']->query($sql);
 
             /* 根据记录类型做相应处理 */
@@ -180,15 +178,15 @@ function order_paid($log_id, $pay_status = PS_PAYED, $note = '')
                 order_action($order_sn, OS_UNCONFIRMED, SS_UNSHIPPED, $pay_status, $note, $GLOBALS['_LANG']['buyer']);
 
                 /* 如果需要，发短信 */
-                if ($GLOBALS['_CFG']['sms_order_payed'] == '1' && $GLOBALS['_CFG']['sms_shop_mobile'] != '')
+                /*if ($GLOBALS['_CFG']['sms_order_payed'] == '1' && $GLOBALS['_CFG']['sms_shop_mobile'] != '')
                 {
                     include_once(ROOT_PATH.'include/cls_sms.php');
                     $sms = new sms();
-		    $sms_error = array();
+		    		$sms_error = array();
                     if(!$sms->send($GLOBALS['_CFG']['sms_shop_mobile'], sprintf($GLOBALS['_LANG']['order_payed_sms'], $order_sn, $order['consignee'], $order['tel']), $sms_error)){
 						echo $sms_error;
 					}
-                }
+                }*/
 
                 /* 对虚拟商品的支持 */
                 $virtual_goods = get_virtual_goods($order_id);
@@ -240,54 +238,6 @@ function order_paid($log_id, $pay_status = PS_PAYED, $note = '')
                     log_account_change($arr['user_id'], $arr['amount'], 0, 0, 0, $_LANG['surplus_type_0'], ACT_SAVING);
                 }
             }
-        }
-        else
-        {
-            /* 取得已发货的虚拟商品信息 */
-            $post_virtual_goods = get_virtual_goods($pay_log['order_id'], true);
-
-            /* 有已发货的虚拟商品 */
-            if (!empty($post_virtual_goods))
-            {
-                $msg = '';
-                /* 检查两次刷新时间有无超过12小时 */
-                $sql = 'SELECT pay_time, order_sn FROM ' . $GLOBALS['ecs']->table('order_info') . " WHERE order_id = '$pay_log[order_id]'";
-                $row = $GLOBALS['db']->getRow($sql);
-                $intval_time = gmtime() - $row['pay_time'];
-                if ($intval_time >= 0 && $intval_time < 3600 * 12)
-                {
-                    $virtual_card = array();
-                    foreach ($post_virtual_goods as $code => $goods_list)
-                    {
-                        /* 只处理虚拟卡 */
-                        if ($code == 'virtual_card')
-                        {
-                            foreach ($goods_list as $goods)
-                            {
-                                if ($info = virtual_card_result($row['order_sn'], $goods))
-                                {
-                                    $virtual_card[] = array('goods_id'=>$goods['goods_id'], 'goods_name'=>$goods['goods_name'], 'info'=>$info);
-                                }
-                            }
-
-                            $GLOBALS['smarty']->assign('virtual_card',      $virtual_card);
-                        }
-                    }
-                }
-                else
-                {
-                    $msg = '<div>' .  $GLOBALS['_LANG']['please_view_order_detail'] . '</div>';
-                }
-
-                $GLOBALS['_LANG']['pay_success'] .= $msg;
-            }
-
-           /* 取得未发货虚拟商品 */
-           $virtual_goods = get_virtual_goods($pay_log['order_id'], false);
-           if (!empty($virtual_goods))
-           {
-               $GLOBALS['_LANG']['pay_success'] .= '<br />' . $GLOBALS['_LANG']['virtual_goods_ship_fail'];
-           }
         }
     }
 }
