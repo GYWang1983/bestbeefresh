@@ -187,7 +187,8 @@
     <td scope="col"><div align="center"><strong>{$lang.goods_price}</strong></div></td>
     <td scope="col"><div align="center"><strong>{$lang.goods_number}</strong></div></td>
     <td scope="col"><div align="center"><strong>{$lang.goods_attr}</strong></div></td>
-    <td scope="col"><div align="center"><strong>{$lang.storage}</strong></div></td>
+    <td scope="col"><div align="center"><strong>优惠</strong></div></td>
+    <!-- <td scope="col"><div align="center"><strong>{$lang.storage}</strong></div></td> -->
     <td scope="col"><div align="center"><strong>{$lang.subtotal}</strong></div></td>
   </tr>
   {foreach from=$goods_list item=goods}
@@ -212,7 +213,8 @@
     <td><div align="right">{$goods.goods_number}
     </div></td>
     <td>{$goods.goods_attr|nl2br}</td>
-    <td><div align="right">{$goods.storage}</div></td>
+    <td><div align="center">{$goods.free_more_desc}</div></td>
+    <!--<td><div align="right">{$goods.storage}</div></td>-->
     <td><div align="right">{$goods.formated_subtotal}</div></td>
   </tr>
   {/foreach}

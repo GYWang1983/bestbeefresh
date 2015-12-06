@@ -336,8 +336,9 @@ elseif ($_REQUEST['act'] == 'info')
             }
         }
 
-        $row['formated_subtotal']       = price_format($row['goods_price'] * $row['goods_number']);
-        $row['formated_goods_price']    = price_format($row['goods_price']);
+        $row['formated_subtotal']    = price_format($row['goods_price'] * $row['goods_number']);
+        $row['formated_goods_price'] = price_format($row['goods_price']);
+        $row['free_more_desc']       = get_free_more_desc($row['free_more']);    
 
         $goods_attr[] = explode(' ', trim($row['goods_attr'])); //将商品属性拆分为一个数组
 
@@ -3033,9 +3034,10 @@ elseif ($_REQUEST['act'] == 'operate')
                     }
                 }
 
-                $row['formated_subtotal']       = price_format($row['goods_price'] * $row['goods_number']);
-                $row['formated_goods_price']    = price_format($row['goods_price']);
-
+                $row['formated_subtotal']    = price_format($row['goods_price'] * $row['goods_number']);
+                $row['formated_goods_price'] = price_format($row['goods_price']);
+                $row['free_more_desc']       = get_free_more_desc($row['free_more']);
+                
                 $goods_attr[] = explode(' ', trim($row['goods_attr'])); //将商品属性拆分为一个数组
                 $goods_list[] = $row;
             }
@@ -3055,8 +3057,7 @@ elseif ($_REQUEST['act'] == 'operate')
             $smarty->assign('goods_list', $goods_list);
 
             $smarty->template_dir = '../' . DATA_DIR;
-            $html .= $smarty->fetch('order_print.html') .
-                '<div style="PAGE-BREAK-AFTER:always"></div>';
+            $html .= $smarty->fetch('order_print.html');
         }
 
         echo $html;
