@@ -594,50 +594,37 @@ elseif ($_REQUEST['step'] == 'checkout')
     }*/
 
     /* 取得支付列表 */
-    if (!is_wechat_browser()) 
-    {
-	    $payment_list = available_payment_list(false, $cod_fee, true);
-	    if(isset($payment_list))
+	$payment_list = available_payment_list(false, $cod_fee, true, is_wechat_browser());
+	if(!empty($payment_list))
+	{
+		$smarty->assign('default_payment', $payment_list[0]['pay_id']);
+	    foreach ($payment_list as $key => $payment)
 	    {
-	        foreach ($payment_list as $key => $payment)
+	        if ($payment['is_cod'] == '1')
 	        {
-	            if ($payment['is_cod'] == '1')
-	            {
-	                $payment_list[$key]['format_pay_fee'] = '<span id="ECS_CODFEE">' . $payment['format_pay_fee'] . '</span>';
-	            }
-	            /* 如果有易宝神州行支付 如果订单金额大于300 则不显示 */
-	            if ($payment['pay_code'] == 'yeepayszx' && $total['amount'] > 300)
+	            $payment_list[$key]['format_pay_fee'] = '<span id="ECS_CODFEE">' . $payment['format_pay_fee'] . '</span>';
+	        }
+	            
+	        // 如果有余额支付 
+	        if ($payment['pay_code'] == 'balance')
+	        {
+	        	// 如果未登录，不显示
+	            if ($_SESSION['user_id'] == 0)
 	            {
 	                unset($payment_list[$key]);
 	            }
-	            /* 如果有余额支付 */
-	            if ($payment['pay_code'] == 'balance')
+	            else
 	            {
-	                /* 如果未登录，不显示 */
-	                if ($_SESSION['user_id'] == 0)
+	                if ($_SESSION['flow_order']['pay_id'] == $payment['pay_id'])
 	                {
-	                    unset($payment_list[$key]);
-	                }
-	                else
-	                {
-	                    if ($_SESSION['flow_order']['pay_id'] == $payment['pay_id'])
-	                    {
-	                        $smarty->assign('disable_surplus', 1);
-	                    }
+	                    $smarty->assign('disable_surplus', 1);
 	                }
 	            }
 	        }
 	    }
-	    $smarty->assign('payment_list', $payment_list);
-    }
-    else
-    {
-    	$payment_list = available_payment_list(false, $cod_fee, false, true);
-    	if (!empty($payment_list))
-    	{
-    		$smarty->assign('wechat_pay_id', $payment_list[0]['pay_id']);
-    	}
-    }   
+	}
+	$smarty->assign('payment_list', $payment_list);
+    
     
     /* 取得包装与贺卡 */
     if ($total['real_goods_count'] > 0)
@@ -1850,6 +1837,10 @@ elseif ($_REQUEST['step'] == 'pay')
 		));
 	}
 
+	/* 插入支付日志 */
+	include_once('include/lib_clips.php');
+	$order['log_id'] = insert_pay_log($order['order_id'], $order['order_amount'], $pay_id, PAY_ORDER);
+	
 	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
 	$pay_obj    = new $payment['pay_code'];
 	$pay_online = $pay_obj->get_code($order, unserialize_config($payment['pay_config']));
@@ -2153,6 +2144,42 @@ elseif ($_REQUEST['step'] == 'add_package_to_cart')
     }
     $result['confirm_type'] = !empty($_CFG['cart_confirm']) ? $_CFG['cart_confirm'] : 2;
     die($json->encode($result));
+}
+elseif ($_REQUEST['step'] == 'pay_code')
+{
+	//支付宝支付绕过微信屏蔽
+	$log_id = $_REQUEST['log'];
+	$sql = "SELECT o.*, l.pay_id AS cur_pay_id FROM " . $ecs->table('order_info', o) . ',' . $ecs->table('pay_log', l) .
+		" WHERE o.order_id = l.order_id AND l.log_id = '$log_id'";
+	$order = $db->getRow($sql);
+
+	//TODO: 检查登录用户
+	
+	if ($order['order_status'] == OS_UNCONFIRMED && $order['pay_status'] == PS_UNPAYED)
+	{
+		$order_id = $order['order_id'];
+		$pay_id   = $order['cur_pay_id'];
+		
+		$payment = payment_info($pay_id);
+		
+		if ($order['pay_id'] != $pay_id)
+		{
+			$order['pay_id'] = $pay_id;
+			update_order($order_id, array(
+				'pay_id'   => $pay_id,
+				'pay_name' => $payment['pay_name']
+			));
+		}
+		
+		$order['log_id'] = $log_id;
+		
+		include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+		$pay_obj    = new $payment['pay_code'];
+		$pay_online = $pay_obj->get_code2($order, unserialize_config($payment['pay_config']));
+		
+		echo $pay_online;
+		exit;
+	}
 }
 else
 {

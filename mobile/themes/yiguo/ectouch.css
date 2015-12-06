@@ -1014,6 +1014,20 @@ Template Type: type_0
 	
 	.select_city select{}
 /* ====================
+     提交订单页面
+==================== */
+    .payment_box{padding:5px;height:45px;border-bottom:1px solid #f3f3f3;}
+    .payment_box div.col{float:left;}
+    .payment_box .payment_logo{width:15%;}
+    .payment_box .payment_logo img{width:100%;max-width:45px;}
+    .payment_box .payment_title{width:70%;padding-left:10px;}
+    .payment_box .payment_name{font-size:16px;font-weight:bold;}
+    .payment_box .payment_desc{color:#666;}
+    .payment_box .payment_select{width:10%;text-align:center;line-height:45px;}
+    .payment_box .payment_select span{padding:4px;border:2px solid #ccc;border-radius:50%;min-width:16px;min-height:16px;display:inline-block;font-size:16px;}
+    .payment_box .payment_select .icon-checkmark{color:#fff;}
+    .payment_box .payment_select .checked{color:#ffb24c!important;border-color:#ffb24c!important;}
+/* ====================
      文章页面
 ==================== */
 	.art_content{ background:#FFF;overflow:hidden; padding:1rem;}

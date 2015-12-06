@@ -282,28 +282,32 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
         </div>
     </section>
     <!--{if $is_exchange_goods neq 1 || $total.real_goods_count neq 0}-->
-      <!--{if !is_wechat_browser() }-->
       <section class="order_box padd1 radius5" style="padding-top:0.3rem;padding-bottom:0.3rem;">
-        <div class="table_box table_box2"> 
+        <input name="payment" id="payment" type="hidden" value="{$default_payment}"/>
+        <div class="table_box table_box1"> 
           <dl>
-            <dd class="dd1">{$lang.payment_method}</dd>
-            <dd class="dd2 selectPayment" id="selected2">请选择支付方式</dd>
-            <i></i>
+            <dd class="dd1">请选择支付方式</dd>
           </dl>
-		  <div class="dl_box" id="payment">
+		  <div class="dl_box">
 		    <!-- {foreach from=$payment_list item=payment} -->
-		    <p>
-              <input type="radio" class="radio" name="payment" id="payment_{$payment.pay_id}" value="{$payment.pay_id}" isCod="{$payment.is_cod}" onclick="selectPayment(this)" {if $cod_disabled and $payment.is_cod eq "1"}disabled="true"{/if} style="vertical-align:middle" /><label for="payment_{$payment.pay_id}">{$payment.pay_name} [{$payment.format_pay_fee}]</label>
-            </p>
+		    <div class="payment_box" data="{$payment.pay_id}">
+              <div class="col payment_logo">
+                <img src="{$ectouch_themes}/images/payment/{$payment.pay_code}.png" alt="{$payment.pay_name}" />
+              </div>
+              <div class="col payment_title">
+                <div class="payment_name">{$payment.pay_name}</div>
+                <div class="payment_desc">（{$payment.pay_desc}）</div>
+              </div>
+              <div class="col payment_select">
+                <span class="icon-checkmark {if $default_payment eq $payment.pay_id}checked{/if}"></span>
+              </div>
+            </div>
             <!-- {/foreach} -->
 		  </div>
         </div>
       </section>
-      <!--{else}-->
-      <input name = "payment" type="radio" value = "{$wechat_pay_id}" checked="checked"  style="display:none"/>
-      <!--{/if}-->
     <!--{else}-->
-    <input name = "payment" type="radio" value = "-1" checked="checked"  style="display:none"/>
+    <input name="payment" type="hidden" value ="-1"/>
     <!--{/if}-->
     <section class="order_box padd1 radius5" style="padding-top:0.3rem;padding-bottom:0.3rem;">
       <div class="table_box table_box2" style=" margin-bottom:0.5rem"> 
@@ -355,7 +359,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
 		<div class="dl_box">
 		  <dl>
             <dd class="c333">留言备注</dd>
-			<dd><input placeholder="请输入订单备注" name="inv_payee" type="text" size="20" /></dd>
+			<dd><input placeholder="请输入订单备注" name="postscript" type="text" size="20" /></dd>
 		  </dl>
 		</div>	
       </div>
@@ -437,8 +441,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     <li class="cur">3.购买成功</li>
   </ul>
 </div>
-<div class="blank3"></div>
-
+<div class="blank2"></div>
 <section class="content">
   <div id="J_plugin_cart">
     

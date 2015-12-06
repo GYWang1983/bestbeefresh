@@ -100,7 +100,7 @@ function orderShippingSelectedResponse(result)
 /* *
  * 改变支付方式
  */
-function selectPayment(obj)
+/*function selectPayment(obj)
 {
   if (selectedPayment == obj)
   {
@@ -112,7 +112,7 @@ function selectPayment(obj)
   }
 
   Ajax.call('flow.php?step=select_payment', 'payment=' + obj.value, orderSelectedResponse, 'GET', 'JSON');
-}
+}*/
 /* *
  * 团购购物流程 --> 改变配送方式
  */
@@ -492,7 +492,7 @@ function checkOrderForm(frm)
       shippingSelected = true;
     }*/
 
-    if (frm.elements[i].name == 'payment' && frm.elements[i].checked)
+    if (frm.elements[i].name == 'payment' && frm.elements[i].value > 0)
     {
       paymentSelected = true;
     }

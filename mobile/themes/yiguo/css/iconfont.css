@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url('iconfont.eot?47hti8');
-	src:url('iconfont.eot?47hti8#iefix') format('embedded-opentype'),
-		url('iconfont.ttf?47hti8') format('truetype'),
-		url('iconfont.woff?47hti8') format('woff'),
-		url('iconfont.svg?47hti8#icomoon') format('svg');
+	src:url('iconfont.eot?z74l49');
+	src:url('iconfont.eot?z74l49#iefix') format('embedded-opentype'),
+		url('iconfont.ttf?z74l49') format('truetype'),
+		url('iconfont.woff?z74l49') format('woff'),
+		url('iconfont.svg?z74l49#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -88,6 +88,9 @@
 }
 .icon-info:before {
 	content: "\e90f";
+}
+.icon-checkmark:before {
+	content: "\e913";
 }
 .icon-arrow-left:before {
 	content: "\e910";
