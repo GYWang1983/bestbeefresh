@@ -105,6 +105,15 @@ class ecs_error
     }
 
     /**
+     * 判断是否有错误信息
+     * @return boolean
+     */
+    function has_error()
+    {
+    	return !empty($this->_message);
+    }
+    
+    /**
      * 显示错误信息
      *
      * @access  public

@@ -349,7 +349,7 @@ function cancel_order($order_id, $user_id = 0)
     /* 查询订单信息，检查状态 */
     $sql = "SELECT user_id, order_id, order_sn , surplus , integral , bonus_id, order_status, shipping_status, pay_status, pay_id, money_paid " .
     		" FROM " .$GLOBALS['ecs']->table('order_info') ." WHERE order_id = '$order_id'";
-    $order = $GLOBALS['db']->GetRow($sql);
+    $order = $GLOBALS['db']->getRow($sql);
 
     if (empty($order))
     {
@@ -371,24 +371,63 @@ function cancel_order($order_id, $user_id = 0)
         return false;
     }
     
+    $pay_status = PS_UNPAYED;
+    
     // 如果已付款，走退款流程
     if ($order['pay_status'] == PS_PAYED && $order['money_paid'] > 0)
     {
-    	$payment = payment_info($order['pay_id']);
-    	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+    	//查找paylog
+    	$sql = "SELECT * FROM " . $GLOBALS['ecs']->table('pay_log') .
+    	" WHERE order_id = '$order[order_id]' AND pay_id = '$order[pay_id]' AND is_paid = 1 ORDER BY log_id DESC LIMIT 1";
+    	$paylog = $GLOBALS['db']->getRow($sql);
     	
-    	$pay_obj = new $payment['pay_code'];
-    	$result  = $pay_obj->refund($order, unserialize_config($payment['pay_config']));
-
-    	if (!$result)
+    	//退款申请
+    	$refund_data = array(
+    		'order_id' => $order['order_id'],
+    		'log_id'   => $paylog['log_id'],
+    		'outer_sn' => $paylog['outer_sn'],
+    		'pay_id'   => $order['pay_id'],
+    		'user_id'  => $order['user_id'],
+    		'order_amount'  => $order['money_paid'],
+    		'refund_amount' => $order['money_paid'],
+    		'create_time'   => time(),
+    	);
+    	
+    	$pay_status = PS_REFUNDING;
+    	
+    	$payment = payment_info($order['pay_id']);
+    	if ($payment['self_refund'] == 1)
     	{
-    		$GLOBALS['err']->add('退款失败，请联系客服处理。');
-    		return false;
+    		//支持自助退款
+	    	include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
+	    	
+	    	$pay_obj = new $payment['pay_code'];
+	    	$result  = $pay_obj->refund($order, unserialize_config($payment['pay_config']));
+	
+	    	if (!$result)
+	    	{
+	    		$GLOBALS['err']->add('退款失败，请联系客服处理');
+	    	}
+	    	else
+	    	{
+	    		$pay_status = PS_REFUND;
+	    		
+	    		$refund_data['refund_admin'] = 0;
+	    		$refund_data['finish_time']  = time();
+	    		$refund_data['status']       = 2;
+	    		//TODO:发送微信模板消息或短信通知
+	    	}
     	}
+    	else
+    	{
+    		$GLOBALS['err']->add('等待客服审核退款申请');
+    	}
+    	
+    	$GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('refund_apply'), $refund_data, 'INSERT');
     }
 
     //将用户订单设置为取消
-    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = " . OS_CANCELED . ", pay_status = " . PS_UNPAYED .
+    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = " . OS_CANCELED . ", pay_status = " . $pay_status .
     		" WHERE order_id = '$order_id'";
     if ($GLOBALS['db']->query($sql))
     {
@@ -430,7 +469,7 @@ function cancel_order($order_id, $user_id = 0)
     }
     else
     {
-        die($GLOBALS['db']->errorMsg());
+        return false;
     }
 
 }

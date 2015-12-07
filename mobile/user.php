@@ -1243,15 +1243,14 @@ elseif ($action == 'cancel_order')
     
     $order_id = isset($_REQUEST['order_id']) ? intval($_REQUEST['order_id']) : 0;
 
-    if (cancel_order($order_id, $user_id))
+    if (cancel_order($order_id, $user_id) && !$err->has_error())
     {
         //ecs_header("Location: user.php?act=order_list\n");
     	show_message('订单取消成功', $_LANG['order_list_lnk'], 'user.php?act=order_list');
-    	exit;
     }
     else
     {
-        $err->show($_LANG['order_list_lnk'], 'user.php?act=order_list');
+        $err->show('查看订单状态', 'user.php?act=order_detail&order_id=' . $order_id);
     }
 }
 
