@@ -111,7 +111,6 @@ wx.ready(function() {
             	window.location.href = url;
     		});
     	} else if (res.errMsg == 'chooseWXPay:cancel') {
-    		alert(url);
     		window.location.href = url;
     	} else {
     	    var err = res;

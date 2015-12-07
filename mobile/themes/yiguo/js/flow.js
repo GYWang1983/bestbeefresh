@@ -18,9 +18,7 @@ $(function() {
 
 function selectPayment(e) {
 	var pay_id = $(e.currentTarget).attr('data');
-	console.log('pay_id=' + pay_id);
 	if (pay_id != $('#payment').val()) {
-		console.log('old_pay_id=' + $('#payment').val());
 		$(".payment_box .checked").removeClass('checked');
 		$(e.currentTarget).find('.icon-checkmark').addClass('checked');
 		$('#payment').val(pay_id);

@@ -1193,26 +1193,17 @@ elseif ($action == 'order_detail')
     }
 
     /* 未发货，未付款时允许更换支付方式 */
-    if ($order['order_amount'] > 0 && $order['pay_status'] == PS_UNPAYED && $order['shipping_status'] == SS_UNSHIPPED)
+    if ($order['order_amount'] > 0 && $order['order_status'] == OS_UNCONFIRMED
+    		&& $order['pay_status'] == PS_UNPAYED && $order['shipping_status'] == SS_UNSHIPPED)
     {
-    	if (!is_wechat_browser())
-    	{
-        	$payment_list = available_payment_list(false, 0, true);
-    	}
-    	else
-    	{
-    		$payment_list = available_payment_list(false, 0, false, true);
-    	}
+    	$smarty->assign('need_pay', true);
     	
-        $smarty->assign('need_pay', true);
-        if (count($payment_list) > 1)
-        {	
-        	$smarty->assign('payment_list', $payment_list);
-        }
-        else
-        {
-        	$smarty->assign('payment', $payment_list[0]);
-        }
+    	$payment_list = available_payment_list(false, 0, false, is_wechat_browser());
+    	if(!empty($payment_list))
+    	{
+    		$smarty->assign('payment_list', $payment_list);
+    		$smarty->assign('default_payment', $payment_list[0]['pay_id']);    		
+    	}
     }
 
     /* 订单 支付 配送 状态语言项 */

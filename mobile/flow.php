@@ -1819,7 +1819,7 @@ elseif ($_REQUEST['step'] == 'pay')
 		show_message('订单不需要支付');
 	}
 	
-	$pay_id = intval($_POST['pay_id']) > 0 ? intval($_POST['pay_id']) : $order['pay_id'];
+	$pay_id = intval($_POST['payment']) > 0 ? intval($_POST['payment']) : $order['pay_id'];
 	if (empty($pay_id))
 	{
 		show_message('未选择支付方式');

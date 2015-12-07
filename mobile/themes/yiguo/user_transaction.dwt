@@ -319,7 +319,7 @@ jQuery(function($){
         <div class="status_{$order.order_cs}">{$order.order_cs_desc}</div>
       </section>
       <!--商品列表 -->
-      <section class="order_box padd1 radius10">
+      <section class="order_box padd1 radius5">
         <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
       	  <!-- {foreach from=$goods_list item=goods} -->
           <tr>
@@ -395,7 +395,7 @@ jQuery(function($){
       
       <!--取货码 {if $order.order_cs eq CS_UNPICK}-->
       <script type="text/javascript" src="{$ectouch_themes}/js/jquery.qrcode.min.js"></script>
-      <section class="order_box padd1 radius10">
+      <section class="order_box padd1 radius5">
         <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
           <tr>
             <td class="pickup_time">取货时间：{$order.pickup_time_start} ~ {$order.pickup_time_end}</td>
@@ -412,7 +412,7 @@ jQuery(function($){
       </script>
       <!--{/if}-->
       
-      <section class="order_box padd1 radius10">
+      <section class="order_box padd1 radius5">
         <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
             <td>订单编号：{$order.order_sn}</td>
@@ -455,7 +455,7 @@ jQuery(function($){
       </section> 
       
       <!-- {if $order.card_message or $order.postscript}  是否有订单附言 -->
-      <section class="order_box padd1 radius10">
+      <section class="order_box padd1 radius5">
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <!-- {if $order.card_message} 是否使用贺卡 -->
         <tr>
@@ -474,30 +474,38 @@ jQuery(function($){
       <!-- {/if} -->
       
       <!-- {if $need_pay } -->
+      <script type="text/javascript" src="{$ectouch_themes}/js/flow.js"></script>
+      <form name="pay" method="post" action="flow.php">
+      <section class="order_box padd1 radius5" style="padding-top:0.3rem;padding-bottom:0.3rem;">
+        <input name="payment" id="payment" type="hidden" value="{$default_payment}"/>
+        <input type="hidden" name="order_id" value="{$order.order_id}" />
+        <input type="hidden" name="step" value="pay" />
+        <div class="table_box table_box1"> 
+          <dl>
+            <dd class="dd1">请选择支付方式</dd>
+          </dl>
+          <div class="dl_box">
+            <!-- {foreach from=$payment_list item=payment} -->
+            <div class="payment_box" data="{$payment.pay_id}">
+              <div class="col payment_logo">
+                <img src="{$ectouch_themes}/images/payment/{$payment.pay_code}.png" alt="{$payment.pay_name}" />
+              </div>
+              <div class="col payment_title">
+                <div class="payment_name">{$payment.pay_name}</div>
+                <div class="payment_desc">（{$payment.pay_desc}）</div>
+              </div>
+              <div class="col payment_select">
+                <span class="icon-checkmark {if $default_payment eq $payment.pay_id}checked{/if}"></span>
+              </div>
+            </div>
+            <!-- {/foreach} -->
+          </div>
+        </div>
+      </section>
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
-        <tr>
-          <td align="center">
-            <form name="refund" method="post" action="flow.php">
-              <input type="hidden" name="order_id" value="{$order.order_id}" />
-              <input type="hidden" name="step" value="pay" />
-            <!--{if $payment_list}-->            
-              {$lang.change_payment}: <br/>
-              <select name="pay_id" style="margin:6px 0">
-                <!--{foreach from=$payment_list item=payment}-->
-                <option value="{$payment.pay_id}"> {$payment.pay_name} </option>
-                <!--{/foreach}-->
-              </select>
-              <br/>
-              <input type="submit" name="goto_pay" class="c-btn3" value="去付款" />
-            <!--{/if}-->
-            <!--{if $payment}-->
-              <input type="hidden" name="pay_id" value="{$payment.pay_id}" />
-              <input type="submit" name="goto_pay" class="c-btn3" value="使用 {$payment.pay_name} 付款" />
-            <!--{/if}-->
-            </form>
-          </td>
-        </tr>
+        <tr><td align="center"><input type="submit" name="goto_pay" class="c-btn3" value="去付款" /></td></tr>
       </table>
+      </form>
       <!-- {elseif $order.order_cs eq CS_PAID} -->
       <table width="100%" border="0" cellpadding="5" cellspacing="0" class="ectouch_table">
         <tr>
@@ -522,7 +530,7 @@ jQuery(function($){
             </form>
           </td>
         </tr>
-      </table>            
+      </table>
       <!-- {/if} -->   
     </section>
     <!--{/if} --> 
