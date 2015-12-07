@@ -37,7 +37,7 @@ var site_url = '{$config.site_url}';
 <!-- TemplateBeginEditable name="中部主区域" -->
 <!-- #BeginLibraryItem "/library/cat_goods.lbi" -->
 <!--循环分类下商品 begin-->
-<section class="item_show_box1 box1 region">
+<section class="item_show_box1 region">
     <header>
         <span>
             {$goods_cat.name|escape:html}
