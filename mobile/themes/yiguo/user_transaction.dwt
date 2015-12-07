@@ -417,9 +417,11 @@ jQuery(function($){
         <tr>
             <td>订单编号：{$order.order_sn}</td>
         </tr>
+        <!--{if $order.order_status eq OS_UNCONFIRMED or $order.order_status eq OS_CONFIRMED}-->
         <tr>
             <td>提货地址：{$config.shop_address}<span class="shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$config.shop_address_coord}&referer=bestbeefresh" target="_blank"></a></span></td>
         </tr>
+        <!--{/if}-->
         <tr>
             <td>创建时间：{$order.formated_add_time}</td>
         </tr>
@@ -431,6 +433,16 @@ jQuery(function($){
         <!--{if $order.formated_receive_time}-->
         <tr>
             <td>取货时间：{$order.formated_receive_time}</td>
+        </tr>
+        <!--{/if}-->
+        <!--{if $order.pay_status eq PS_REFUNDING}-->
+        <tr>
+            <td>退款状态：<font color="red">退款处理中</font></td>
+        </tr>
+        <!--{/if}-->
+        <!--{if $order.pay_status eq PS_REFUND}-->
+        <tr>
+            <td>退款状态：<font color="red">退款完成</font></td>
         </tr>
         <!--{/if}-->
         <!--{if $order.to_buyer}-->

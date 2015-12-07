@@ -413,6 +413,7 @@ function cancel_order($order_id, $user_id = 0)
 	    		$pay_status = PS_REFUND;
 	    		
 	    		$refund_data['refund_admin'] = 0;
+	    		$refund_data['refund_time']  = time();
 	    		$refund_data['finish_time']  = time();
 	    		$refund_data['status']       = 2;
 	    		//TODO:发送微信模板消息或短信通知
