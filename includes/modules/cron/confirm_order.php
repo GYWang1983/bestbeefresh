@@ -44,6 +44,7 @@ if (isset($set_modules) && $set_modules == TRUE)
     return;
 }
 
+define('SHELF_ROW_NUM', 4);
 
 include_once(ROOT_PATH . 'includes/lib_order.php');
 $locktime = strtotime(date('Y-m-d') . ' ' . $_CFG['order_lock_time']);
@@ -70,30 +71,81 @@ if (!empty($orders))
 		'status'       => 1
 	);
 	
+	$pack_date = date('Ymd', $pickup_time['start']);
+	$pack_obj = array(
+		'create_date' => $pack_date,
+		'expire_time' => $code_obj['abandon_time'],
+	);
+	
 	$users = array();
+	$packs = array();
 	foreach ($orders as $o)
 	{
-		//生成取货码
-		if (!in_array($o['user_id'], $users))
+		$user_id = $o['user_id'];
+		
+		// 生成取货码
+		if (!in_array($user_id, $users))
 		{
 			$code_obj['code']    = make_pickup_code($o);
-			$code_obj['user_id'] = $o['user_id'];
+			$code_obj['user_id'] = $user_id;
 			$db->autoExecute($ecs->table('pickup_code'), $code_obj);
 			
-			$users[] = $o['user_id'];
+			$users[] = $user_id;
 		}
 		
-		//TODO:生成包裹
+		// 生成包裹
+		if (!array_key_exists($user_id, $packs))
+		{
+			$pack_obj['user_id'] = $user_id;
+			$db->autoExecute($ecs->table('pickup_pack'), $pack_obj);
+			$pack_id = $db->insert_id();
+			$packs[$user_id] = $pack_id;
+		}
+		else
+		{
+			$pack_id = $packs[$user_id];
+		}
 		
-		//更新订单状态
+		// 更新订单状态
+		$os['package_id'] = $pack_id;
 		update_order($o['order_id'], $os);
-	
+		
 		// 计算并发放积分
 		//$integral = integral_to_give($o);
 		//log_account_change($order['user_id'], 0, 0, intval($integral['rank_points']), intval($integral['custom_points']), sprintf($_LANG['order_gift_integral'], $order['order_sn']));
 		
 		// 发放红包 
 		send_order_bonus($o['order_id']);
+	}
+	
+	unset($users);
+	unset($packs);
+}
+
+// 规划包裹位置
+if (empty($pack_date))
+{
+	$pack_date = date('Ymd', time());
+}
+
+$sql = "SELECT id FROM " . $ecs->table('pickup_pack') . " WHERE create_date = '$pack_date' ORDER BY id ASC";
+$pack_list = $db->getCol($sql);
+$pack_num = count($pack_list);
+
+if ($pack_num > 0)
+{	
+	$num_per_row  = floor($pack_num / SHELF_ROW_NUM);
+	$overflow_num = $pack_num % SHELF_ROW_NUM;
+	$n = 0;
+	for ($row = 1; $row <= SHELF_ROW_NUM; $row++)
+	{
+		$col = $row <= $overflow_num ? $num_per_row + 1 : $num_per_row;
+		for ($sn = 1; $sn <= $col; $sn++)
+		{
+			$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET pos_row='$row', pos_sn='$sn' WHERE id=" . $pack_list[$n];
+			$db->query($sql);
+			$n++;
+		}
 	}
 }
 
