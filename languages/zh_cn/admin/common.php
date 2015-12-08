@@ -208,6 +208,7 @@ $_LANG['06_undispose_booking'] = '缺货登记';
 $_LANG['08_add_order'] = '添加订单';
 $_LANG['09_delivery_order'] = '发货单列表';
 $_LANG['10_back_order'] = '退货单列表';
+$_LANG['11_pickup_pack'] = '打包管理';
 
 /* 广告管理 */
 $_LANG['ad_position'] = '广告位置';
