@@ -59,11 +59,13 @@ foreach ($crondb AS $key => $cron_val)
                 continue;
             }
         }
+        
+        $cron = array();
         if (!empty($cron_val['cron_config']))
         {
             foreach ($cron_val['cron_config'] AS $k => $v)
             {
-                $cron_val['cron'][$v['name']] = $v['value'];
+                $cron[$v['name']] = $v['value'];
             }
         }
         include_once(ROOT_PATH . 'includes/modules/cron/' . $cron_val['cron_code'] . '.php');
@@ -74,7 +76,7 @@ foreach ($crondb AS $key => $cron_val)
     }
 
     $close = $cron_val['run_once'] ? 0 : 1;
-    $next_time = get_next_time($cron_val['cron']);
+    $next_time = get_next_time($cron);
     $sql = "UPDATE " . $ecs->table('crons') .
            "SET thistime = '$timestamp', nextime = '$next_time', enable = $close " .
            "WHERE cron_id = '$cron_val[cron_id]' LIMIT 1";

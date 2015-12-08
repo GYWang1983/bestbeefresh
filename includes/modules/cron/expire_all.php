@@ -38,17 +38,18 @@ if (isset($set_modules) && $set_modules == TRUE)
 
     /* 配置信息 */
     $modules[$i]['config']  = array(
-        //array('name' => 'minuts_interval', 'type' => 'text', 'value' => ''),
+        array('name' => 'minuts_interval',    'type' => 'text', 'value' => '60'),
+    	array('name' => 'unpay_order_expire', 'type' => 'text', 'value' => '8'),
     );
 
     return;
 }
 
-make_order_expire();
-make_pickup_code_expire();
-make_verifycode_expire();
+make_order_expire($cron);
+make_pickup_code_expire($cron);
+make_verifycode_expire($cron);
 
-function make_order_expire()
+function make_order_expire($cron)
 {
 	global $db, $ecs;
 	
@@ -56,12 +57,17 @@ function make_order_expire()
 			" AND shipping_status = " . SS_SHIPPED . " AND receive_deadline < " . time();
 	$db->query($sql);
 	
+	//24小时未支付则过期
+	$expire_time = time() - intval($cron['unpay_order_expire']) * 3600;
+	$sql = "UPDATE " . $ecs->table('order_info') . " SET order_status = " . OS_EXPIRED .
+		" WHERE order_status = " . OS_UNCONFIRMED . " AND pay_status = " . PS_UNPAYED . " AND add_time < $expire_time";
+	$db->query($sql);
 }
 
 /**
  * 取货码过期
  */
-function make_pickup_code_expire()
+function make_pickup_code_expire($cron)
 {
 	global $db, $ecs;
 	
@@ -72,7 +78,7 @@ function make_pickup_code_expire()
 /**
  * 手机验证码过期
  */
-function make_verifycode_expire()
+function make_verifycode_expire($cron)
 {
 	global $db, $ecs;
 	
