@@ -3083,8 +3083,7 @@ function order_bonus($order_id)
 	
 	$order = order_info($order_id);
 	
-	if (!empty($order) && $order['order_status'] == OS_CONFIRMED 
-		&& ($order['shipping_status'] == SS_RECEIVED || $order['shipping_status'] == SS_SHIPPED))
+	if (!empty($order) && $order['order_status'] == OS_CONFIRMED)
 	{
 	    
 		$order_time = $order['pay_time'];

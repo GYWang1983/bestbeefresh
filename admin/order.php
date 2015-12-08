@@ -852,25 +852,25 @@ elseif ($_REQUEST['act'] == 'delivery_ship')
     /* 发货单发货记录log */
     order_action($order['order_sn'], OS_CONFIRMED, $shipping_status, $order['pay_status'], $action_note, null, 1);
 
-    /* 如果当前订单已经全部发货 */
-    if ($order_finish)
+    // 如果当前订单已经全部发货
+    /*if ($order_finish)
     {
-        /* 如果订单用户不为空，计算积分，并发给用户；发红包 */
+        // 如果订单用户不为空，计算积分，并发给用户；发红包
         if ($order['user_id'] > 0)
         {
-            /* 取得用户信息 */
+            // 取得用户信息 
             $user = user_info($order['user_id']);
 
-            /* 计算并发放积分 */
+            // 计算并发放积分
             $integral = integral_to_give($order);
 
             log_account_change($order['user_id'], 0, 0, intval($integral['rank_points']), intval($integral['custom_points']), sprintf($_LANG['order_gift_integral'], $order['order_sn']));
 
-            /* 发放红包 */
+            // 发放红包
             send_order_bonus($order_id);
         }
 
-        /* 发送邮件 */
+        // 发送邮件
         $cfg = $_CFG['send_ship_email'];
         if ($cfg == '1')
         {
@@ -890,7 +890,7 @@ elseif ($_REQUEST['act'] == 'delivery_ship')
             }
         }
 
-        /* 如果需要，发短信 */
+        // 如果需要，发短信
         if ($GLOBALS['_CFG']['sms_order_shipped'] == '1' && $order['mobile'] != '')
         {
             include_once('../includes/cls_sms.php');
@@ -899,7 +899,7 @@ elseif ($_REQUEST['act'] == 'delivery_ship')
                 local_date($GLOBALS['_LANG']['sms_time_format']), $GLOBALS['_CFG']['shop_name']), 0);
         }
 		
-		/* 更新商品销量 */
+		// 更新商品销量
 		$sql = 'SELECT goods_id,goods_number FROM '.$GLOBALS['ecs']->table('order_goods').' WHERE order_id ='.$order_id;
 		$order_res = $GLOBALS['db']->getAll($sql);	
 		foreach($order_res as $idx=>$val)
@@ -918,7 +918,7 @@ elseif ($_REQUEST['act'] == 'delivery_ship')
 	
 			$db->query($sql);
 		}	
-    }
+    }*/
 
     /* 清除缓存 */
     clear_cache_files();
@@ -3158,11 +3158,14 @@ elseif ($_REQUEST['act'] == 'batch_operate_post')
                 update_order($order_id, array('order_status' => OS_CONFIRMED, 'confirm_time' => gmtime()));
                 update_order_amount($order_id);
 
+                // 确认订单时发红包
+                send_order_bonus($order_id);
+                
                 /* 记录log */
                 order_action($order['order_sn'], OS_CONFIRMED, SS_UNSHIPPED, PS_UNPAYED, $action_note);
 
                 /* 发送邮件 */
-                if ($_CFG['send_confirm_email'] == '1')
+                /*if ($_CFG['send_confirm_email'] == '1')
                 {
                     $tpl = get_mail_template('order_confirm');
                     $order['formated_add_time'] = local_date($GLOBALS['_CFG']['time_format'], $order['add_time']);
@@ -3172,7 +3175,7 @@ elseif ($_REQUEST['act'] == 'batch_operate_post')
                     $smarty->assign('sent_date', local_date($_CFG['date_format']));
                     $content = $smarty->fetch('str:' . $tpl['template_content']);
                     send_mail($order['consignee'], $order['email'], $tpl['template_subject'], $content, $tpl['is_html']);
-                }
+                }*/
 
                 $sn_list[] = $order['order_sn'];
             }
@@ -3412,21 +3415,30 @@ elseif ($_REQUEST['act'] == 'operate_post')
     /* 确认 */
     if ('confirm' == $operation)
     {
-        /* 标记订单为已确认 */
+    	// 检查是否已支付
+    	if ($order['pay_status'] != PS_PAYED)
+    	{
+    		sys_msg('订单未支付，不能确认', 1);
+    	}
+    	
+        // 标记订单为已确认 
         update_order($order_id, array('order_status' => OS_CONFIRMED, 'confirm_time' => gmtime()));
         update_order_amount($order_id);
 
-        /* 记录log */
+        // 确认订单时发红包
+        send_order_bonus($order_id);
+        
+        // 记录log
         order_action($order['order_sn'], OS_CONFIRMED, SS_UNSHIPPED, PS_UNPAYED, $action_note);
 
-        /* 如果原来状态不是“未确认”，且使用库存，且下订单时减库存，则减少库存 */
+        // 如果原来状态不是“未确认”，且使用库存，且下订单时减库存，则减少库存
         if ($order['order_status'] != OS_UNCONFIRMED && $_CFG['use_storage'] == '1' && $_CFG['stock_dec_time'] == SDT_PLACE)
         {
             change_order_goods_storage($order_id, true, SDT_PLACE);
         }
 
         /* 发送邮件 */
-        $cfg = $_CFG['send_confirm_email'];
+        /*$cfg = $_CFG['send_confirm_email'];
         if ($cfg == '1')
         {
             $tpl = get_mail_template('order_confirm');
@@ -3439,7 +3451,7 @@ elseif ($_REQUEST['act'] == 'operate_post')
             {
                 $msg = $_LANG['send_mail_fail'];
             }
-        }
+        }*/
     }
     /* 付款 */
     elseif ('pay' == $operation)
@@ -3447,12 +3459,12 @@ elseif ($_REQUEST['act'] == 'operate_post')
         /* 检查权限 */
         admin_priv('order_ps_edit');
 
-        /* 标记订单为已确认、已付款，更新付款时间和已支付金额，如果是货到付款，同时修改订单为“收货确认” */
-        if ($order['order_status'] != OS_CONFIRMED)
+        // 标记订单为已确认、已付款，更新付款时间和已支付金额，如果是货到付款，同时修改订单为“收货确认”
+        /*if ($order['order_status'] != OS_CONFIRMED)
         {
             $arr['order_status']    = OS_CONFIRMED;
             $arr['confirm_time']    = gmtime();
-        }
+        }*/
         $arr['pay_status']  = PS_PAYED;
         $arr['pay_time']    = gmtime();
         $arr['money_paid']  = $order['money_paid'] + $order['order_amount'];
@@ -4610,7 +4622,10 @@ function operable_list($order)
         /* 状态：未确认 => 未付款、未发货 */
         if ($priv_list['os'])
         {
-            $list['confirm']    = true; // 确认
+        	if ($ps == PS_PAYED)
+        	{
+            	$list['confirm'] = true; // 确认
+        	}
             $list['invalid']    = true; // 无效
             $list['cancel']     = true; // 取消
             if ($is_cod)

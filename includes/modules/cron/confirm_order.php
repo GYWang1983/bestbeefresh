@@ -73,6 +73,7 @@ if (!empty($orders))
 	$users = array();
 	foreach ($orders as $o)
 	{
+		//生成取货码
 		if (!in_array($o['user_id'], $users))
 		{
 			$code_obj['code']    = make_pickup_code($o);
@@ -82,8 +83,17 @@ if (!empty($orders))
 			$users[] = $o['user_id'];
 		}
 		
+		//TODO:生成包裹
+		
 		//更新订单状态
 		update_order($o['order_id'], $os);
+	
+		// 计算并发放积分
+		//$integral = integral_to_give($o);
+		//log_account_change($order['user_id'], 0, 0, intval($integral['rank_points']), intval($integral['custom_points']), sprintf($_LANG['order_gift_integral'], $order['order_sn']));
+		
+		// 发放红包 
+		send_order_bonus($o['order_id']);
 	}
 }
 
