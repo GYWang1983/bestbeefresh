@@ -48,7 +48,7 @@ if (isset($set_modules) && $set_modules == TRUE)
 include_once(ROOT_PATH . 'includes/lib_order.php');
 $locktime = strtotime(date('Y-m-d') . ' ' . $_CFG['order_lock_time']);
 
-$sql = "SELECT * FROM " . $ecs->table('order_info') . " WHERE order_status=" . OS_UNCONFIRMED . " AND pay_status=" . PS_PAYED . " AND pay_time<=$locktime";
+$sql = "SELECT order_id, user_id FROM " . $ecs->table('order_info') . " WHERE order_status=" . OS_UNCONFIRMED . " AND pay_status=" . PS_PAYED . " AND pay_time<=$locktime";
 $orders = $db->getAll($sql);
 
 if (!empty($orders))

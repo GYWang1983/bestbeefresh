@@ -80,8 +80,10 @@ elseif ($action == 'pickup')
 		order_action($o['order_sn'], OS_CONFIRMED, SS_RECEIVED, PS_PAYED, '门店取货');
 	}
 	
+	// TODO: 多店铺后查询是否还有可取货订单，如果有取货码保持有效
+	
 	// Update pickup code status
-	$sql = "UPDATE " . $ecs->table('pickup_code') . " SET status = 2 WHERE code ='$code'";
+	$sql = "UPDATE " . $ecs->table('pickup_code') . " SET status = 2 WHERE user_id ='$user_id' AND status = 1";
 	$db->query($sql);
 	
 	echo json_encode(array('errcode' => 0, 'msg' => '取货完成'));

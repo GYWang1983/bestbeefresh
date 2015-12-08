@@ -311,7 +311,7 @@ jQuery(function($){
     <!-- {/if} -->
     
     <header id="header">
-      <div class="header_l header_return"> <a class="ico_10" href="javascript:history.go(-1)"> 返回 </a> </div>
+      <div class="header_l header_return"> <a class="ico_10" href="user.php?act=order_list"> 返回 </a> </div>
       <h1>订单详情</h1>
     </header>
     <section class="wrap order_detail">
