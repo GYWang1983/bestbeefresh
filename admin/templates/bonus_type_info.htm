@@ -36,9 +36,9 @@
   <tr id="1" style="display:none">
     <td class="label">
       <a href="javascript:showNotice('Order_money_a');" title="{$lang.form_notice}">
-      <img src="images/notice.gif" width="16" height="16" border="0" alt="{$lang.form_notice}"></a>{$lang.min_amount}</td>
+      <img src="images/notice.gif" width="16" height="16" border="0" alt="{$lang.form_notice}"></a>订单金额范围</td>
     <td>
-      <input name="min_amount" type="text" id="min_amount" value="{$bonus_arr.min_amount}" size="20" />
+      <input name="min_amount" type="text" id="min_amount" value="{$bonus_arr.min_amount}" size="20" /> ～ <input name="max_amount" type="text" id="max_amount" value="{$bonus_arr.max_amount}" size="20" />
       <br /><span class="notice-span" {if $help_open}style="display:block" {else} style="display:none" {/if} id="Order_money_a">{$lang.order_money_notic}</span>    </td>
   </tr>
   <tr>

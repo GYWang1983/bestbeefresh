@@ -125,7 +125,7 @@ if ($_REQUEST['act'] == 'edit_type_money')
 //-- 编辑订单下限
 /*------------------------------------------------------ */
 
-if ($_REQUEST['act'] == 'edit_min_amount')
+if ($_REQUEST['act'] == 'edit_min_goods_amount')
 {
     check_authz_json('bonus_manage');
 
@@ -134,11 +134,11 @@ if ($_REQUEST['act'] == 'edit_min_amount')
 
     if ($val < 0)
     {
-        make_json_error($_LANG['min_amount_empty']);
+        make_json_error($_LANG['min_goods_amount_empty']);
     }
     else
     {
-        $exc->edit("min_amount='$val'", $id);
+        $exc->edit("min_goods_amount='$val'", $id);
 
         make_json_result(number_format($val, 2));
     }
@@ -205,6 +205,7 @@ if ($_REQUEST['act'] == 'insert')
     /* 初始化变量 */
     $type_id     = !empty($_POST['type_id'])    ? intval($_POST['type_id'])    : 0;
     $min_amount  = !empty($_POST['min_amount']) ? intval($_POST['min_amount']) : 0;
+    $min_amount  = !empty($_POST['max_amount']) ? intval($_POST['max_amount']) : 0;
 
     /* 检查类型是否有重复 */
     $sql = "SELECT COUNT(*) FROM " .$ecs->table('bonus_type'). " WHERE type_name='$type_name'";
@@ -221,7 +222,7 @@ if ($_REQUEST['act'] == 'insert')
     $use_enddate    = local_strtotime($_POST['use_end_date']);
 
     /* 插入数据库 */
-    $sql = "INSERT INTO ".$ecs->table('bonus_type')." (type_name, type_money,send_start_date,send_end_date,use_start_date,use_end_date,send_type,min_amount,min_goods_amount,use_time_limit)
+    $sql = "INSERT INTO ".$ecs->table('bonus_type')." (type_name, type_money,send_start_date,send_end_date,use_start_date,use_end_date,send_type,min_amount,max_amount,min_goods_amount,use_time_limit)
     VALUES ('$type_name',
             '$_POST[type_money]',
             '$send_startdate',
@@ -229,7 +230,7 @@ if ($_REQUEST['act'] == 'insert')
             '$use_startdate',
             '$use_enddate',
             '$_POST[send_type]',
-            '$min_amount','" . floatval($_POST['min_goods_amount']) . "'," .
+            '$min_amount','$max_amount','" . floatval($_POST['min_goods_amount']) . "'," .
             get_use_time_limit() . ")";
 
     $db->query($sql);
@@ -295,6 +296,7 @@ if ($_REQUEST['act'] == 'update')
     $type_name   = !empty($_POST['type_name'])  ? trim($_POST['type_name'])    : '';
     $type_id     = !empty($_POST['type_id'])    ? intval($_POST['type_id'])    : 0;
     $min_amount  = !empty($_POST['min_amount']) ? intval($_POST['min_amount']) : 0;
+    $max_amount  = !empty($_POST['max_amount']) ? intval($_POST['max_amount']) : 0;
 
     $sql = "UPDATE " .$ecs->table('bonus_type'). " SET ".
            "type_name       = '$type_name', ".
@@ -305,6 +307,7 @@ if ($_REQUEST['act'] == 'update')
            "use_end_date    = '$use_enddate', ".
            "send_type       = '$_POST[send_type]', ".
            "min_amount      = '$min_amount', " .
+           "max_amount      = '$max_amount', " .
            "min_goods_amount = '" . floatval($_POST['min_goods_amount']) . "', ".
            "use_time_limit  = " . get_use_time_limit() .
            " WHERE type_id   = '$type_id'";
