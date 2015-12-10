@@ -101,7 +101,7 @@ function searchUserResponse(result)
     {
       var opt = document.createElement('OPTION');
       opt.value = result.content[i].user_id;
-      opt.text  = result.content[i].user_name + '[' + result.content[i].mobile_phone + ']';
+      opt.text  = result.content[i].mobile_phone;
       eles['user_search[]'].options.add(opt);
     }
   }
