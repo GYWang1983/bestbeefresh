@@ -34,6 +34,17 @@ elseif ($action == 'query')
 	$code = trim($_POST['code']);
 	$user_id = check_pickup_code($code);
 	
+	//查询包裹
+	$packlist = get_pickup_packs($user_id);
+	$packs = array();
+	foreach ($packlist as $p)
+	{
+		$packs[] = array(
+			'sn' => substr($p['create_date'], 6, 2) . '-' . $p['pos_row'] . '-' . str_pad($p['pos_sn'], 2, '0', STR_PAD_LEFT),
+			'status' => $p['status'],	
+		);
+	}
+	
 	$goods = get_pickup_goods($user_id);
 	if (empty($goods))
 	{
@@ -51,6 +62,7 @@ elseif ($action == 'query')
 		'mobile'  => $mobile,
 		'goods'   => $goods,
 		'orders'  => $orders,
+		'packs'   => $packs,
 	);
 	
 	echo json_encode($response);
@@ -61,6 +73,7 @@ elseif ($action == 'pickup')
 	$code = trim($_POST['code']);
 	$user_id = check_pickup_code($code);
 	
+	// 更新订单状态
 	$orders = get_pickup_orders($user_id);
 	if (empty($orders))
 	{
@@ -78,6 +91,22 @@ elseif ($action == 'pickup')
 	{
 		update_order($o['order_id'], $status);
 		order_action($o['order_sn'], OS_CONFIRMED, SS_RECEIVED, PS_PAYED, '门店取货');
+	}
+	
+	// 更新包裹状态
+	$packlist = get_pickup_packs($user_id);
+	if (!empty($packlist))
+	{
+		foreach ($packlist as $pack)
+		{
+			if ($pack['status'] == 2)
+			{
+				$pids[] = $pack['id'];
+			}
+		}
+		
+		$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET status=3 WHERE id IN (" . implode(',', $pids) . ")";
+		$db->query($sql);
 	}
 	
 	// TODO: 多店铺后查询是否还有可取货订单，如果有取货码保持有效
@@ -126,6 +155,23 @@ function check_pickup_code($code)
 	}
 	
 	return $qcode['user_id'];
+}
+
+/**
+ * 获取指定用户可取货的包裹列表
+ * 
+ * @param integer $user_id
+ */
+function get_pickup_packs($user_id)
+{
+	global $ecs, $db;
+	
+	//TODO: 多门店后只查询当前门店的包裹
+	
+	$sql = "SELECT id, create_date, pos_row, pos_sn, status FROM " . $ecs->table('pickup_pack') . 
+		" WHERE user_id = '$user_id' AND status IN (1, 2)";
+	$packs = $db->getAll($sql);
+	return $packs;
 }
 
 /**

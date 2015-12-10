@@ -19,6 +19,12 @@
   <div class="row center">
     <button type="button" class="scan" disabled="false">扫码取货</button>
   </div>
+  <div class="row user">
+    <span>取货人手机号: </span><span class="mobile"></span>
+  </div>
+  <div class="row" style="padding-bottom:10px;margin-bottom:10px;border-bottom:1px #000 solid;">
+    <span>包裹清单: </span><span class="package"></span>
+  </div>
   <div class="row goods_list">
     <div>取货列表</div>
     <ul>
@@ -35,9 +41,6 @@
       </li>
     -->
     </ul>
-  </div>
-  <div class="row user">
-    <span>取货人手机号: </span><span class="mobile"></span>
   </div>
   <div class="row order_list">
     <div>订单列表</div>
@@ -62,7 +65,7 @@
 <script>
 $(function(){
 	//test
-    //query_order('1fd3de79c98de8bc36167724e13d8fefd8265be4');
+    query_order('1f8b76b850d3f61f50de6cb959f63699a0f786f3');
 	
 	wx.ready(function(){
 		$('button.scan').removeAttr('disabled');
@@ -112,6 +115,14 @@ function query_order(pickup_code)
 			list_goods(response.goods);
 			list_order(response.orders);
 			$('.user .mobile').text(response.mobile);
+			
+			var packs = '';
+			for (var i in response.packs) {
+				var p = response.packs[i];
+				packs += p.sn + '[' + (p.status == 2 ? '可取':'准备中') + '], ';
+			}
+			$('.package').text(packs);
+			
 			$('button.confirm').show();
 		}
 	}, 'json');
