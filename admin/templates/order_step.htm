@@ -9,8 +9,9 @@
 {if $step eq "user"}
 <form name="theForm" action="order.php?act=step_post&step={$step}&order_id={$order_id}&step_act={$step_act}" method="post" onsubmit="return checkUser()">
 <div class="main-div" style="padding: 15px">
-  <label><input type="radio" name="anonymous" value="1" checked /> {$lang.anonymous}</label><br />
-  <label><input type="radio" name="anonymous" value="0" id="user_useridname" /> {$lang.by_useridname}</label>
+  <!-- <label><input type="radio" name="anonymous" value="1" checked /> {$lang.anonymous}</label><br />
+  <label><input type="radio" name="anonymous" value="0" id="user_useridname" /> {$lang.by_useridname}</label> -->
+  <label>按手机号搜索</label>
   <input name="keyword" type="text" value="" />
   <input type="button" class="button" name="search" value="{$lang.button_search}" onclick="searchUser();" />
   <select name="user"></select>
@@ -257,6 +258,12 @@ region.isAdmin=true;
     <th>{$lang.desc}</th>
     <th width="15%">{$lang.pay_fee}</th>
   </tr>
+  <tr>
+    <td><input type="radio" name="payment" value="0" {if $order.pay_id eq $payment.pay_id}checked{/if} /></td>
+    <td>无</td>
+    <td>不指定</td>
+    <td align="right">0</td>
+  </tr>
   {foreach from=$payment_list item=payment}
   <tr>
     <td><input type="radio" name="payment" value="{$payment.pay_id}" {if $order.pay_id eq $payment.pay_id}checked{/if} /></td>
@@ -491,7 +498,7 @@ region.isAdmin=true;
     var eles = document.forms['theForm'].elements;
 
     /* 如果搜索会员，检查是否找到 */
-    if (document.getElementById('user_useridname').checked && eles['user'].options.length == 0)
+    if (eles['user'].options.length == 0)
     {
       alert(pls_search_user);
       return false;

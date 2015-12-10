@@ -1231,10 +1231,12 @@ elseif ($_REQUEST['act'] == 'step_post')
     {
         /* 取得参数：user_id */
         $user_id = ($_POST['anonymous'] == 1) ? 0 : intval($_POST['user']);
-
+		$mobile = $user_id ? $db->getOne("SELECT mobile_phone FROM" . $ecs->table('users') . " WHERE user_id='$user_id'") : '';
+        
         /* 插入新订单，状态为无效 */
         $order = array(
             'user_id'           => $user_id,
+        	'mobile'            => $mobile,
             'add_time'          => gmtime(),
             'order_status'      => OS_INVALID,
             'shipping_status'   => SS_UNSHIPPED,
@@ -1290,12 +1292,11 @@ elseif ($_REQUEST['act'] == 'step_post')
               $goods_attr = $_POST['goods_attr'][$key];
               $product_id = intval($_POST['product_id'][$key]);
               if($product_id)
-                {
-
+              {
                    $sql = "SELECT product_number ".
                           'FROM ' . $GLOBALS['ecs']->table('products') .
                           " WHERE product_id =".$_POST['product_id'][$key];
-                }
+              }
               $goods_number_all = $db->getOne($sql);
               if($goods_number_all>=$goods_number)
               {
@@ -1309,9 +1310,7 @@ elseif ($_REQUEST['act'] == 'step_post')
               }
               else
               {
-               sys_msg($_LANG['goods_num_err']);
-
-
+                sys_msg($_LANG['goods_num_err']);
               }
             }
 
@@ -1485,7 +1484,7 @@ elseif ($_REQUEST['act'] == 'step_post')
         /* 下一步 */
         if (isset($_POST['next']))
         {
-            ecs_header("Location: order.php?act=" . $step_act . "&order_id=" . $order_id . "&step=consignee\n");
+            ecs_header("Location: order.php?act=" . $step_act . "&order_id=" . $order_id . "&step=payment\n");
             exit;
         }
         /* 完成 */
@@ -1687,24 +1686,32 @@ elseif ($_REQUEST['act'] == 'step_post')
     {
         /* 取得支付信息 */
         $pay_id = $_POST['payment'];
-        $payment = payment_info($pay_id);
-
-        /* 计算支付费用 */
-        $order_amount = order_amount($order_id);
-        if ($payment['is_cod'] == 1)
-        {
-            $order = order_info($order_id);
-            $region_id_list = array(
-                $order['country'], $order['province'], $order['city'], $order['district']
-            );
-            $shipping = shipping_area_info($order['shipping_id'], $region_id_list);
-            $pay_fee = pay_fee($pay_id, $order_amount, $shipping['pay_fee']);
+        if (!empty($pay_id))
+	    {
+	        $payment = payment_info($pay_id);
+	
+	        /* 计算支付费用 */
+	        $order_amount = order_amount($order_id);
+	        if ($payment['is_cod'] == 1)
+	        {
+	            $order = order_info($order_id);
+	            $region_id_list = array(
+	                $order['country'], $order['province'], $order['city'], $order['district']
+	            );
+	            $shipping = shipping_area_info($order['shipping_id'], $region_id_list);
+	            $pay_fee = pay_fee($pay_id, $order_amount, $shipping['pay_fee']);
+	        }
+	        else
+	        {
+	            $pay_fee = pay_fee($pay_id, $order_amount);
+	        }
         }
         else
         {
-            $pay_fee = pay_fee($pay_id, $order_amount);
+        	$payment['pay_name'] = '';
+        	$pay_fee = 0;
         }
-
+        
         /* 保存订单 */
         $order = array(
             'pay_id' => $pay_id,
@@ -2134,13 +2141,13 @@ elseif ($_REQUEST['act'] == 'add' || $_REQUEST['act'] == 'edit')
     }
 
     // 设置收货人
-    elseif ('consignee' == $step)
+    /*elseif ('consignee' == $step)
     {
-        /* 查询是否存在实体商品 */
+        // 查询是否存在实体商品
         $exist_real_goods = exist_real_goods($order_id);
         $smarty->assign('exist_real_goods', $exist_real_goods);
 
-        /* 取得收货地址列表 */
+        // 取得收货地址列表
         if ($order['user_id'] > 0)
         {
             $smarty->assign('address_list', address_list($order['user_id']));
@@ -2170,42 +2177,42 @@ elseif ($_REQUEST['act'] == 'add' || $_REQUEST['act'] == 'edit')
 
         if ($exist_real_goods)
         {
-            /* 取得国家 */
+            // 取得国家 
             $smarty->assign('country_list', get_regions());
             if ($order['country'] > 0)
             {
-                /* 取得省份 */
+                // 取得省份
                 $smarty->assign('province_list', get_regions(1, $order['country']));
                 if ($order['province'] > 0)
                 {
-                    /* 取得城市 */
+                    // 取得城市
                     $smarty->assign('city_list', get_regions(2, $order['province']));
                     if ($order['city'] > 0)
                     {
-                        /* 取得区域 */
+                        // 取得区域
                         $smarty->assign('district_list', get_regions(3, $order['city']));
                     }
                 }
             }
         }
-    }
+    }*/
 
     // 选择配送方式
-    elseif ('shipping' == $step)
+    /*elseif ('shipping' == $step)
     {
-        /* 如果不存在实体商品 */
+        // 如果不存在实体商品 
         if (!exist_real_goods($order_id))
         {
             die ('Hacking Attemp');
         }
 
-        /* 取得可用的配送方式列表 */
+        // 取得可用的配送方式列表 
         $region_id_list = array(
             $order['country'], $order['province'], $order['city'], $order['district']
         );
         $shipping_list = available_shipping_list($region_id_list);
 
-        /* 取得配送费用 */
+        // 取得配送费用 
         $total = order_weight_price($order_id);
         foreach ($shipping_list AS $key => $shipping)
         {
@@ -2216,7 +2223,7 @@ elseif ($_REQUEST['act'] == 'add' || $_REQUEST['act'] == 'edit')
             $shipping_list[$key]['free_money'] = price_format($shipping['configure']['free_money']);
         }
         $smarty->assign('shipping_list', $shipping_list);
-    }
+    }*/
 
     // 选择支付方式
     elseif ('payment' == $step)
@@ -4293,21 +4300,20 @@ elseif ($_REQUEST['act'] == 'search_users')
     include_once(ROOT_PATH . 'includes/cls_json.php');
     $json = new JSON();
 
-    $id_name = empty($_GET['id_name']) ? '' : json_str_iconv(trim($_GET['id_name']));
+    $mobile = empty($_GET['id_name']) ? '' : json_str_iconv(trim($_GET['id_name']));
 
     $result = array('error'=>0, 'message'=>'', 'content'=>'');
-    if ($id_name != '')
+    if ($mobile != '')
     {
-        $sql = "SELECT user_id, user_name FROM " . $GLOBALS['ecs']->table('users') .
-                " WHERE user_id LIKE '%" . mysql_like_quote($id_name) . "%'" .
-                " OR user_name LIKE '%" . mysql_like_quote($id_name) . "%'" .
-                " LIMIT 20";
+        $sql = "SELECT user_id, mobile_phone FROM " . $GLOBALS['ecs']->table('users') .
+                " WHERE mobile_phone LIKE '%" . mysql_like_quote($mobile) . "%'" .
+                " LIMIT 30";
+        
         $res = $GLOBALS['db']->query($sql);
-
-         $result['userlist'] = array();
+        $result['userlist'] = array();
         while ($row = $GLOBALS['db']->fetchRow($res))
         {
-             $result['userlist'][] = array('user_id' => $row['user_id'], 'user_name' => $row['user_name']);
+             $result['userlist'][] = array('user_id' => $row['user_id'], 'user_name' => $row['mobile_phone']);
         }
     }
     else

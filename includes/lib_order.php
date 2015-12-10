@@ -2771,10 +2771,9 @@ function order_query_sql($type = 'finished', $alias = '')
     elseif ($type == 'await_ship')
     {
         return " AND   {$alias}order_status " .
-                 db_create_in(array(OS_CONFIRMED, OS_SPLITED, OS_SPLITING_PART)) .
+                 db_create_in(array(OS_CONFIRMED)) .
                " AND   {$alias}shipping_status " .
-                 db_create_in(array(SS_UNSHIPPED, SS_PREPARING, SS_SHIPPED_ING)) .
-               " AND ( {$alias}pay_status " . db_create_in(array(PS_PAYED, PS_PAYING)) . " OR {$alias}pay_id " . db_create_in(payment_id_list(true)) . ") ";
+                 db_create_in(array(SS_UNSHIPPED, SS_PREPARING));
     }
     /* 待付款订单 */
     elseif ($type == 'await_pay')
@@ -3108,7 +3107,7 @@ function order_bonus($order_id)
 		
 		    /* 查询按订单发的红包 */
 		    $sql = "SELECT b.*, 1 AS number " .
-		            "FROM " . $GLOBALS['ecs']->table('bonus_type') . ' AS b' .
+		            "FROM " . $GLOBALS['ecs']->table('bonus_type') . ' AS b ' .
 		            "WHERE send_type = '" . SEND_BY_ORDER . "' " .
 		            "AND min_amount <= $amount AND max_amount >= $amount " .
 		            "AND send_start_date <= '$order_time' " .
