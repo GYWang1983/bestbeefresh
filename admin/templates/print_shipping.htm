@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>打印标签</title>
+</head>
+<style type="text/css">
+@page{size:A4 portrait;margin:10mm;}
+body{font-size:14px;color:#000;background-color:#fff;margin:0mm;size:A4;}
+
+table{border-collapse:collapse;width:100%;}
+
+.package{page-break-inside:avoid;padding-bottom:15px;margin-bottom:5px;border-bottom:1px #ccc dotted ;}
+.blod{font-weight:bold;}
+.check{font-size:24px;text-align:center;}
+</style>
+<body>
+<!-- {foreach from=$packlist item=pack} -->
+<div class="package">
+<table cellpadding="1">
+    <tbody>
+        <tr>
+            <td width="5%" class="check">□</td>
+            <td width="20%" class="blod">{$pack.sn}</td>
+            <td width="30%">{$pack.mobile_phone}</td>
+            <td align="right">{$date}</td>
+        </tr>
+        <tr>
+            <td width="5%">&nbsp;</td>
+            <td colspan="3">{$pack.order_sn}</td>
+        </tr>
+    </tbody>
+</table>
+<table border="1" style="border-color:#000;">
+    <tbody>
+        <tr align="center">
+            <td width="10%">货号</td>
+            <td width="40%">名称</td>
+            <td width="28%">规格</td>
+            <td width="6%">优惠</td>
+            <td width="6%">订购</td>
+            <td width="8%">总数</td>
+        </tr>
+        <!-- {foreach from=$pack.goods_list item=goods} -->
+        <tr>
+            <td align="center">{$goods.goods_sn}</td>
+            <td>{$goods.goods_name}</td>
+            <td>{$goods.goods_attr}</td>
+            <td align="center">{$goods.free_more}</td>
+            <td align="center">{$goods.goods_number}</td>
+            <td align="center">{$goods.total_number}</td>
+        </tr>
+        <!-- {/foreach} -->
+    </tbody>
+</table>
+</div>
+<!-- {/foreach} -->
+</body>
+</html>
