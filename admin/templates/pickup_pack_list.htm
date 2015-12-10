@@ -1,0 +1,101 @@
+{if $full_page}
+{include file="pageheader.htm"}
+{insert_scripts files="../js/utils.js,listtable.js"}
+<!-- 搜索 -->
+<div class="form-div">
+  <form action="javascript:search()" name="searchForm">
+    <img src="images/icon_search.gif" width="26" height="22" border="0" alt="SEARCH" />
+    {$lang.create_date}：<input name="create_date" type="text" id="create_date" size="12" value="{$filter.create_date}">
+    {$lang.mobile_phone}：<input name="mobile_phone" type="text" id="mobile_phone" size="15" value="{$filter.mobile_phone}">
+    {$lang.status}：
+    <select name="status" id="status">
+      <option value="0" {if $filter.status eq 0}selected{/if}>全部</option>
+      <option value="2" {if $filter.status eq 2}selected{/if}>就绪</option>
+      <option value="3" {if $filter.status eq 3}selected{/if}>已取</option>
+      <option value="4" {if $filter.status eq 4}selected{/if}>过期</option>
+    </select>
+    <input type="submit" value="{$lang.button_search}" class="button" />
+  </form>
+</div>
+
+<form method="post" action="pickup_pack.php" name="listForm">
+<div class="list-div" id="listDiv">
+{/if}
+  <table cellpadding="3" cellspacing="1">
+    <tr>
+      <th>{$lang.create_date}</th>
+      <th><a href="javascript:listTable.sort('user_id'); ">{$lang.mobile_phone}</a>{$sort_user_id}</th>
+      <th>{$lang.pack_sn}</th>
+      <th>{$lang.order_num}</th>
+      <th><a href="javascript:listTable.sort('expire_time'); ">{$lang.expire_time}</a>{$sort_expire_time}</th>
+      <th>{$lang.status}</th>
+    </tr>
+    {foreach from=$pickup_pack_list item=pack}
+    <tr>
+      <td class="first-cell" align="center">{$pack.create_date}</td>
+      <td align="center">{$pack.mobile_phone}</td>
+      <td align="center">{$pack.pos_row}-{$pack.pos_sn}</td>
+      <td align="center">{$pack.order_num}</td>
+      <td align="center">{$pack.expire_time|timestamp:'Y-m-d'}</td>
+      <td align="center">{if $pack.status eq 1}打包中{elseif $pack.status eq 2}就绪{elseif $pack.status eq 3}已取{elseif $pack.status eq 4}过期{/if}</td>
+    </tr>
+    {foreachelse}
+    <tr><td class="no-records" colspan="10">{$lang.no_records}</td></tr>
+    {/foreach}
+  </table>
+<table id="page-table" cellspacing="0">
+  <tr>
+    <td>
+      <input name="print_shipping" type="button" id="print_shipping" value="打印分拣单" class="button" onclick="print('shipping');"/>
+      <input name="print_label" type="button" id="print_label" value="打印标签" class="button" onclick="print('label');"/>
+      <input name="print_date" type="hidden" id='print_date' value="print" />
+      <input name="act" type="hidden" value="" />
+      <input name="print_date" type="hidden" value="{$filter.create_date}" />
+    </td>
+    <td align="right" nowrap="true">
+    {include file="page.htm"}
+    </td>
+  </tr>
+</table>
+{if $full_page}
+</div>
+</form>
+
+<script type="text/javascript" language="javascript">
+  listTable.recordCount = {$record_count};
+  listTable.pageCount = {$page_count};
+
+  {foreach from=$filter item=item key=key}
+  listTable.filter.{$key} = '{$item}';
+  {/foreach}
+
+  {literal}
+  onload = function()
+  {
+      // 开始检查订单
+      startCheckOrder();
+  }
+  
+  /**
+   * 搜索订单
+   */
+  function search()
+  {
+      listTable.filter['create_date'] = Utils.trim(document.forms['searchForm'].elements['create_date'].value);
+      listTable.filter['mobile_phone'] = Utils.trim(document.forms['searchForm'].elements['mobile_phone'].value);
+      listTable.filter['status'] = document.forms['searchForm'].elements['status'].value;
+      listTable.filter['page'] = 1;
+      listTable.loadList();
+  }
+  
+  function print(type)
+  {
+	  document.forms['listForm'].target = '_blank';
+	  document.forms['listForm'].elements['act'].value = 'print_' + type;
+	  document.forms['listForm'].submit();
+  }
+  
+  {/literal}
+</script>
+{include file="pagefooter.htm"}
+{/if}

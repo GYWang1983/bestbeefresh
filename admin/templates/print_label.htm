@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>打印标签</title>
+</head>
+<style type="text/css">
+@page{size:A4 portrait;margin:0mm;}
+body{font-size:13px;color:#000;background-color:#fff;margin:0;size:A4;}
+
+table{border-collapse:collapse;}
+table.page {page-break-after:always;}
+table.page td{width:52.5mm;height:28.6mm;border:1px #ccc dashed;padding:0 1mm}
+table.page tr:first-child td{border-top:none;}
+table.page tr:last-child td{border-bottom:none;}
+table.page tr td:first-child{border-left:none;}
+table.page tr td:last-child{border-right:none;}
+
+.label div{padding:0;float:left;line-height:5mm;margin-bottom:2mm;}
+.label .qrcode{width:23mm;height:23mm;margin:0 1mm 0 1.5mm;}
+.label .qrcode canvas{width:23mm;height:23mm;}
+.label .sn{border:2px #000 solid;font-size:18px;padding:1mm;font-weight:bold;}
+.label .sn.date{border-right:none;}
+.label .mobile{width:85px;font-size:15px;]}
+.label.empty .date{width:22.2px;}
+.label.empty .pos{width:41.15px;}
+</style>
+<body>
+<?php 
+$this->_var['curr'] = 0;
+$total_num = $this->_var['total_num'];
+if ($total_num > 0) {
+  $page_num = ceil($total_num / 40);
+} else {
+  $page_num = 1;
+}
+?>
+<?php for($page = 0; $page < $page_num; $page++): ?>
+  <table class="page">
+  <?php for($n = 0; $n < 40; $n++): ?>
+    <?php if($n % 4 == 0): ?><tr><?php endif; ?>
+      <td>
+        <!-- {if $curr < $total_num} -->
+        <!-- {assign var="label" value="$rs[$curr]"} -->
+        <div class="label">
+          <div class="qrcode" data="{$label.id}"></div>
+          <div class="sn date">{$date}</div>
+          <div class="sn pos">{$label.pos_row}-{$label.pos_sn|lpad:0:2}</div>
+          <div class="mobile">{$label.mobile_phone|substr:0:3}****{$label.mobile_phone|substr:8:4}</div>
+          <div class="">件数×</div>
+        </div>
+        <!-- {else} -->
+        <div class="label empty">
+          <div class="qrcode" data="0"></div>
+          <div class="sn date">&nbsp;</div>
+          <div class="sn pos">&nbsp;</div>
+        </div>
+        <!-- {/if} -->
+      </td>
+    <?php if($n % 4 == 3): ?></tr><?php endif; ?>
+    <?php $this->_var['curr']++; ?>
+  <?php endfor; ?> 
+</table>
+<?php endfor; ?> 
+</body>
+{insert_scripts files="jquery-1.11.3.min.js,jquery.qrcode.min.js"}
+<script>
+$(function() {
+    $('.qrcode').each(function() {
+    	var url = '{$config.site_url}/mobile/user.php?act=order_list&pack=' + $(this).attr('data');
+    	$(this).qrcode('{$config.site_url}');
+    });
+});
+</script>
+</html>
