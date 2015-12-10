@@ -29,11 +29,9 @@ function sendsms($mobile, $data, $step = 'register', $type = 'text')
 	return $ret;
 }
 
-
-
 function ismobile($mobile)
 {
-	return (strlen($mobile) == 11 || strlen($mobile) == 12) && (preg_match("/^13\d{9}$/", $mobile) || preg_match("/^14\d{9}$/", $mobile) || preg_match("/^15\d{9}$/", $mobile) || preg_match("/^18\d{9}$/", $mobile) || preg_match("/^0\d{10}$/", $mobile) || preg_match("/^0\d{11}$/", $mobile));
+	return preg_match("/^1\d{10}$/", $mobile) || preg_match("/^0\d{11}$/", $mobile);
 }
 
 /**
