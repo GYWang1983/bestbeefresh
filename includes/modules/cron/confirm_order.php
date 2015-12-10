@@ -128,7 +128,7 @@ if (empty($pack_date))
 	$pack_date = date('Ymd', time());
 }
 
-$sql = "SELECT id FROM " . $ecs->table('pickup_pack') . " WHERE create_date = '$pack_date' ORDER BY id ASC";
+$sql = "SELECT id FROM " . $ecs->table('pickup_pack') . " WHERE create_date = '$pack_date' ORDER BY user_id ASC";
 $pack_list = $db->getCol($sql);
 $pack_num = count($pack_list);
 
