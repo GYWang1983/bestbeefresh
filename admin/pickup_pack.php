@@ -69,6 +69,51 @@ elseif ($_REQUEST['act'] == 'query')
 /*------------------------------------------------------ */
 elseif ($_REQUEST['act'] == 'print_shipping')
 {
+	$print_date = empty($_REQUEST['print_date']) ? date('Ymd', time()) : trim($_REQUEST['print_date']);
+	$sql = "SELECT p.*, u.mobile_phone, g.goods_sn, g.goods_name, g.goods_attr, g.free_more, " .
+		" sum(g.goods_number) AS goods_number FROM " .
+		$ecs->table('pickup_pack', 'p') . ',' . $ecs->table('users', 'u') . ',' .
+		$ecs->table('order_info', 'o') . ',' . $ecs->table('order_goods', 'g') .
+		" WHERE p.user_id = u.user_id AND p.id = o.package_id AND o.order_id = g.order_id " .
+		" AND p.create_date = '$print_date' AND o.order_status != " . OS_CANCELED .
+		" GROUP BY p.user_id, g.goods_id, g.goods_attr, g.free_more " .
+		" ORDER BY p.user_id ASC";
+	
+	$query = $db->query($sql);
+	
+	$packlist = array();
+	$pack_id = 0;
+	while($rs = $db->fetch_array($query))
+	{
+		if ($pack_id != $rs['id'])
+		{
+			$pack_id = $rs['id'];
+			
+			$sql = "SELECT order_sn FROM " . $ecs->table('order_info') . " WHERE package_id = '$pack_id' AND order_status != " . OS_CANCELED;
+			$order_sn =$db->getCol($sql);
+			
+			$packlist[$pack_id] = array(
+				'sn' => substr($rs['create_date'], 6, 2) . '-' . $rs['pos_row'] . '-' . str_pad($rs['pos_sn'], 2, '0', STR_PAD_LEFT),
+				'mobile_phone' => $rs['mobile_phone'],
+				'order_sn'     => implode(', ', $order_sn),
+				'goods_list'   => array(),
+			);
+		}
+		
+		$pack = &$packlist[$pack_id];
+		$pack['goods_list'][] = array(
+			'goods_sn'   => $rs['goods_sn'],
+			'goods_name' => $rs['goods_name'],
+			'goods_attr' => $rs['goods_attr'],
+			'free_more'  => $rs['free_more'],
+			'goods_number' => $rs['goods_number'],
+			'total_number' => $rs['goods_number'] + get_free_more_number($rs['free_more'], $rs['goods_number']),
+		);
+	}
+	
+	$smarty->assign('packlist', $packlist);
+	$smarty->assign('date', $print_date);
+	$smarty->assign('config', $_CFG);
 	$smarty->display('print_shipping.htm');
 }
 /*------------------------------------------------------ */
@@ -79,9 +124,9 @@ elseif ($_REQUEST['act'] == 'print_label')
 	$print_date = empty($_REQUEST['print_date']) ? date('Ymd', time()) : trim($_REQUEST['print_date']);
 	
 	$sql = "SELECT p.id, p.pos_row, p.pos_sn, u.mobile_phone FROM " . 
-			$ecs->table('pickup_pack', 'p') . ', ' . $ecs->table('users', 'u') .
-			" WHERE p.user_id = u.user_id AND create_date = '$print_date'" .
-			" ORDER BY p.user_id ASC";
+		$ecs->table('pickup_pack', 'p') . ',' . $ecs->table('users', 'u') .
+		" WHERE p.user_id = u.user_id AND create_date = '$print_date'" .
+		" ORDER BY p.user_id ASC";
 	$rs = $db->getAll($sql);
 	//var_dump($rs);
 	

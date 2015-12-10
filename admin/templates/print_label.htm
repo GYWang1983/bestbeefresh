@@ -68,7 +68,7 @@ if ($total_num > 0) {
 $(function() {
     $('.qrcode').each(function() {
     	var url = '{$config.site_url}/mobile/user.php?act=order_list&pack=' + $(this).attr('data');
-    	$(this).qrcode('{$config.site_url}');
+    	$(this).qrcode(url);
     });
 });
 </script>
