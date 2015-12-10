@@ -1343,6 +1343,7 @@ elseif ($_REQUEST['act'] == 'step_post')
         $goods_id = intval($_POST['goodslist']);
         $goods_price = $_POST['add_price'] != 'user_input' ? floatval($_POST['add_price']) : floatval($_POST['input_price']);
         $goods_attr = '0';
+        $attr_value = empty($_POST['attr_value']) ? array() : array(trim($_POST['attr_value']));
         for ($i = 0; $i < $_POST['spec_count']; $i++)
         {
             if (is_array($_POST['spec_' . $i]))
@@ -1376,7 +1377,7 @@ elseif ($_REQUEST['act'] == 'step_post')
         $sql = "SELECT attr_value ".
             'FROM ' . $GLOBALS['ecs']->table('goods_attr') .
             "WHERE goods_attr_id in($attr_list)";
-       $res = $db->query($sql);
+        $res = $db->query($sql);
         while ($row = $db->fetchRow($res))
         {
             $attr_value[] = $row['attr_value'];
@@ -1394,11 +1395,11 @@ elseif ($_REQUEST['act'] == 'step_post')
         }
 
         //商品存在规格 是货品 检查该货品库存
-        if (is_spec($goods_attr) && !empty($prod))
+        /*if (is_spec($goods_attr) && !empty($prod))
         {
             if (!empty($goods_attr))
             {
-                /* 取规格的货品库存 */
+                // 取规格的货品库存
                 if ($goods_number > $product_info['product_number'])
                 {
                     $url = "order.php?act=" . $step_act . "&order_id=" . $order_id . "&step=goods";
@@ -1409,11 +1410,11 @@ elseif ($_REQUEST['act'] == 'step_post')
                     return false;
                 }
             }
-        }
+        }*/
 
         if(is_spec($goods_attr) && !empty($prod))
         {
-        /* 插入订单商品 */
+            // 插入订单商品 
             $sql = "INSERT INTO " . $ecs->table('order_goods') .
                         "(order_id, goods_id, goods_name, goods_sn, product_id, goods_number, market_price, " .
                         "goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, goods_attr_id) " .
@@ -1987,9 +1988,9 @@ elseif ($_REQUEST['act'] == 'step_post')
             /* 完成 */
             if ($step_act == 'add')
             {
-                /* 订单改为已确认，（已付款） */
-                $arr['order_status'] = OS_CONFIRMED;
-                $arr['confirm_time'] = gmtime();
+                /* 订单改为未确认，（已付款） */
+                $arr['order_status'] = OS_UNCONFIRMED;
+                //$arr['confirm_time'] = gmtime();
                 if ($order['order_amount'] <= 0)
                 {
                     $arr['pay_status']  = PS_PAYED;

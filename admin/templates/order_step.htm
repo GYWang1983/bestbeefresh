@@ -98,7 +98,7 @@
   </tr>
   <tr>
     <th>{$lang.goods_attr}<input type="hidden" name="spec_count" value="0" /></th>
-    <td id="goods_attr">&nbsp;</td>
+    <td id="goods_attr"><input name="attr_value" type="text" value="" size="10"></td>
   </tr>
   <tr>
     <th>{$lang.goods_number}</th>
@@ -775,6 +775,7 @@ region.isAdmin=true;
       }
     }
     eles['spec_count'].value = specCnt;
+    attrHtml += '<input name="attr_value" type="text" value="" size="10">'
     document.getElementById('goods_attr').innerHTML = attrHtml;
   }
 
