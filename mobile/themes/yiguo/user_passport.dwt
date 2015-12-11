@@ -20,12 +20,12 @@
 <!--#登录界面 start--> 
 <!-- {if $action eq 'login' or $action eq 'register'} -->
 <div id="page">
-  <header id="header">
+  <header id="header" class="nofix">
     <div class="header_l"> <a class="ico_10" onClick="javascript:history.back();"> 返回 </a> </div>
     <h1> 登录/注册 </h1>
   </header>
 </div>
-<section class="wrap">
+<section class="wrap1">
   <div id="leftTabBox" class="loginBox">
     <div class="hd"> <span>欢迎光临，登录后体验更多服务</span>
       <ul>
@@ -211,12 +211,12 @@ jQuery(function($){
 <!--#绑定手机号 start--> 
 <!-- {if $action eq 'bind'} -->
 <div id="page">
-  <header id="header">
+  <header id="header" class="nofix">
     <div class="header_l"> <a class="ico_10" href="index.php"> 返回 </a> </div>
     <h1> 绑定手机号 </h1>
   </header>
 </div>
-<section class="wrap">
+<section class="wrap1">
   <div id="leftTabBox" class="loginBox">
     <div class="hd" id="alert" style="color:red;margin-top:15px;">{$message}</div>
     <div class="bd">
@@ -267,12 +267,12 @@ jQuery(function($){
     {/foreach}
     </script>
 <div id="page">
-  <header id="header">
+  <header id="header" class="nofix">
     <div class="header_l"> <a class="ico_10" onClick="javascript:history.back();"> 返回 </a> </div>
     <h1> 找回密码 </h1>
   </header>
 </div>
-<section class="wrap">
+<section class="wrap1">
   <div id="leftTabBox" class="loginBox">
     <div class="hd" id="alert" style="color:red;display:none;">{$message}</div>
     <div id="tabBox1-bd"><!-- 添加id，js用到 -->
@@ -349,11 +349,11 @@ jQuery(function($){
 <!--#重置密码 start--> 
 <!-- {if $action eq 'reset_pwd_sms'} -->
 <div id="page">
-  <header id="header">
+  <header id="header" class="nofix">
     <h1>重置密码</h1>
   </header>
 </div>
-<section class="wrap">
+<section class="wrap1">
   <div id="leftTabBox" class="loginBox">
     <div class="hd" id="alert" style="color:red;display:none;">{$message}</div>
     <div class="bd">
