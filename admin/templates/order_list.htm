@@ -71,6 +71,7 @@
     <input name="cancel" type="submit" id="btnSubmit2" value="{$lang.op_cancel}" class="button" disabled="true" onclick="this.form.target = '_self'" />
     <input name="remove" type="submit" id="btnSubmit3" value="{$lang.remove}" class="button" disabled="true" onclick="this.form.target = '_self'" />
     <input name="print" type="submit" id="btnSubmit4" value="{$lang.print_order}" class="button" disabled="true" onclick="this.form.target = '_blank'" />
+    <input name="print_prepare" type="submit" id="btnSubmit5" value="打印采购单" class="button" onclick="this.form.target = '_blank';this.form.elements['batch'].value='0';" />
     <input name="batch" type="hidden" value="1" />
     <input name="order_id" type="hidden" value="" />
   </div>
@@ -106,6 +107,11 @@ listTable.filter.{$key} = '{$item}';
     {
       var snArray = new Array();
       var eles = document.forms['listForm'].elements;
+      if (eles['batch'].value == 0)
+      {
+    	  eles['batch'].value = 1;
+    	  return true;
+      }
       for (var i=0; i<eles.length; i++)
       {
         if (eles[i].tagName == 'INPUT' && eles[i].type == 'checkbox' && eles[i].checked && eles[i].value != 'on')

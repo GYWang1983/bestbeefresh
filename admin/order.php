@@ -3071,6 +3071,45 @@ elseif ($_REQUEST['act'] == 'operate')
         echo $html;
         exit;
     }
+    // 打印采购单
+    elseif (isset($_POST['print_prepare']))
+    {
+    	$sql = "SELECT a.user_id, b.goods_sn, b.goods_name, b.goods_attr, b.goods_price, SUM(b.goods_number) AS goods_number, b.free_more FROM " .
+      		$ecs->table('order_info', 'a') . ',' . $ecs->table('order_goods', 'b') .
+    		" WHERE a.order_id = b.order_id AND a.order_status = 1 AND a.shipping_status = 3" .
+			" GROUP BY a.user_id, b.goods_id, b.goods_attr, b.free_more";
+    	$query = $db->query($sql);
+    	
+    	$goods_list = array();
+    	while($rs = $db->fetch_array($query))
+    	{
+    		$key = "{$rs[goods_sn]}-{$rs[goods_attr]}-{$rs[free_more]}";
+    		$goods_number = $rs['goods_number'] + get_free_more_number($rs['free_more'], $rs['goods_number']);
+    		
+    		if (array_key_exists($key, $goods_list))
+    		{
+    			$goods_list[$key]['goods_number'] += $goods_number;
+    		}
+    		else
+    		{
+    			$goods_list[$key] = array(
+    					'goods_sn'     => $rs['goods_sn'],
+    					'goods_name'   => $rs['goods_name'],
+    					'goods_attr'   => $rs['goods_attr'],
+    					'goods_price'  => $rs['goods_price'],
+    					'free_more'    => $rs['free_more'],
+    					'goods_number' => $goods_number,
+    			);
+    		}
+    	}
+    	
+    	ksort($goods_list, SORT_STRING);
+    	
+    	$smarty->assign('goods_list', $goods_list);
+    	$smarty->assign('config', $_CFG);
+    	$smarty->display('print_prepare.htm');
+    	exit;
+    }
     /* 去发货 */
     elseif (isset($_POST['to_delivery']))
     {

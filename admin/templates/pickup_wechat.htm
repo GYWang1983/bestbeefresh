@@ -65,7 +65,7 @@
 <script>
 $(function(){
 	//test
-    query_order('1f8b76b850d3f61f50de6cb959f63699a0f786f3');
+    //query_order('1f8b76b850d3f61f50de6cb959f63699a0f786f3');
 	
 	wx.ready(function(){
 		$('button.scan').removeAttr('disabled');
@@ -154,6 +154,7 @@ function clear_all() {
     $('.goods_list ul').empty();
     $('.order_list dl').empty();
     $('.user .mobile').text('');
+    $('.package').text('');
     $('button.confirm').hide();
     $('.message').text('').removeClass('error').hide();
 }
