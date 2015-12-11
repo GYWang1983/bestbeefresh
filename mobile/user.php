@@ -115,7 +115,7 @@ if ($action == 'default')
 	$sql = "SELECT * FROM " . $ecs->table('pickup_code') . 
     	" WHERE user_id = $user_id AND status = 1 AND abandon_time > " . time() .
     	" ORDER BY create_time ASC LIMIT 1";
-    $pcode = $db->getRow($sql);    	
+    $pcode = $db->getRow($sql);
     if (!empty($pcode))
     {
     	$pcode['start_time_formated'] = date('Y-m-d H:i', $pcode['start_time']);
@@ -1027,19 +1027,30 @@ elseif ($action == 'order_list')
 {
     include_once(ROOT_PATH . 'include/lib_transaction.php');
 
-    $page = isset($_REQUEST['page']) ? intval($_REQUEST['page']) : 1;
-
-    $record_count = $db->getOne("SELECT COUNT(*) FROM " .$ecs->table('order_info'). " WHERE user_id = '$user_id'");
-
-    $pager  = get_pager('user.php', array('act' => $action), $record_count, $page);
-
-    $orders = get_user_orders($user_id, '', $pager['size'], $pager['start']);
-    $merge  = get_user_merge($user_id);
-
-    $smarty->assign('merge',  $merge);
-    $smarty->assign('pager',  $pager);
-    $smarty->assign('orders', $orders);
-    $smarty->assign('status', intval($_GET['status']));
+    $status = isset($_REQUEST['status']) ? intval($_REQUEST['status']) : 0;
+    
+	if (isset($_REQUEST['pack']))
+	{
+		$pack = intval($_REQUEST['pack']);
+		if ($pack > 0)
+		{
+			$sql = "SELECT user_id FROM " . $ecs->table('pickup_pack') . " WHERE id = $pack";
+			$user_id = $db->getOne($sql);
+			
+			if (empty($user_id) || $_SESSION['user_id'] != $user_id)
+			{
+				ecs_header("Location: ./index.php\n");
+				exit;
+			}
+			
+			$smarty->assign('pack', $_REQUEST['pack']);
+		}
+		
+		$status = 3;
+		
+	}
+    
+    $smarty->assign('status', $status);
     $smarty->display('user_transaction.dwt');
 }
 
@@ -1052,20 +1063,28 @@ elseif ($action == 'async_order_list')
     $start = $_POST['last'];
     $limit = $_POST['amount'];
     $status = intval($_GET['status']);
+    $pack   = intval($_GET['pack']);
     
-    switch ($status)
+    if ($pack > 0)
     {
-    case 1:
-    	$cond = 'pay_status IN (' . PS_UNPAYED . ',' . PS_PAYING . ') AND order_status = ' . OS_UNCONFIRMED;
-    	break;
-    case 2:
-    	$cond = 'pay_status = ' . PS_PAYED . ' AND shipping_status != ' . SS_RECEIVED . ' AND order_status IN (' . OS_CONFIRMED . ',' . OS_UNCONFIRMED . ')';
-    	break;
-    case 3:
-    	$cond = '(shipping_status = ' . SS_RECEIVED . ' OR order_status IN (' . OS_CANCELED . ',' . OS_EXPIRED . ',' . OS_RETURNED . '))';
-    	break;
-    default:
-    	$cond = '';
+    	$cond = "package_id = $pack";
+    }
+    else
+    {
+	    switch ($status)
+	    {
+	    case 1:
+	    	$cond = 'pay_status IN (' . PS_UNPAYED . ',' . PS_PAYING . ') AND order_status = ' . OS_UNCONFIRMED;
+	    	break;
+	    case 2:
+	    	$cond = 'pay_status = ' . PS_PAYED . ' AND shipping_status != ' . SS_RECEIVED . ' AND order_status IN (' . OS_CONFIRMED . ',' . OS_UNCONFIRMED . ')';
+	    	break;
+	    case 3:
+	    	$cond = '(shipping_status = ' . SS_RECEIVED . ' OR order_status IN (' . OS_CANCELED . ',' . OS_EXPIRED . ',' . OS_RETURNED . '))';
+	    	break;
+	    default:
+	    	$cond = '';
+	    }
     }
     
     $orders = get_user_orders($user_id, $cond, $limit, $start);

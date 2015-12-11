@@ -179,6 +179,7 @@
     {/foreach}
     jQuery(function($){
     	var spinner_code = '<div style="text-align:center; margin:10px;"><img src="{$ectouch_themes}/images/loader.gif" /></div>';
+    	var pack = '{$pack}';
     	$('.order_list_tab li').click(function(e){
     	   var curTab = $(e.currentTarget);
     	   $('.has_no_item').hide();
@@ -187,7 +188,13 @@
     	   $('.order_list').more({'address': 'user.php?act=async_order_list&status=' + curTab.attr('data'), amount: 6, 'spinner_code':spinner_code})
     	});
     	
-    	$('.order_list').more({'address': 'user.php?act=async_order_list&status={$status}', amount: 6, 'spinner_code':spinner_code})
+    	var url = 'user.php?act=async_order_list&status={$status}';
+    	if (parseInt(pack) > 0)
+    	{
+    	    url += '&pack=' + pack;
+    	}
+    	
+    	$('.order_list').more({'address': url, amount: 6, 'spinner_code':spinner_code})
 		$(window).scroll(function () {
 			if ($(window).scrollTop() == $(document).height() - $(window).height()) {
 				$('.get_more').click();
