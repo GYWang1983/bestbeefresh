@@ -1239,7 +1239,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         /* 检查该商品是否已经存在在购物车中 */
         $sql = "SELECT goods_number FROM " .$GLOBALS['ecs']->table('cart').
                 " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
-                " AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
+                " AND parent_id = 0 AND goods_attr = '" .$goods_attr. "' " .
                 " AND extension_code <> 'package_buy' " .
                 " AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";//by mike add
 
@@ -1262,7 +1262,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                 $sql = "UPDATE " . $GLOBALS['ecs']->table('cart') . " SET goods_number = '$num'" .
                        " , goods_price = '$goods_price'".
                        " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
-                       " AND parent_id = 0 AND goods_attr = '" .get_goods_attr_info($spec). "' " .
+                       " AND parent_id = 0 AND goods_attr = '" .$goods_attr. "' " .
                        " AND extension_code <> 'package_buy' " .
                        "AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";
                 $GLOBALS['db']->query($sql);
