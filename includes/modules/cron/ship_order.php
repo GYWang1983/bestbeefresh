@@ -81,7 +81,7 @@ $param = array(
 
 while ($rs = $db->fetch_array($query))
 {
-	$param['first']['value'] = "最鲜蜂正在为您配送{$rs[order_count]}个水果订单，您可以于今天{$_CFG[shop_open_time]}后到{$_CFG[shop_address]}取货。";
+	$param['first']['value'] = "最鲜蜂正在为您配送{$rs[order_count]}个水果订单，您可以于{$_CFG[shop_open_time]}至{$_CFG[shop_close_time]}到{$_CFG[shop_address]}取货。";
 	$param['keyword1']['value'] = $rs['order_sn'];
 	$param['keyword2']['value'] = $rs['order_amount'] . '元';
 	$result = $wechat->send_template_msg($rs['wxid'], $tmplid, $param, $link);

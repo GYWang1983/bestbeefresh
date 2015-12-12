@@ -232,14 +232,12 @@ function get_pickup_orders($user_id)
 	{
 		if ($order_id != $g['order_id'])
 		{
-			$o = array(
+			$orders[] = array(
 				'order_id' => $g['order_id'],
 				'order_sn' => $g['order_sn'],
 				'pay_time' => date('Y-m-d H:i', $g['pay_time']),
 				'goods' => array()
 			);
-			
-			$orders[] = &$o;
 			$order_id = $g['order_id'];
 		}
 		
@@ -248,7 +246,7 @@ function get_pickup_orders($user_id)
 		unset($g['pay_time']);
 		
 		$g['free_more_desc'] = get_free_more_desc($g['free_more']);
-		$o['goods'][] = $g;
+		$orders[count($orders) - 1]['goods'][] = $g;
 	}
 	
 	return $orders;

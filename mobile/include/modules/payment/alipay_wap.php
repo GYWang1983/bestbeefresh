@@ -108,7 +108,7 @@ class alipay_wap
     	global $_CFG;
     	
     	$html = $alipay_form . "<script>
-    $('body').html(\"<iframe id='alipay_frame' src='flow.php?step=pay_code&log={$order[log_id]}' style='width:100%;border:0;'></iframe>\");
+    $('body').html(\"<iframe id='alipay_frame' src='flow.php?step=pay_code&log={$order[log_id]}' style='width:100%;border:0;height:100%;min-height:300px;'></iframe>\");
 </script>";
     	//$html = $order['order_sn'] . '_' . $order['log_id'];
     	return $html;
@@ -150,7 +150,7 @@ class alipay_wap
 	{
 		global $_CFG, $ecs, $db;
 		require_once("alipaylib/alipay_notify.class.php");
-		
+		//file_put_contents(__DIR__ .'/respond.log', print_r($_REQUEST, true), FILE_APPEND);
 		$is_sync = $payment['call_type'] == 'sync';
 		$alipayNotify = new AlipayNotify($this->get_config($payment));
 		$verify_result = $is_sync ? $alipayNotify->verifyReturn() : $alipayNotify->verifyNotify();
