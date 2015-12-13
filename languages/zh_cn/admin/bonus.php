@@ -44,6 +44,7 @@ $_LANG['send_by'][SEND_BY_USER] = '按用户发放';
 $_LANG['send_by'][SEND_BY_GOODS] = '按商品发放';
 $_LANG['send_by'][SEND_BY_ORDER] = '按订单金额发放';
 $_LANG['send_by'][SEND_BY_PRINT] = '线下发放的红包';
+$_LANG['send_by'][SEND_BY_REGISTER] = '注册发放';
 $_LANG['report_form'] = '报表';
 $_LANG['send'] = '发放';
 $_LANG['bonus_excel_file'] = '线下红包信息列表';

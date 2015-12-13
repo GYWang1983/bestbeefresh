@@ -109,13 +109,16 @@ function register($username, $password, $email = NULL, $other = array())
         $GLOBALS['user']->set_session($username);
         $GLOBALS['user']->set_cookie($username);
 
-        /* 注册送积分 */
+        // 注册送积分
         if (!empty($GLOBALS['_CFG']['register_points']))
         {
             log_account_change($_SESSION['user_id'], 0, 0, $GLOBALS['_CFG']['register_points'], $GLOBALS['_CFG']['register_points'], $GLOBALS['_LANG']['register_points']);
         }
 
-        /*推荐处理*/
+        // 注册送红包
+        send_register_bonus();
+        
+        // 推荐处理
         $affiliate  = unserialize($GLOBALS['_CFG']['affiliate']);
         if (isset($affiliate['on']) && $affiliate['on'] == 1)
         {
@@ -467,4 +470,29 @@ function admin_registered( $adminname )
     return $res;
 }
 
+/**
+ * 送注册红包
+ */
+function send_register_bonus()
+{
+	global $ecs, $db;
+	
+	$now = time();
+	$user_id = $_SESSION['user_id'];
+	
+	//SEND_BY_REGISTER
+	$sql = "SELECT * FROM " . $ecs->table('bonus_type') . 
+		" WHERE send_type = " . SEND_BY_REGISTER . " AND send_start_date <= '$now' AND send_end_date >= '$now' " .
+		" ORDER BY type_id ASC";
+	$typelist = $db->getAll($sql);
+	
+	foreach ($typelist AS $type)
+	{
+		$expire_time = min($type['use_end_date'], $now + $type['use_time_limit']);
+		
+		$sql = "INSERT INTO " . $ecs->table('user_bonus') . " (bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed,amount,add_time,expire_time) " .
+			" VALUES ('$type[type_id]', 0, '$user_id', 0, 0, " .BONUS_NOT_SMS. ",$type[type_money],$now,$expire_time)";
+		$db->query($sql);
+	}
+}
 ?>

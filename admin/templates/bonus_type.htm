@@ -30,7 +30,7 @@
         {if $type.send_type eq 3}
         <a href="bonus.php?act=gen_excel&tid={$type.type_id}">{$lang.report_form}</a> |
         {/if}
-        {if $type.send_type neq 2}
+        {if $type.send_type neq 2 and $type.send_type neq 4}
         <a href="bonus.php?act=send&amp;id={$type.type_id}&amp;send_by={$type.send_type}">{$lang.send}</a> |
         {/if}
         <a href="bonus.php?act=bonus_list&amp;bonus_type={$type.type_id}">{$lang.view}</a> |
