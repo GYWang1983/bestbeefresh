@@ -1563,7 +1563,7 @@ elseif ($_REQUEST['step'] == 'done')
     /* 如果订单金额为0（使用余额或积分或红包支付），修改订单状态为已确认、已付款 */
     if ($order['order_amount'] <= 0)
     {
-        $order['order_status'] = OS_CONFIRMED;
+        $order['order_status'] = OS_UNCONFIRMED;
         $order['confirm_time'] = gmtime();
         $order['pay_status']   = PS_PAYED;
         $order['pay_time']     = gmtime();
@@ -1769,6 +1769,13 @@ elseif ($_REQUEST['step'] == 'done')
 
         $smarty->assign('pay_online', $pay_online);
     }
+    else
+    {
+    	// 跳转到订单详情页面
+    	ecs_header("Location: user.php?act=order_detail&order_id={$new_order_id}\n");
+    	exit;
+    }
+    
     if(!empty($order['shipping_name']))
     {
         $order['shipping_name']=trim(stripcslashes($order['shipping_name']));

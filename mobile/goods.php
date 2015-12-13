@@ -132,7 +132,6 @@ if (!empty($_REQUEST['act']) && $_REQUEST['act'] == 'gotopage')
     die($json->encode($res));
 }
 
-
 /*------------------------------------------------------ */
 //-- PROCESSOR
 /*------------------------------------------------------ */
@@ -198,7 +197,6 @@ if (!$smarty->is_cached('goods.dwt', $cache_id))
         $smarty->assign('keywords',           htmlspecialchars($goods['keywords']));
         $smarty->assign('description',        htmlspecialchars($goods['goods_brief']));
 
-
         $catlist = array();
         foreach(get_parent_cats($goods['cat_id']) as $k=>$v)
         {
@@ -234,7 +232,6 @@ if (!$smarty->is_cached('goods.dwt', $cache_id))
         $smarty->assign('specification',       $properties['spe']);                              // 商品规格
         $smarty->assign('attribute_linked',    get_same_attribute_goods($properties));           // 相同属性的关联商品
         $smarty->assign('related_goods',       $linked_goods);                                   // 关联商品
-       // print_r($linked_goods);
         $smarty->assign('goods_article_list',  get_linked_articles($goods_id));                  // 关联文章
         $smarty->assign('fittings',            get_goods_fittings(array($goods_id)));                   // 配件
         $smarty->assign('rank_prices',         get_user_rank_prices($goods_id, $shop_price));    // 会员等级价格
