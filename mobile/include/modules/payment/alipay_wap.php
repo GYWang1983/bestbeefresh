@@ -108,7 +108,7 @@ class alipay_wap
     	global $_CFG;
     	
     	$html = $alipay_form . "<script>
-    $('body').html(\"<iframe id='alipay_frame' src='flow.php?step=pay_code&log={$order[log_id]}' style='width:100%;border:0;height:100%;min-height:300px;'></iframe>\");
+    $('body').html(\"<iframe id='alipay_frame' src='flow.php?step=pay_code&log={$order[log_id]}' style='width:100%;border:0;height:100%;min-height:450px;'></iframe>\");
 </script>";
     	//$html = $order['order_sn'] . '_' . $order['log_id'];
     	return $html;
