@@ -49,9 +49,14 @@ make_order_expire($cron);
 make_pickup_code_expire($cron);
 make_verifycode_expire($cron);
 
+/**
+ * 订单过期
+ */
 function make_order_expire($cron)
 {
 	global $db, $ecs;
+	
+	include_once(ROOT_PATH . 'includes/lib_transaction.php');
 	
 	$sql = "UPDATE " . $ecs->table('order_info') . " SET `order_status` = " . OS_EXPIRED . " WHERE `order_status` = " . OS_CONFIRMED . 
 			" AND shipping_status = " . SS_SHIPPED . " AND receive_deadline < " . time();
@@ -59,9 +64,13 @@ function make_order_expire($cron)
 	
 	//24小时未支付则过期
 	$expire_time = time() - intval($cron['unpay_order_expire']) * 3600;
-	$sql = "UPDATE " . $ecs->table('order_info') . " SET order_status = " . OS_EXPIRED .
+	$sql = "SELECT * FROM " . $ecs->table('order_info') . 
 		" WHERE order_status = " . OS_UNCONFIRMED . " AND pay_status = " . PS_UNPAYED . " AND add_time < $expire_time";
-	$db->query($sql);
+	$query = $db->query($sql);
+	while ($rs = $db->fetch_array($query))
+	{
+		cancel_order($rs['order_id'], $rs['user_id'], OS_EXPIRED);
+	}
 }
 
 /**

@@ -341,10 +341,11 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
  * @access  public
  * @param   int         $order_id       订单ID
  * @param   int         $user_id        用户ID
+ * @param   int         $action         取消类型
  *
  * @return void
  */
-function cancel_order($order_id, $user_id = 0)
+function cancel_order($order_id, $user_id = 0, $action = OS_CANCELED)
 {
     /* 查询订单信息，检查状态 */
     $sql = "SELECT user_id, order_id, order_sn , surplus , integral , bonus_id, order_status, shipping_status, pay_status, pay_id, money_paid " .
@@ -388,12 +389,12 @@ function cancel_order($order_id, $user_id = 0)
     }
 
     //将用户订单设置为取消
-    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = " . OS_CANCELED . ", pay_status = " . PS_UNPAYED .
+    $sql = "UPDATE ".$GLOBALS['ecs']->table('order_info') ." SET order_status = '{$action}', pay_status = " . PS_UNPAYED .
     		" WHERE order_id = '$order_id'";
     if ($GLOBALS['db']->query($sql))
     {
         /* 记录log */
-        order_action($order['order_sn'], OS_CANCELED, $order['shipping_status'], PS_UNPAYED, $GLOBALS['_LANG']['buyer_cancel'], 'buyer');
+        order_action($order['order_sn'], $action, $order['shipping_status'], PS_UNPAYED, $GLOBALS['_LANG']['buyer_cancel'], 'buyer');
         /* 退货用户余额、积分、红包 */
         if ($order['user_id'] > 0 && $order['surplus'] > 0)
         {
