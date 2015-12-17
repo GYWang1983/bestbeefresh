@@ -78,7 +78,7 @@ $(function() {
 </script> 
 <!--商品图 end---> 
 <!--商品参数-->
-<section class="goodsInfo">
+<section class="goodsInfo s-detail">
   <!--<a class="collect" id="collect_box" href="javascript:collect({$goods.goods_id})" style="display: inline;">{$record_count}</a>-->
   <div class="title">
     <h1> {$goods.goods_style_name} </h1>
