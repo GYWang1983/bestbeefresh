@@ -31,18 +31,47 @@ if ($action == 'default')
 }
 elseif ($action == 'query')
 {
-	$code = trim($_POST['code']);
-	$user_id = check_pickup_code($code);
+	if (!empty($_POST['code']))
+	{
+		$code = trim($_POST['code']);
+		$user_id = check_pickup_code($code);
+	}
+	elseif (!empty($_POST['ordersn']))
+	{
+		$code = trim($_POST['ordersn']);
+		$sql = "SELECT user_id FROM " . $ecs->table('order_info') . " WHERE order_sn = '$code'";
+		$user_id = $db->getOne($sql);
+	}
+	
+	if (empty($user_id))
+	{
+		echo json_encode(array('errcode' => 10, 'msg' => '没有可以取货的商品'));
+		exit;
+	}
 	
 	//查询包裹
 	$packlist = get_pickup_packs($user_id);
+	
+	
 	$packs = array();
+	$pids = array();
 	foreach ($packlist as $p)
 	{
 		$packs[] = array(
 			'sn' => substr($p['create_date'], 6, 2) . '-' . $p['pos_row'] . '-' . str_pad($p['pos_sn'], 2, '0', STR_PAD_LEFT),
 			'status' => $p['status'],	
 		);
+		if ($p['status'] == 2)
+		{
+			$pids[] = $p['id'];
+		}
+	}
+	
+	// Update package status
+	if (!empty($pids))
+	{
+		$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET status=3 WHERE id IN (" . implode(',', $pids) . ")";
+		$db->query($sql);
 	}
 	
 	$goods = get_pickup_goods($user_id);
@@ -52,7 +81,26 @@ elseif ($action == 'query')
 		exit;
 	}
 	
+	// Update order status
 	$orders = get_pickup_orders($user_id);
+	if (!empty($orders))
+	{
+		$status = array(
+			'shipping_status' => SS_RECEIVED,
+			'receive_time'    => time()
+		);
+		foreach ($orders as &$o)
+		{
+			update_order($o['order_id'], $status);
+			order_action($o['order_sn'], OS_CONFIRMED, SS_RECEIVED, PS_PAYED, '门店取货');
+		}
+	}
+	
+	// TODO: 多店铺后查询是否还有可取货订单，如果有取货码保持有效
+	
+	// Update pickup code status
+	$sql = "UPDATE " . $ecs->table('pickup_code') . " SET status = 2 WHERE user_id ='$user_id' AND status = 1";
+	$db->query($sql);
 	
 	$sql = "SELECT mobile_phone FROM " . $ecs->table('users') . " WHERE user_id = $user_id";
 	$mobile = $db->getOne($sql);
@@ -66,56 +114,6 @@ elseif ($action == 'query')
 	);
 	
 	echo json_encode($response);
-	exit;
-}
-elseif ($action == 'pickup')
-{
-	$code = trim($_POST['code']);
-	$user_id = check_pickup_code($code);
-	
-	// 更新订单状态
-	$orders = get_pickup_orders($user_id);
-	if (empty($orders))
-	{
-		echo json_encode(array('errcode' => 10, 'msg' => '没有可以取货的商品'));
-		exit;
-	}
-	
-	// Update order status
-	$status = array(
-		'shipping_status' => SS_RECEIVED,
-		'receive_time'    => time()		
-	);
-	
-	foreach ($orders as &$o)
-	{
-		update_order($o['order_id'], $status);
-		order_action($o['order_sn'], OS_CONFIRMED, SS_RECEIVED, PS_PAYED, '门店取货');
-	}
-	
-	// 更新包裹状态
-	$packlist = get_pickup_packs($user_id);
-	if (!empty($packlist))
-	{
-		foreach ($packlist as $pack)
-		{
-			if ($pack['status'] == 2)
-			{
-				$pids[] = $pack['id'];
-			}
-		}
-		
-		$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET status=3 WHERE id IN (" . implode(',', $pids) . ")";
-		$db->query($sql);
-	}
-	
-	// TODO: 多店铺后查询是否还有可取货订单，如果有取货码保持有效
-	
-	// Update pickup code status
-	$sql = "UPDATE " . $ecs->table('pickup_code') . " SET status = 2 WHERE user_id ='$user_id' AND status = 1";
-	$db->query($sql);
-	
-	echo json_encode(array('errcode' => 0, 'msg' => '取货完成'));
 	exit;
 }
 
@@ -183,7 +181,7 @@ function get_pickup_goods($user_id)
 {
 	global $ecs, $db;
 	
-	$sql = "SELECT og.goods_id, og.goods_sn, og.goods_name, sum(og.goods_number) AS goods_number, og.free_more " .
+	$sql = "SELECT og.goods_id, og.goods_sn, og.goods_name, og.goods_attr, sum(og.goods_number) AS goods_number, og.free_more " .
 		" FROM " . $ecs->table('order_info', 'o') . "," . $ecs->table('order_goods', 'og') .
 		" WHERE o.order_id = og.order_id AND o.user_id = $user_id AND o.order_status = " . OS_CONFIRMED . " AND o.shipping_status = " . SS_SHIPPED . 
 		" GROUP BY og.goods_id, og.free_more ORDER BY og.goods_id";

@@ -17,7 +17,8 @@
 <body>
 <div class="container pickup">
   <div class="row center">
-    <button type="button" class="scan" disabled="false">扫码取货</button>
+    <button type="button" class="scan" disabled="false">扫码取货</button><br/>
+    <input type="tel" class="ordersn_input" value="" />
   </div>
   <div class="row user">
     <span>取货人手机号: </span><span class="mobile"></span>
@@ -55,11 +56,6 @@
     -->
     </dl>
   </div>
-  <div class="row message" style="display:none;">取货完成</div>
-  <div class="row center">
-    <input type="hidden" id="pickup_code" value=""></button>
-    <button type="button" class="confirm" style="display:none;">确认取货</button>
-  </div>
 <div>
 </body>
 <script>
@@ -77,41 +73,44 @@ $(function(){
 			'needResult': 1,
 			'scanType': ['qrCode', 'barCode'],
 			'success': function (res) {
-				query_order(res.resultStr);
+				query_order(res.resultStr, 1);
 			}
 		});
 	});
 	
-	$('button.confirm').click(function(){
-		
-		if (confirm('确认取货？') == false) {
-			return;
+	$('input.ordersn_input').bind('input', function(e){
+        
+		var input = $(e.currentTarget).val();
+		if (input.match(/^\d{13}$/))
+		{
+			clear_all();
+			query_order(input, 2);
 		}
-		
-		$.post('pickup.php', {
-	        'act':  'pickup',
-	        'code': $('#pickup_code').val()
-	    }, function(response) {
-	        if (response.errcode != 0) {
-	        	$('.message').addClass('error');
-	        }
-	        $('.message').text(response.msg).show();
-	        $('button.confirm').hide();
-	    }, 'json');
-	});
+        
+    });
 });
 
 
-function query_order(pickup_code)
+function query_order(pickup_code, type)
 {
-	$.post('pickup.php', {
-		'act':  'query',
-		'code': pickup_code
-	}, function(response) {
+	$('button.scan').attr('disabled', true);
+	
+	var param = {'act': 'query'};
+	if (type == 1)
+	{
+		param['code'] = pickup_code;
+	}
+	else
+	{
+		param['ordersn'] = pickup_code;
+	}
+	
+	$.post('pickup.php', param, function(response) {
+		$('button.scan').removeAttr('disabled');
 		if (response.errcode != 0) {
 		    $('.message').text(response.msg).addClass('error').show();
 		} else {
-			$('#pickup_code').val(pickup_code);
+		    $('input.ordersn_input').val('');
 			list_goods(response.goods);
 			list_order(response.orders);
 			$('.user .mobile').text(response.mobile);
@@ -122,8 +121,6 @@ function query_order(pickup_code)
 				packs += p.sn + '[' + (p.status == 2 ? '可取':'准备中') + '], ';
 			}
 			$('.package').text(packs);
-			
-			$('button.confirm').show();
 		}
 	}, 'json');
 }
@@ -131,7 +128,7 @@ function query_order(pickup_code)
 function list_goods(goods) {
 	for (var id in goods) {
 		var g = goods[id];
-		var item = '<li><div class="goods_sn">' + g['goods_sn'] + '</div><div class="goods_name">' + g['goods_name'] + '</div><div class="goods_number">x ' + g['goods_number'] + '</div></li>';
+		var item = '<li><div class="goods_sn">' + g['goods_sn'] + '</div><div class="goods_name">' + g['goods_name'] + '</div><div class="goods_attr">[' + g['goods_attr'] + ']</div><div class="goods_number">x ' + g['goods_number'] + '</div></li>';
 		$(item).appendTo('.goods_list ul');
 	}
 }
@@ -155,7 +152,6 @@ function clear_all() {
     $('.order_list dl').empty();
     $('.user .mobile').text('');
     $('.package').text('');
-    $('button.confirm').hide();
     $('.message').text('').removeClass('error').hide();
 }
 </script>
