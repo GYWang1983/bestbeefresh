@@ -456,9 +456,10 @@ if ($_REQUEST['act'] == 'send_by_user')
 
         $id_array   = array_slice($user_array, $start, $limit);
 
-        /* 根据会员ID取得用户名和邮件地址 */
-        $sql = "SELECT user_id, mobile_phone, user_name FROM " .$ecs->table('users').
-               " WHERE user_id " .db_create_in($id_array);
+        /* 根据会员ID取得手机号和openid */
+        $sql = "SELECT u.user_id, u.mobile_phone, u.user_name, w.wxid FROM " . 
+          	   $ecs->table('users', 'u') . " LEFT JOIN wxch_user w ON u.user_id = w.uid " . 
+               " WHERE u.user_id " .db_create_in($id_array);
         $user_list  = $db->getAll($sql);
         $count = count($user_list);
     }
@@ -474,40 +475,32 @@ if ($_REQUEST['act'] == 'send_by_user')
     //$today = local_date($_CFG['date_format']);
 	$expire_time = min($bonus_type['use_end_date'], $now + $bonus_type['use_time_limit']);
 	
+	//模板消息配置
+	include_once(ROOT_PATH . '/includes/cls_wechat.php');
+	$wechat = new WechatApi();
+	$href = $_CFG['site_url'] . '/mobile/user.php?act=bonus';
+	$tmplid = 'FRYrwOR7gxcvFGU3a1_RIv87GamInBnW_3CrENj-sa0';
+
+	$param = array(
+		'first'    => array('color' => '#000000', 'value' => '您有一张优惠券已到账'),
+		'keyword1' => array('color' => '#000000', 'value' => $bonus_type['type_name']),
+		'keyword2' => array('color' => '#000000', 'value' => '客服发放'),
+		'keyword3' => array('color' => '#000000', 'value' => date('Y-m-d H:i', $expire_time)),
+		'keyword4' => array('color' => '#000000', 'value' => '订单满' . $bonus_type['min_goods_amount'] . '元可用'),
+		"remark"   => array('color' => '#0000ff', 'value' => "点击查看详情"),
+	);
+	
     foreach ($user_list AS $key => $val)
     {
-        /* 发送邮件通知 */
-        /*$smarty->assign('user_name',    $val['user_name']);
-        $smarty->assign('shop_name',    $GLOBALS['_CFG']['shop_name']);
-        $smarty->assign('send_date',    $today);
-        $smarty->assign('sent_date',    $today);
-        $smarty->assign('count',        1);
-        $smarty->assign('money',        price_format($bonus_type['type_money']));
-
-        $content = $smarty->fetch('str:' . $tpl['template_content']);
-
-        if (add_to_maillist($val['user_name'], $val['email'], $tpl['template_subject'], $content, $tpl['is_html']))
-        {
-        	//向会员红包表录入数据
-            $sql = "INSERT INTO " . $ecs->table('user_bonus') .
-                    "(bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed) " .
-                    "VALUES ('$_REQUEST[id]', 0, '$val[user_id]', 0, 0, " .BONUS_MAIL_SUCCEED. ")";
-            $db->query($sql);
-        }
-        else
-        {
-            // 邮件发送失败，更新数据库
-            $sql = "INSERT INTO " . $ecs->table('user_bonus') .
-                    "(bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed) " .
-                    "VALUES ('$_REQUEST[id]', 0, '$val[user_id]', 0, 0, " .BONUS_MAIL_FAIL. ")";
-            $db->query($sql);
-        }*/
-    	
-		//TODO: 未来改为短信通知
-		
         $sql = "INSERT INTO " . $ecs->table('user_bonus') . " (bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed,amount,add_time,expire_time) " .
         "VALUES ('$_REQUEST[id]', 0, '$val[user_id]', 0, 0, " .BONUS_NOT_SMS. ",$bonus_type[type_money],$now,$expire_time)";
         $db->query($sql);
+        
+        //发送微信模板消息通知
+        if (!empty($val['wxid']))
+        {
+        	$wechat->send_template_msg($val['wxid'], $tmplid, $param, $href);
+        }
         
         if ($loop >= $limit)
         {
