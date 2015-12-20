@@ -1198,7 +1198,7 @@ elseif ($action == 'order_detail')
     }
 
      /* 设置能否修改使用余额数 */
-    if ($order['order_amount'] > 0)
+    if ($order['order_amount'] > 0 && $_CFG['use_surplus'] == '1')
     {
         if ($order['order_status'] == OS_UNCONFIRMED || $order['order_status'] == OS_CONFIRMED)
         {
@@ -1217,7 +1217,7 @@ elseif ($action == 'order_detail')
     {
     	$smarty->assign('need_pay', true);
     	
-    	$payment_list = available_payment_list(false, 0, false, is_wechat_browser());
+    	$payment_list = available_payment_list(false, 0, true, is_wechat_browser());
     	if(!empty($payment_list))
     	{
     		$smarty->assign('payment_list', $payment_list);
