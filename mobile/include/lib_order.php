@@ -1135,7 +1135,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     	$goods_attr = $goods['amount_desc'] . "\n" . $goods_attr;
     }
     
-    /* 初始化要插入购物车的基本件数据 */
+    // 初始化要插入购物车的基本件数据
     $parent = array(
         'user_id'       => $_SESSION['user_id'],
         'session_id'    => SESS_ID,
@@ -1151,6 +1151,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         'extension_code'=> $goods['extension_code'],
         'is_gift'       => 0,
         'is_shipping'   => $goods['is_shipping'],
+    	'add_time'      => time(),
         'rec_type'      => CART_GENERAL_GOODS
     );
 
@@ -1650,7 +1651,7 @@ function get_cart_goods()
         'save_rate'    => 0, // 节省百分比
         'goods_amount' => 0, // 本店售价合计（无格式）
     );
-
+    
     /* 循环、统计 */
     $sql = "SELECT *, IF(parent_id, parent_id, goods_id) AS pid " .
             " FROM " . $GLOBALS['ecs']->table('cart') . " " .
@@ -3190,6 +3191,49 @@ function get_order_custom_status($order)
 	if ($order['order_status'] == OS_EXPIRED)
 	{
 		return CS_EXPIRED;
+	}
+}
+
+/**
+ * 更新购物车中的商品
+ */
+function update_cart()
+{
+	global $ecs, $db;
+	
+	//删除已下架商品
+	$sql = "DELETE c FROM " . $ecs->table('cart', 'c') . " WHERE " . get_cart_cond() . 
+			" AND NOT EXISTS (SELECT 1 FROM " . $ecs->table('goods', 'g') . " WHERE g.goods_id = c.goods_id AND g.is_on_sale = 1 AND g.is_delete = 0) " .
+			" AND c.rec_type = " . CART_GENERAL_GOODS;
+	$db->query($sql);
+	
+	//更新产品价格、规格等
+	$sql = "SELECT c.rec_id, c.goods_id, c.goods_number, c.goods_attr_id, g.goods_name, g.market_price, g.shop_price, g.amount_desc, g.free_more FROM " . 
+	        $ecs->table('cart', 'c') . ',' . $ecs->table('goods', 'g') . 
+			" WHERE c.goods_id = g.goods_id AND " . get_cart_cond('c.');
+	$query = $db->query($sql);
+	while ($rs = $db->fetch_array($query))
+	{
+		$spec = explode(',', $rs['goods_attr_id']);
+		$goods_attr = get_goods_attr_info($spec);
+		if (empty($goods_attr))
+		{
+			$goods_attr = $rs['amount_desc'];
+		}
+		else
+		{
+			$goods_attr = $rs['amount_desc'] . "\n" . $goods_attr;
+		}
+		
+		$cart = array(
+			'goods_name'   => $rs['goods_name'],
+			'market_price' => $rs['market_price'],
+			'goods_price'  => get_final_price($rs['goods_id'], $rs['goods_number'], true, $spec),
+			'goods_attr'   => $goods_attr,
+			'free_more'    => $rs['free_more'],
+		);
+		
+		$db->autoExecute($ecs->table('cart'), $cart, 'UPDATE', 'rec_id=' . $rs['rec_id']);
 	}
 }
 ?>

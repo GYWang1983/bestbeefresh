@@ -401,6 +401,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     </section>
     <div class="blank1"></div>
     <input type="submit" name="submit" value="提交订单" class="c-btn3" />
+    <input type="hidden" name="checkout_time" value="{$checkout_time}" />
     <input type="hidden" name="step" value="done" />
   </form>
 </section>

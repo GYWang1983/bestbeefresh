@@ -468,8 +468,11 @@ elseif ($_REQUEST['step'] == 'checkout')
 
     $_SESSION['flow_consignee'] = $consignee;
     $smarty->assign('consignee', $consignee);*/
-
-    /* 对商品信息赋值 */
+    
+    // 刷新购物车
+    update_cart();
+    
+    // 对商品信息赋值
     $cart_goods = cart_goods($flow_type); // 取得商品列表，计算合计
     $smarty->assign('goods_list', $cart_goods);
 
@@ -713,6 +716,7 @@ elseif ($_REQUEST['step'] == 'checkout')
         $smarty->assign('inv_type_list', $inv_type_list);
     }
 
+    $smarty->assign('checkout_time', time());
     $smarty->assign('order_attention', order_attention($order));
     
     /* 保存 session */
@@ -1308,10 +1312,10 @@ elseif ($_REQUEST['step'] == 'done')
     include_once('include/lib_clips.php');
     include_once('include/lib_payment.php');
 
-    /* 取得购物类型 */
+    // 取得购物类型
     $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
 
-    /* 检查购物车中是否有商品 */
+    // 检查购物车中是否有商品
     $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') .
         " WHERE " . get_cart_cond() .
         " AND parent_id = 0 AND is_gift = 0 AND rec_type = '$flow_type'";
@@ -1319,7 +1323,13 @@ elseif ($_REQUEST['step'] == 'done')
     {
         show_message($_LANG['no_goods_in_cart'], '', '', 'warning');
     }
-
+    
+    // 检查订单提交失效
+    if (isset($_POST['checkout_time']) && intval($_POST['checkout_time']) < time() - 3600)
+    {
+    	show_message('订单提交超时', '重新确认订单', 'flow.php?step=checkout', 'error');
+    }
+    
     /* 检查商品库存 */
     /* 如果使用库存，且下订单时减库存，则减少库存 */
     if ($_CFG['use_storage'] == '1' && $_CFG['stock_dec_time'] == SDT_PLACE)
@@ -2190,17 +2200,20 @@ elseif ($_REQUEST['step'] == 'pay_code')
 }
 else
 {
-    /* 标记购物流程为普通商品 */
+    // 标记购物流程为普通商品
     $_SESSION['flow_type'] = CART_GENERAL_GOODS;
 
-    /* 如果是一步购物，跳到结算中心 */
+    // 如果是一步购物，跳到结算中心
     if ($_CFG['one_step_buy'] == '1')
     {
         ecs_header("Location: flow.php?step=checkout\n");
         exit;
     }
-
-    /* 取得商品列表，计算合计 */
+    
+    // 刷新购物车
+    update_cart();
+    
+    // 取得商品列表，计算合计
     $cart_goods = get_cart_goods();
     $smarty->assign('goods_list', $cart_goods['goods_list']);
     $smarty->assign('total', $cart_goods['total']);
