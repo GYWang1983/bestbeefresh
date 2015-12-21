@@ -19,7 +19,9 @@
       <th><a href="javascript:listTable.sort('type_name'); ">{$lang.bonus_type}</a>{$sort_type_name}</th>
       <th><a href="javascript:listTable.sort('order_id'); ">{$lang.order_id}</a>{$sort_order_id}</th>
       <th><a href="javascript:listTable.sort('user_id'); ">{$lang.user_id}</a>{$sort_user_id}</th>
+      <th>手机号</th>
       <th><a href="javascript:listTable.sort('used_time'); ">{$lang.used_time}</a>{$sort_use_time}{$sort_used_time}</th>
+      <th><a href="javascript:listTable.sort('expire_time'); ">过期时间</a>{$sort_expire_time}{$sort_expire_time}</th>
       {if $show_mail}
       <th><a href="javascript:listTable.sort('emailed'); ">{$lang.emailed}</a>{$sort_emailed}{$sort_emailed}</th>
       {/if}
@@ -33,8 +35,10 @@
       {/if}
       <td>{$bonus.type_name}</td>
       <td>{$bonus.order_sn}</td>
-      <td>{if $bonus.email}<a href="mailto:{$bonus.email}">{$bonus.user_name}</a>{else}{$bonus.user_name}{/if}</td>
+      <td>{$bonus.user_name}</td>
+      <td>{$bonus.mobile_phone}</td>
       <td align="right">{$bonus.used_time}</td>
+      <td align="right">{$bonus.expire_time}</td>
       {if $show_mail}
       <td align="center">{$bonus.emailed}</td>
       {/if}

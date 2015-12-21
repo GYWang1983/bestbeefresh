@@ -1037,11 +1037,23 @@ function get_bonus_list()
           " LIMIT ". $filter['start'] .", $filter[page_size]";
     $row = $GLOBALS['db']->getAll($sql);
 
-    foreach ($row AS $key => $val)
+    foreach ($row AS &$val)
     {
-        $row[$key]['used_time'] = $val['used_time'] == 0 ?
-            $GLOBALS['_LANG']['no_use'] : local_date($GLOBALS['_CFG']['date_format'], $val['used_time']);
-        $row[$key]['emailed'] = $GLOBALS['_LANG']['mail_status'][$row[$key]['emailed']];
+    	if ($val['used_time'] > 0)
+    	{
+    		$val['used_time'] = local_date($GLOBALS['_CFG']['date_format'], $val['used_time']);
+    	}
+    	elseif ($val['expire_time'] < time())
+    	{
+    		$val['used_time'] = '已过期';
+    	}
+        else
+        {
+        	$val['used_time'] = $GLOBALS['_LANG']['no_use'];
+        }
+        
+        $val['expire_time'] = local_date($GLOBALS['_CFG']['date_format'], $val['expire_time']);
+        //$val['emailed'] = $GLOBALS['_LANG']['mail_status'][$row[$key]['emailed']];
     }
 
     $arr = array('item' => $row, 'filter' => $filter, 'page_count' => $filter['page_count'], 'record_count' => $filter['record_count']);
