@@ -92,7 +92,6 @@ elseif ($_REQUEST['act'] == 'query')
     admin_priv('order_view');
 
     $order_list = order_list();
-
     $smarty->assign('order_list',   $order_list['orders']);
     $smarty->assign('filter',       $order_list['filter']);
     $smarty->assign('record_count', $order_list['record_count']);
@@ -5122,7 +5121,7 @@ function order_list()
 
         /* 查询 */
         $sql = "SELECT o.order_id, o.order_sn, o.add_time, o.order_status, o.shipping_status, o.order_amount, o.money_paid," .
-                    "o.pay_status, o.consignee, o.address, o.mobile, o.extension_code, o.extension_id, " .
+                    "o.pay_status, o.consignee, o.address, o.mobile, o.extension_code, o.extension_id, o.bonus, o.pay_name, o.postscript, " .
                     "(" . order_amount_field('o.') . ") AS total_fee, " .
                     "IFNULL(u.user_name, '" .$GLOBALS['_LANG']['anonymous']. "') AS buyer ".
                 " FROM " . $GLOBALS['ecs']->table('order_info') . " AS o " .
@@ -5145,20 +5144,20 @@ function order_list()
     $row = $GLOBALS['db']->getAll($sql);
 
     /* 格式话数据 */
-    foreach ($row AS $key => $value)
+    foreach ($row AS &$value)
     {
-        $row[$key]['formated_order_amount'] = price_format($value['order_amount']);
-        $row[$key]['formated_money_paid'] = price_format($value['money_paid']);
-        $row[$key]['formated_total_fee'] = price_format($value['total_fee']);
-        $row[$key]['short_order_time'] = local_date('m-d H:i', $value['add_time']);
+        $value['formated_order_amount'] = price_format($value['order_amount']);
+        $value['formated_money_paid'] = price_format($value['money_paid']);
+        $value['formated_total_fee'] = price_format($value['total_fee']);
+        $value['short_order_time'] = local_date('m-d H:i', $value['add_time']);
         if ($value['order_status'] == OS_INVALID || $value['order_status'] == OS_CANCELED)
         {
             /* 如果该订单为无效或取消则显示删除链接 */
-            $row[$key]['can_remove'] = 1;
+            $value['can_remove'] = 1;
         }
         else
         {
-            $row[$key]['can_remove'] = 0;
+            $value['can_remove'] = 0;
         }
     }
     $arr = array('orders' => $row, 'filter' => $filter, 'page_count' => $filter['page_count'], 'record_count' => $filter['record_count']);
