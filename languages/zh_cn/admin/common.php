@@ -198,6 +198,7 @@ $_LANG['13_wholesale'] = '批发管理';
 $_LANG['ebao_commend'] = '易宝推荐';
 $_LANG['14_package_list'] = '超值礼包';
 $_LANG['package_add'] = '添加超值礼包';
+$_LANG['16_flash_sale'] = '限时促销';
 
 /* 订单管理 */
 $_LANG['02_order_list'] = '订单列表';
