@@ -15,15 +15,17 @@ table{border-collapse:collapse;width:100%;border-color:#000;}
 .blod{font-weight:bold;}
 </style>
 <body>
+<h4>日期：</h4>
 <table border="1">
     <tbody>
         <tr align="center">
             <td width="10%">货号</td>
-            <td width="40%">名称</td>
-            <td width="28%">规格</td>
+            <td width="38%">名称</td>
+            <td width="20%">规格</td>
             <td width="6%">优惠</td>
-            <td width="8%">订购价格</td>
+            <td width="8%">售价</td>
             <td width="6%">总数</td>
+            <td width="12%">采购金额</td>
         </tr>
         <!-- {foreach from=$goods_list item=goods} -->
         <tr>
@@ -33,6 +35,7 @@ table{border-collapse:collapse;width:100%;border-color:#000;}
             <td align="center">{$goods.free_more}</td>
             <td align="center">{$goods.goods_price}</td>
             <td align="center">{$goods.goods_number}</td>
+            <td>&nbsp;</td>
         </tr>
         <!-- {/foreach} -->
     </tbody>
