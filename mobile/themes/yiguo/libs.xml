@@ -163,11 +163,11 @@
       <lib>vote_list</lib>
       <lib>email_list</lib>
     </region>
-    <region name="վ"/>
     <region name="">
       <lib>recommend_best</lib>
       <lib>recommend_new</lib>
       <lib>recommend_hot</lib>
+      <lib>flash_sale</lib>
     </region>
   </file>
   <file name="message.dwt"/>

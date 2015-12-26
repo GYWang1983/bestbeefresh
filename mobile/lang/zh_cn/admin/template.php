@@ -121,6 +121,7 @@ $_LANG['template_libs']['relatetag'] = '其他应用关联标签数据';
 $_LANG['template_libs']['message_list'] = '留言列表';
 $_LANG['template_libs']['exchange_hot'] = '积分商城热卖商品';
 $_LANG['template_libs']['exchange_list'] = '积分商城列表商品';
+$_LANG['template_libs']['flash_sale'] = '限时抢购商品';
 
 /* 模板布局备份 */
 $_LANG['backup_setting'] = '备份模板设置';
