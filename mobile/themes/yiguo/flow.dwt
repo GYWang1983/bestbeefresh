@@ -319,13 +319,13 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
         </dl>
 		<div class="dl_box" id="bonus_box" style="display:none;">
           <!-- {foreach from=$bonus_list item=bonus} -->
-           <p>
-            <input name="bonus" type="radio" class="radio" value="0" {if $order.bonus_id eq 0}checked{/if} onclick="changeBonus(this.value)" /> 不使用
-           </p>
-            <p>
+          <p>
             <input name="bonus" type="radio" id="bonus_{$bonus.bonus_id}" class="radio" value="{$bonus.bonus_id}" {if $order.bonus_id eq $bonus.bonus_id}checked{/if}  onclick="changeBonus(this.value)" /> <label for="bonus_{$bonus.bonus_id}">{$bonus.amount}元（{$bonus.expire_time|timestamp:'Y-m-d H:i'}过期）</label>
-           </p>
-            <!-- {/foreach} -->
+          </p>
+          <!-- {/foreach} -->
+          <p>
+            <input name="bonus" type="radio" class="radio" value="0" {if $order.bonus_id eq 0}checked{/if} onclick="changeBonus(this.value)" /> 不使用
+          </p>
 		</div>
         <!-- {/if} 是否使用红包 --> 
 
