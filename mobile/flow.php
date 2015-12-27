@@ -761,7 +761,7 @@ elseif ($_REQUEST['step'] == 'select_shipping')
 
         /* 取得可以得到的积分和红包 */
         $smarty->assign('total_integral', cart_amount(false, $flow_type) - $total['bonus'] - $total['integral_money']);
-        $smarty->assign('total_bonus',    price_format(get_total_bonus(), false));
+        $smarty->assign('total_bonus',    price_format(get_total_bonus($total['goods_price'] - $total['bonus']), false));
 	
         /* 团购标志 */
         if ($flow_type == CART_GROUP_BUY_GOODS)
@@ -824,7 +824,7 @@ elseif ($_REQUEST['step'] == 'select_insure')
 
         /* 取得可以得到的积分和红包 */
         $smarty->assign('total_integral', cart_amount(false, $flow_type) - $total['bonus'] - $total['integral_money']);
-        $smarty->assign('total_bonus',    price_format(get_total_bonus(), false));
+        $smarty->assign('total_bonus',    price_format(get_total_bonus($total['goods_price'] - $total['bonus']), false));
 
         /* 团购标志 */
         if ($flow_type == CART_GROUP_BUY_GOODS)
@@ -883,7 +883,7 @@ elseif ($_REQUEST['step'] == 'select_payment')
 
         /* 取得可以得到的积分和红包 */
         $smarty->assign('total_integral', cart_amount(false, $flow_type) - $total['bonus'] - $total['integral_money']);
-        $smarty->assign('total_bonus',    price_format(get_total_bonus(), false));
+        $smarty->assign('total_bonus',    price_format(get_total_bonus($total['goods_price'] - $total['bonus']), false));
 
         /* 团购标志 */
         if ($flow_type == CART_GROUP_BUY_GOODS)
@@ -939,7 +939,7 @@ elseif ($_REQUEST['step'] == 'select_pack')
 
         /* 取得可以得到的积分和红包 */
         $smarty->assign('total_integral', cart_amount(false, $flow_type) - $total['bonus'] - $total['integral_money']);
-        $smarty->assign('total_bonus',    price_format(get_total_bonus(), false));
+        $smarty->assign('total_bonus',    price_format(get_total_bonus($total['goods_price'] - $total['bonus']), false));
 
         /* 团购标志 */
         if ($flow_type == CART_GROUP_BUY_GOODS)
@@ -995,7 +995,7 @@ elseif ($_REQUEST['step'] == 'select_card')
 
         /* 取得可以得到的积分和红包 */
         $smarty->assign('total_integral', cart_amount(false, $flow_type) - $order['bonus'] - $total['integral_money']);
-        $smarty->assign('total_bonus',    price_format(get_total_bonus(), false));
+        $smarty->assign('total_bonus',    price_format(get_total_bonus($total['goods_price'] - $total['bonus']), false));
 
         /* 团购标志 */
         if ($flow_type == CART_GROUP_BUY_GOODS)
@@ -1768,9 +1768,9 @@ elseif ($_REQUEST['step'] == 'done')
     $order['log_id'] = insert_pay_log($new_order_id, $order['order_amount'], $order['pay_id'], PAY_ORDER);
 
     /* 取得支付信息，生成支付代码 */
-    if ($order['order_amount'] > 0)
+    if ($order['order_amount'] > 0 && !empty($payment))
     {
-        $payment = payment_info($order['pay_id']);
+        //$payment = payment_info($order['pay_id']);
         include_once(ROOT_PATH . 'include/modules/payment/' . $payment['pay_code'] . '.php');
         
         $pay_obj    = new $payment['pay_code'];

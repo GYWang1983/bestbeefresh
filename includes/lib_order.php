@@ -814,7 +814,9 @@ function order_fee($order, $goods, $consignee = NULL)
     {
         $total['will_get_integral'] = get_give_integral($goods);
     }
-    $total['will_get_bonus']        = $order['extension_code'] == 'exchange_goods' ? 0 : price_format(get_total_bonus(), false);
+    
+    $goods_amount = $total['goods_price'] - $total['bonus'];
+    $total['will_get_bonus']        = $order['extension_code'] == 'exchange_goods' ? 0 : price_format(get_total_bonus($goods_amount), false);
     $total['formated_goods_price']  = price_format($total['goods_price'], false);
     $total['formated_market_price'] = price_format($total['market_price'], false);
     $total['formated_saving']       = price_format($total['saving'], false);
@@ -2221,14 +2223,17 @@ function last_shipping_and_payment()
 
 /**
  * 取得当前用户应该得到的红包总额
+ * 
+ * @param $amount array 订单金额
  */
-function get_total_bonus()
+function get_total_bonus($amount)
 {
-    $day    = getdate();
-    $today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
-
+    //$day    = getdate();
+    //$today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
+	$now = time();
+	
     /* 按商品发的红包 */
-    $sql = "SELECT SUM(c.goods_number * t.type_money)" .
+    $sql = "SELECT SUM(c.goods_number * t.type_money) " .
             "FROM " . $GLOBALS['ecs']->table('cart') . " AS c, "
                     . $GLOBALS['ecs']->table('bonus_type') . " AS t, "
                     . $GLOBALS['ecs']->table('goods') . " AS g " .
@@ -2237,26 +2242,26 @@ function get_total_bonus()
             "AND c.goods_id = g.goods_id " .
             "AND g.bonus_type_id = t.type_id " .
             "AND t.send_type = '" . SEND_BY_GOODS . "' " .
-            "AND t.send_start_date <= '$today' " .
-            "AND t.send_end_date >= '$today' " .
+            "AND t.send_start_date <= '$now' " .
+            "AND t.send_end_date >= '$now' " .
             "AND c.rec_type = '" . CART_GENERAL_GOODS . "'";
     $goods_total = floatval($GLOBALS['db']->getOne($sql));
 
     /* 取得购物车中非赠品总金额 */
-    $sql = "SELECT SUM(goods_price * goods_number) " .
+    /*$sql = "SELECT SUM(goods_price * goods_number) " .
             "FROM " . $GLOBALS['ecs']->table('cart') .
             " WHERE " . get_cart_cond() .
             " AND is_gift = 0 " .
             " AND rec_type = '" . CART_GENERAL_GOODS . "'";
-    $amount = floatval($GLOBALS['db']->getOne($sql));
+    $amount = floatval($GLOBALS['db']->getOne($sql));*/
 
     /* 按订单发的红包 */
-    $sql = "SELECT FLOOR('$amount' / min_amount) * type_money " .
+    $sql = "SELECT type_money " .
             "FROM " . $GLOBALS['ecs']->table('bonus_type') .
             " WHERE send_type = '" . SEND_BY_ORDER . "' " .
-            " AND send_start_date <= '$today' " .
-            "AND send_end_date >= '$today' " .
-            "AND min_amount > 0 ";
+            " AND send_start_date <= '$now' " .
+            "AND send_end_date >= '$now' " .
+            "AND min_amount <= $amount AND max_amount > $amount ";
     $order_total = floatval($GLOBALS['db']->getOne($sql));
 
     return $goods_total + $order_total;
@@ -3087,7 +3092,7 @@ function order_bonus($order_id)
 	{
 	    
 		$order_time = $order['pay_time'];
-		$amount     = $order['money_paid'];
+		$amount     = $order['goods_amount'] - $order['bonus']; //$order['money_paid'];
 		
 		if ($amount > 0)
 		{
@@ -3098,6 +3103,7 @@ function order_bonus($order_id)
 		                      $GLOBALS['ecs']->table('bonus_type') . " AS b " .
 		            " WHERE o.order_id = '$order_id' " .
 		            " AND o.is_gift = 0 " .
+		            " AND o.extension_code = ''" .
 		            " AND o.goods_id = g.goods_id " .
 		            " AND g.bonus_type_id = b.type_id " .
 		            " AND b.send_type = '" . SEND_BY_GOODS . "' " .
@@ -3110,7 +3116,7 @@ function order_bonus($order_id)
 		    $sql = "SELECT b.*, 1 AS number " .
 		            "FROM " . $GLOBALS['ecs']->table('bonus_type') . ' AS b ' .
 		            "WHERE send_type = '" . SEND_BY_ORDER . "' " .
-		            "AND min_amount <= $amount AND max_amount >= $amount " .
+		            "AND min_amount <= $amount AND max_amount > $amount " .
 		            "AND send_start_date <= '$order_time' " .
 		            "AND send_end_date >= '$order_time' ";
 		    $list = array_merge($list, $GLOBALS['db']->getAll($sql));
