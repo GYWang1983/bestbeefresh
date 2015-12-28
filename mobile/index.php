@@ -77,6 +77,8 @@ if (!$smarty->is_cached('index.dwt', $cache_id))
     //$smarty->assign('auction_list',    index_get_auction());        // 拍卖活动
     //$smarty->assign('shop_notice',     $_CFG['shop_notice']);       // 商店公告
 
+    $smarty->assign('flash_sale', get_flash_sale_goods()); // 限时抢购
+    
     /* 首页主广告设置 */
     /*$smarty->assign('index_ad',     $_CFG['index_ad']);
     if ($_CFG['index_ad'] == 'cus')
