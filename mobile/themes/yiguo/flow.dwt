@@ -26,7 +26,7 @@
 <body>
 <!-- {if $step eq "cart"} -->
 <script type="text/javascript">
-var cart = {};
+var cart={}, flash={};
 </script>
 <div id="page">
   <header id="header">
@@ -47,12 +47,13 @@ var cart = {};
 <section class="wrap box1">
   <form id="formCart" name="formCart" method="post" action="flow.php">
       <!-- {foreach from=$goods_list item=goods} -->
-      <div class="goodsItem" id="goods{$goods.goods_id}">
+      <div class="goodsItem" id="{if $goods.extension_code eq 'flash_sale'}flash{$goods.extension_id}{else}goods{$goods.goods_id}{/if}">
         <div class="thumb">
             <img src="{$site_url}{$goods.goods_thumb}" alt="{$goods.goods_name|escape:html}" />
         </div>
         <div class="desc">
             <div class="title">
+                {if $goods.extension_code eq 'flash_sale'}<span class="red-flag">限时抢购</span>{/if}
                 <a href="goods.php?id={$goods.goods_id}">{$goods.goods_name|escape:html}</a>
                 <!-- {if $goods.parent_id gt 0} 配件 --> 
                 <span style="color:#FF0000">（{$lang.accessories}）</span> 
@@ -70,7 +71,7 @@ var cart = {};
         </div>
         <div class="price">{$goods.goods_price}</div>
         <!-- {if $goods.goods_id gt 0 && $goods.is_gift eq 0 && $goods.parent_id eq 0} 普通商品可修改数量 -->
-        <div class="cart" data="{$goods.goods_id}">
+        <div class="cart" {if $goods.extension_code eq 'flash_sale'}data="{$goods.extension_id}"{else}data="{$goods.goods_id}"{/if} ext="{$goods.extension_code}">
             <div class="btn drop-goods"><a class="icon-trash" href="flow.php?step=drop_goods&id={$goods.rec_id}"></a></div>
             <div class="btn icon-plus"></div>
             <div class="num">{$goods.goods_number}</div>
@@ -376,7 +377,9 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <a href="javascript:void(0)" onClick="setSuitShow({$goods.goods_id})" >{$goods.goods_name}<span style="color:#FF0000;">（{$lang.remark_package}）</span></a> 
             <!-- { else } --> 
             <a href="goods.php?id={$goods.goods_id}" target="_blank" >
-              {$goods.goods_name}{if $goods.free_more}（{$goods.free_more_desc}）{/if}
+              {$goods.goods_name}
+              {if $goods.free_more}（{$goods.free_more_desc}）{/if}
+              {if $goods.extension_code eq 'flash_sale'}（限时抢购）{/if}
             </a> 
             <!-- {if $goods.parent_id > 0} --> 
             <span style="color:#FF0000">（{$lang.accessories}）</span> 

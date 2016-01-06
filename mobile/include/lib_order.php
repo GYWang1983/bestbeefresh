@@ -874,7 +874,7 @@ function get_order_sn()
 function cart_goods($type = CART_GENERAL_GOODS)
 {
     $sql = "SELECT c.rec_id, c.user_id, c.goods_id, c.goods_name, g.goods_thumb, c.goods_sn, c.goods_number, " .
-            "c.market_price, c.goods_price, c.goods_attr, c.is_real, c.extension_code, c.parent_id, c.is_gift, c.is_shipping, " .
+            "c.market_price, c.goods_price, c.goods_attr, c.is_real, c.extension_code, c.extension_id, c.parent_id, c.is_gift, c.is_shipping, " .
             "c.goods_price * c.goods_number AS subtotal, c.free_more " .
             "FROM " . $GLOBALS['ecs']->table('cart') .
 			" AS c LEFT JOIN ".$GLOBALS['ecs']->table('goods').
@@ -1014,6 +1014,133 @@ function cart_weight_price($type = CART_GENERAL_GOODS)
     $packages_row['formated_weight'] = formated_weight($packages_row['weight']);
 
     return $packages_row;
+}
+
+
+/**
+ * 限时抢购商品加入购物车
+ * @param unknown $id
+ * @param unknown $num
+ */
+function flash_addto_cart($id, $num)
+{
+	global $ecs, $db, $err;
+	
+	$GLOBALS['err']->clean();
+	
+	// 获取限时抢购信息
+	$sql = "SELECT f.*, g.goods_sn, g.goods_name, g.market_price, g.is_real, g.is_shipping FROM " . 
+		$ecs->table('flash_sale', 'f') . ',' . $ecs->table('goods', 'g') . 
+		" WHERE f.goods_id = g.goods_id AND f.id = '$id'";
+	$flash = $db->getRow($sql);
+	
+	if (empty($flash))
+	{
+		$GLOBALS['err']->add($GLOBALS['_LANG']['goods_not_exists'], ERR_NOT_EXISTS);
+		return false;
+	} 
+	
+	// 检查活动是否在进行
+	$now = time();
+	if ($flash['is_on_sale'] == 0)
+	{
+		$GLOBALS['err']->add($GLOBALS['_LANG']['not_on_sale'], ERR_NOT_ON_SALE);
+		return false;
+	}
+	elseif ($now < $flash['start_time'])
+	{
+		$GLOBALS['err']->add('活动尚未开始');
+		return false;
+	}
+	elseif ($now > $flash['end_time'])
+	{
+		$GLOBALS['err']->add('活动已结束');
+		return false;
+	}
+	
+	// 检查库存
+	if ($flash['promote_num'] > 0)
+	{
+		$sql = "SELECT sum(goods_number) AS goods_number FROM " . 
+				$ecs->table('order_info', 'o') . ',' . $ecs->table('order_goods', 'og') .
+				" WHERE o.order_id = og.order_id AND o.order_status = " . OS_UNCONFIRMED . " AND o.pay_status = " . PS_PAYED .
+				" AND og.extension_code = 'flash_sale' AND og.extension_id = $id";
+		$total_num = $db->getOne($sql);
+		
+		if ($total_num >= $flash['promote_num'])
+		{
+			$GLOBALS['err']->add('已经抢光了');
+			return false;
+		}
+		
+		if ($num > $flash['promote_num'] - $total_num)
+		{
+			$GLOBALS['err']->add('只剩' . ($flash['promote_num'] - $total_num) . '件了');
+			return false;
+		}
+	}
+	
+	$sql = "SELECT max(rec_id) AS rec_id, sum(goods_number) AS goods_number FROM " . $ecs->table('cart') .
+			" WHERE extension_code = 'flash_sale' AND extension_id = $id AND rec_type = " . CART_GENERAL_GOODS . 
+			" AND " . get_cart_cond();
+	$in_cart = $db->getRow($sql);
+	
+	// 检查限购数量
+	if ($flash['order_limit_num'] > 0)
+	{
+		$order_num = 0;
+		if (!empty($_SESSION['user_id']))
+		{
+			$sql = "SELECT sum(goods_number) AS goods_number FROM " . 
+				$ecs->table('order_info', 'o') . ',' . $ecs->table('order_goods', 'og') .
+				" WHERE o.order_id = og.order_id AND o.order_status = " . OS_UNCONFIRMED . " AND o.pay_status = " . PS_PAYED .
+				" AND og.extension_code = 'flash_sale' AND og.extension_id = $id AND o.user_id = " . $_SESSION['user_id'];
+			$order_num = $db->getOne($sql);
+		}
+		
+		$cart_num = !empty($in_cart) && !empty($in_cart['goods_number']) ? $in_cart['goods_number'] : 0;
+		
+		if ($order_num + $cart_num >= $flash['order_limit_num'])
+		{
+			$GLOBALS['err']->add('每人只能抢购' . $flash['order_limit_num'] . '件');
+			return false;
+		}
+	}
+	
+	
+	if (!empty($in_cart) && !empty($in_cart['rec_id']))
+	{
+		// 购物车中已存在，更新数量
+		$sql = "UPDATE " . $ecs->table('cart') . " SET goods_number = goods_number + {$num} WHERE rec_id = " . $in_cart['rec_id'];
+		$db->query($sql);
+	}
+	else
+	{
+		// 插入购物车
+		$cart = array(
+			'user_id'       => $_SESSION['user_id'],
+			'session_id'    => SESS_ID,
+			'goods_id'      => $flash['goods_id'],
+			'goods_sn'      => addslashes($flash['goods_sn']),
+			'product_id'    => 0,
+			'goods_name'    => addslashes($flash['goods_name']),
+			'market_price'  => $flash['market_price'],
+			'goods_attr'    => addslashes($flash['amount_desc']),
+			'is_real'       => $flash['is_real'],
+			'extension_code'=> 'flash_sale',
+			'extension_id'  => $flash['id'],
+			'goods_price'   => $flash['promote_price'],
+			'goods_number'  => $num,
+			'is_gift'       => 0,
+			'is_shipping'   => $flash['is_shipping'],
+			'add_time'      => time(),
+			'rec_type'      => CART_GENERAL_GOODS
+		);
+		
+		$db->autoExecute($ecs->table('cart'), $cart, 'INSERT');
+	}
+	
+	return true;
 }
 
 /**
@@ -1249,8 +1376,8 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         $sql = "SELECT goods_number FROM " .$GLOBALS['ecs']->table('cart').
                 " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
                 " AND parent_id = 0 AND goods_attr = '" .$goods_attr. "' " .
-                " AND extension_code <> 'package_buy' " .
-                " AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";//by mike add
+                " AND extension_code <> 'flash_sale' " .
+                " AND rec_type = '" . CART_GENERAL_GOODS . "' AND group_id=''";//by mike add
 
         $row = $GLOBALS['db']->getRow($sql);
 
@@ -1272,8 +1399,8 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                        " , goods_price = '$goods_price'".
                        " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
                        " AND parent_id = 0 AND goods_attr = '" .$goods_attr. "' " .
-                       " AND extension_code <> 'package_buy' " .
-                       "AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";
+                       " AND extension_code <> 'flash_sale' " .
+                       "AND rec_type = '" . CART_GENERAL_GOODS . "' AND group_id=''";
                 $GLOBALS['db']->query($sql);
             }
             else
@@ -3208,15 +3335,25 @@ function update_cart()
 	global $ecs, $db;
 	
 	//删除已下架商品
-	$sql = "DELETE c FROM " . $ecs->table('cart', 'c') . " WHERE " . get_cart_cond() . 
+	$sql = "DELETE c FROM " . $ecs->table('cart', 'c') . " WHERE " . get_cart_cond('c.') . 
 			" AND NOT EXISTS (SELECT 1 FROM " . $ecs->table('goods', 'g') . " WHERE g.goods_id = c.goods_id AND g.is_on_sale = 1 AND g.is_delete = 0) " .
-			" AND c.rec_type = " . CART_GENERAL_GOODS;
+			" AND c.extension_code <> 'flash_sale' AND c.rec_type = " . CART_GENERAL_GOODS;
 	$db->query($sql);
+	
+	//删除已过期限时抢购
+	$now = time();
+	$sql = "DELETE c FROM " . $ecs->table('cart', 'c') . " WHERE " . get_cart_cond('c.') .
+			" AND NOT EXISTS (SELECT 1 FROM " . $ecs->table('flash_sale', 'f') . " WHERE f.id = c.extension_id AND f.is_on_sale = 1 AND f.start_time <= $now AND f.end_time > $now) " .
+			" AND c.extension_code = 'flash_sale' AND c.rec_type = " . CART_GENERAL_GOODS;
+	$db->query($sql);
+	
+	//限时抢购商品限购数量检查
+	check_cartgoods_number(true);
 	
 	//更新产品价格、规格等
 	$sql = "SELECT c.rec_id, c.goods_id, c.goods_number, c.goods_attr_id, g.goods_name, g.market_price, g.shop_price, g.amount_desc, g.free_more FROM " . 
 	        $ecs->table('cart', 'c') . ',' . $ecs->table('goods', 'g') . 
-			" WHERE c.goods_id = g.goods_id AND " . get_cart_cond('c.');
+			" WHERE c.goods_id = g.goods_id AND c.extension_code <> 'flash_sale' AND " . get_cart_cond('c.');
 	$query = $db->query($sql);
 	while ($rs = $db->fetch_array($query))
 	{
@@ -3241,5 +3378,94 @@ function update_cart()
 		
 		$db->autoExecute($ecs->table('cart'), $cart, 'UPDATE', 'rec_id=' . $rs['rec_id']);
 	}
+}
+
+/**
+ * 检查购物车中限购商品数量
+ * 
+ * @param boolean $auto_upload 是否自动修改数量
+ */
+function check_cartgoods_number($auto_upload = false)
+{
+	global $ecs, $db;
+	
+	$sql = "SELECT min(c.rec_id) AS rec_id, count(rec_id) AS rec_count, c.extension_id, sum(c.goods_number) AS goods_number, f.order_limit_num FROM " 
+			. $ecs->table('cart', 'c') . "," . $ecs->table('flash_sale', 'f') .
+			" WHERE c.extension_code = 'flash_sale' AND c.extension_id = f.id AND c.rec_type = " .CART_GENERAL_GOODS .
+			" AND f.order_limit_num > 0 AND " . get_cart_cond('c.') . " GROUP BY c.extension_id";
+	$result = $db->getAll($sql);
+	
+	if (empty($result))
+	{
+		return true;
+	}
+	
+	$flash_cart = array();
+	foreach ($result as &$row)
+	{
+		$row['allow_number'] = $row['order_limit_num'];
+		$flash_cart[$row['extension_id']] = $row;
+	}
+	
+	if (!empty($_SESSION['user_id']))
+	{
+		$sql = "SELECT g.extension_id, sum(g.goods_number) AS goods_number FROM " . 
+			$ecs->table('order_info', 'o') . "," . $ecs->table('order_goods', 'g') . 
+			" WHERE o.order_id = g.order_id AND g.extension_code = 'flash_sale' AND g.extension_id IN (" . implode(',', array_keys($flash_cart)) . ")" .
+			" AND o.pay_status = " . PS_PAYED . " AND o.user_id = " . $_SESSION['user_id'] . 
+			" GROUP BY g.extension_code, g.extension_id";
+		
+		$result = $db->getAll($sql);
+		if (!empty($result))
+		{
+			foreach ($result as $goods)
+			{
+				$flash_id = $goods['extension_id'];
+				if (array_key_exists($flash_id, $flash_cart))
+				{
+					$flash_cart[$flash_id]['allow_number'] = $flash_cart[$flash_id]['order_limit_num'] - $goods['goods_number'];
+				}
+			}
+		}
+	}
+	
+	foreach ($flash_cart as $flash)
+	{
+		if ($flash['allow_number'] <= 0)
+		{
+			if ($auto_upload)
+			{
+				$sql = "DELETE FROM " . $ecs->table('cart') .
+					" WHERE extension_code = 'flash_sale' AND extension_id = '$flash[extension_id]' AND " . get_cart_cond();
+				$db->query($sql);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		elseif ($flash['allow_number'] < $flash['goods_number'])
+		{
+			if ($auto_upload)
+			{
+				if ($flash['rec_count'] > 1)
+				{
+					$sql = "DELETE FROM " . $ecs->table('cart') .
+						" WHERE extension_code = 'flash_sale' AND extension_id = '$flash[extension_id]' AND rec_id <> '$flash[rec_id]'" .
+						" AND " . get_cart_cond();
+					$db->query($sql);
+				}
+				
+				$sql = "UPDATE " . $ecs->table('cart') . " SET goods_number = '$flash[allow_number]' WHERE rec_id = '$flash[rec_id]'";
+				$db->query($sql);
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	return true;
 }
 ?>

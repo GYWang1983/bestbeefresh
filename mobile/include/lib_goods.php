@@ -401,6 +401,37 @@ function get_promote_goods($cats = '')
 }
 
 /**
+ * 获取限时促销商品
+ * 
+ */
+function get_flash_sale_goods()
+{
+	global $ecs, $db;
+
+	$num = get_library_number("flash_sale");
+	$today = date('Y-m-d');
+		
+	$sql = "SELECT f.*, g.goods_name, g.goods_thumb FROM " . 
+		$ecs->table('flash_sale', 'f') . ',' . $ecs->table('goods', 'g') . 
+		" WHERE f.goods_id = g.goods_id AND f.date = '$today' AND f.is_on_sale = 1" .
+		" ORDER BY f.start_time, f.order, g.sort_order ";
+	if ($num > 0)
+	{
+		$sql .= " LIMIT $num";
+	}
+	
+	$result = $db->getAll($sql);
+	foreach ($result as &$goods)
+	{
+		$goods['promote_price_formated']   = price_format($goods['promote_price']);
+		$goods['thumb']  = get_image_path($goods['goods_id'], $goods['goods_thumb'], true);
+		$goods['url']    = build_uri('goods', array('gid' => $goods['goods_id']), $goods['goods_name']);
+	}
+	
+	return $result;
+}
+
+/**
  * 获得指定分类下的推荐商品
  *
  * @access  public

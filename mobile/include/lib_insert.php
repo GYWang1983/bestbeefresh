@@ -396,11 +396,75 @@ function insert_cart_detail_number()
 	return json_encode($cart);
 }
 
+function insert_cart_flash_number()
+{
+	$now = time();
+	$sql = 'SELECT c.extension_id, SUM(c.goods_number) AS number FROM ' . 
+		$GLOBALS['ecs']->table('cart', 'c') . ',' . $GLOBALS['ecs']->table('flash_sale', 'f') .
+		" WHERE c.extension_id = f.id AND f.is_on_sale = 1 AND f.start_time <= $now AND f.end_time > $now AND " . 
+		get_cart_cond('c.') . " AND c.extension_code = 'flash_sale' AND c.rec_type = " . CART_GENERAL_GOODS . 
+		" GROUP BY c.extension_id";
+	$rs = $GLOBALS['db']->getAll($sql);
+
+	if (empty($rs)) {
+		return '{}';
+	}
+
+	$flash = array();
+	foreach ($rs as $good) {
+		$flash[$good['extension_id']] = $good['number'];
+	}
+
+	return json_encode($flash);
+}
+
 function insert_cart_goods_number($goods_id)
 {	
 	$sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
-	" WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' AND goods_id = $goods_id";
+	" WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' AND extension_code <> 'flash_sale' AND goods_id = $goods_id";
 	$num = $GLOBALS['db']->getOne($sql);
 	return $num ?: 0;
+}
+
+function insert_cart_flash_sale_number($flash_id)
+{
+	$sql = 'SELECT SUM(goods_number) AS number FROM ' . $GLOBALS['ecs']->table('cart') .
+	" WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' AND extension_code = 'flash_sale' AND extension_id = $flash_id";
+	$num = $GLOBALS['db']->getOne($sql);
+	return $num ?: 0;
+}
+
+function insert_flash_sale_time($arr)
+{
+	$now = time();
+	$remain = 0;
+	
+	if ($arr[start_time] > $now)
+	{
+		$text = "<span class=\"icon-time\">" . date('H:i', $arr['start_time']) . "准时开抢</span>";
+		$class = 'text-green';
+		$status = 1;
+	}
+	elseif ($arr[end_time] < $now)
+	{
+		$text = "<span class=\"icon-time\">已结束</span>";
+		$class = 'text-gray';
+		$status = 3;
+	}
+	else
+	{
+		$remain = $arr[end_time] - $now;
+		$h = floor($remain / 3600);
+		$m = floor(($remain - $h * 3600) / 60);
+		$s = $remain % 60;
+		
+		$timer = ($h > 0 ? "{$h}时" : '') . ($m > 0 ? "{$m}分" : '') . "{$s}秒";
+		$text = "<span class=\"icon-time\">{$timer}</span>";
+		$class = 'text-black';
+		$status = 2;
+	}
+	
+	$html = "<div class=\"flash_time {$class}\" remain=\"$remain\" status=\"{$status}\">{$text}</div>";
+	return $html;
 }
 ?>

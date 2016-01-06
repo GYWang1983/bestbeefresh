@@ -2,7 +2,7 @@
 $(function() {
 	
 	// category menu
-	$('nav#menu').show().mmenu();
+	//$('nav#menu').show().mmenu();
 	
 	// image lazyload
 	$('.goodsItem .thumb img').lazyload({ 
@@ -20,18 +20,43 @@ $(function() {
 	});
 	
 	
-	$(".cart .icon-plus").click(function(e) {
+	$(".flash-sale .cart .icon-plus").click(function(e) {
 	   var goods_id = $(e.target).parents('.cart').attr('data');
-	   addToCart(goods_id);
+	   addToCart(goods_id, 0, 'flash_sale');
 	});
-	$(".cart .icon-minus").click(function(e) {
+	$(".flash-sale .cart .icon-minus").click(function(e) {
 	   var goods_id = $(e.target).parents('.cart').attr('data');
-       decFromCart(goods_id);
+	   decFromCart(goods_id, 0, 'flash_sale');
     });
+	
+	$(".cat-goods .cart .icon-plus").click(function(e) {
+		var goods_id = $(e.target).parents('.cart').attr('data');
+		addToCart(goods_id);
+	});
+	$(".cat-goods .cart .icon-minus").click(function(e) {
+		var goods_id = $(e.target).parents('.cart').attr('data');
+		decFromCart(goods_id);
+	});
     
     for (var good_id in cart) {
         $('#goods' + good_id + ' .cart .num').text(cart[good_id]);
     }
+    
+    if (flash) {
+    	for (var flash_id in flash) {
+    		$('#flash' + flash_id + ' .cart .num').text(flash[flash_id]);
+    	}
+    }
+    
+    // 限时抢购倒计时
+    $('.flash-sale .goodsItem').each(function(){
+    	var el = $(this),
+    		timeObj = el.find(".flash_time");
+    	if (timeObj.attr('status') == 2) {
+    		el.find('.cart').show();
+    		startFlashTimer(el, timeObj.attr('remain'), 0);
+    	}
+    });
     
     var share_meta = {
     	'title': shop_title,
@@ -48,3 +73,23 @@ $(function() {
 	    wx.onMenuShareQZone(share_meta);
     });
 });
+
+
+function startFlashTimer(el, remain, time) {
+	setTimeout(function() {
+		time++;
+		if (time < remain) {
+			var d = remain - time,
+				h = Math.floor(d / 3600),
+				m = Math.floor((d - h * 3600) / 60),
+				s = d % 60;
+				t = (h > 0 ? h + '时' : '') +  m + '分' + s + '秒';
+			el.find('.flash_time span').text(t);
+			startFlashTimer(el, remain, time);
+		} else {
+			el.find('.flash_time span').text('已结束');
+			el.find('.flash_time').removeClass('text-black').addClass('text-gray');
+			el.find('.cart').hide();
+		}
+	}, 1000);
+}

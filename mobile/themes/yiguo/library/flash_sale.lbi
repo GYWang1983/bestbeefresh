@@ -1,28 +1,27 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!--循环分类下商品 begin-->
-<section class="item_show_box1 region">
-<!-- {foreach name=goods from=$cat_goods item=goods}-->
-    <div class="goodsItem" id="goods{$goods.id}">
+<script type="text/javascript">
+var flash = {insert name='cart_flash_number'};
+</script>
+<section class="flash-sale region">
+<!-- {foreach name=goods from=$flash_sale item=goods}-->
+    <div class="goodsItem" id="flash{$goods.id}">
         <div class="thumb">
-            <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.name|escape:html}" />
+            <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.goods_name|escape:html}" />
         </div>
         <div class="desc">
-            <div class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></div>
-            <!--{if $goods.free_more_desc}-->
-            <div class="freemore">{$goods.free_more_desc}</div>
-            <!--{/if}-->
+            <span class="red-flag">限时抢购</span>
+            <span class="title">{$goods.goods_name|escape:html}</span>
         </div>
         <div class="price">
-            <!-- {if $goods.promote_price neq ""} --> 
-            <span> {$goods.promote_price} </span> 
-            <!-- {else}--> 
-            <span> {$goods.shop_price} </span> 
-            <!--{/if}-->
+            <span> {$goods.promote_price_formated} </span> 
             <!--{if $goods.amount_desc}-->
             <span class="amount_desc"> / {$goods.amount_desc}</span>
             <!--{/if}-->
         </div>
-        <div class="cart" data="{$goods.id}">
+        {insert name="flash_sale_time" start_time="$goods.start_time" end_time="$goods.end_time"}
+        <div class="leftempty">&nbsp;</div>
+        <div class="cart" data="{$goods.id}" style="display:none;">
             <div class="btn icon-plus"></div>
             <div class="num">0</div>
             <div class="btn icon-minus"></div>

@@ -122,13 +122,43 @@ if ($_REQUEST['step'] == 'add_to_cart')
         clear_cart();
     }
 
-    /* 检查：商品数量是否合法 */
+    // 检查：商品数量是否合法
     if (!is_numeric($goods->number) || intval($goods->number) <= 0)
     {
         $result['error']   = 1;
         $result['message'] = $_LANG['invalid_number'];
     }
-    /* 更新：购物车 */
+    // 更新：限时抢购购物车
+    elseif ($goods->extension_code == 'flash_sale')
+    {
+    	if (flash_addto_cart($goods->goods_id, $goods->number))
+    	{
+    		if ($_CFG['cart_confirm'] > 2)
+    		{
+    			$result['message'] = '';
+    		}
+    		else
+    		{
+    			$result['message'] = $_CFG['cart_confirm'] == 1 ? $_LANG['addto_cart_success_1'] : $_LANG['addto_cart_success_2'];
+    		}
+    		
+    		//$result['content'] = insert_cart_info();
+    		$result['one_step_buy'] = $_CFG['one_step_buy'];
+    		$result['flash_id'] = stripslashes($goods->goods_id);
+    		$result['goods_number']  = insert_cart_flash_sale_number($goods->goods_id);
+    		$result['diff_number']  = $goods->number;
+    		$cart_goods = get_cart_goods();
+    		$result['cart_number'] = $cart_goods['total']['real_goods_count'] + $cart_goods['total']['virtual_goods_count'];
+    		$result['cart_total']  = $cart_goods['total'];
+    	}
+    	else
+    	{
+    		$result['message']  = $err->last_message();
+    		$result['error']    = $err->error_no;
+    		$result['flash_id'] = stripslashes($goods->goods_id);
+    	}
+    }
+    // 更新：商品购物车
     else
     {
         // 更新：添加到购物车
@@ -143,12 +173,11 @@ if ($_REQUEST['step'] == 'add_to_cart')
                 $result['message'] = $_CFG['cart_confirm'] == 1 ? $_LANG['addto_cart_success_1'] : $_LANG['addto_cart_success_2'];
             }
 
-            $result['content'] = insert_cart_info();
+            //$result['content'] = insert_cart_info();
             $result['one_step_buy'] = $_CFG['one_step_buy'];
             $result['goods_id'] = stripslashes($goods->goods_id);
             $result['goods_number']  = insert_cart_goods_number($goods->goods_id);
             $result['diff_number']  = $goods->number;
-            //$result['cart_number'] = insert_cart_info_number();
             $cart_goods = get_cart_goods();
             $result['cart_number'] = $cart_goods['total']['real_goods_count'] + $cart_goods['total']['virtual_goods_count'];
             $result['cart_total']  = $cart_goods['total'];
@@ -188,10 +217,6 @@ elseif ($_REQUEST['step'] == 'dec_from_cart')
         $result['message'] = 'invalid_goods';
         die($json->encode($result));
     }
-	else
-	{
-		$result['goods_id'] = $goods->goods_id;
-	}
     
 	/* 检查：商品数量是否合法 */
 	if (!is_numeric($goods->number) || intval($goods->number) <= 0)
@@ -201,7 +226,16 @@ elseif ($_REQUEST['step'] == 'dec_from_cart')
 	}
 	
 	$sql = 'SELECT rec_id, goods_number FROM ' . $GLOBALS['ecs']->table('cart') .
-	" WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' AND goods_id = " . $goods->goods_id;
+	" WHERE " . get_cart_cond() . " AND rec_type = '" . CART_GENERAL_GOODS . "' AND ";
+	if ($goods->extension_code == 'flash_sale')
+	{
+		$sql .= "extension_code = 'flash_sale' AND extension_id = " . $goods->goods_id;
+	}
+	else
+	{
+		$sql .= "extension_code <> 'flash_sale' AND goods_id = " . $goods->goods_id;
+	}
+	
 	$rec = $GLOBALS['db']->getRow($sql);
 	
 	if (!empty($rec)) {
@@ -221,7 +255,17 @@ elseif ($_REQUEST['step'] == 'dec_from_cart')
 		}
 	}
 	
-	$result['goods_number'] = insert_cart_goods_number($goods->goods_id);
+	if ($goods->extension_code == 'flash_sale')
+	{
+		$result['flash_id'] = $goods->goods_id;
+		$result['goods_number']  = insert_cart_flash_sale_number($goods->goods_id);
+	}
+	else
+	{
+		$result['goods_id'] = $goods->goods_id;
+		$result['goods_number'] = insert_cart_goods_number($goods->goods_id);
+	}
+	
 	$result['diff_number']  = -$goods->number;
 	//$result['cart_number'] = insert_cart_info_number();
 	$cart_goods = get_cart_goods();
@@ -410,6 +454,9 @@ elseif ($_REQUEST['step'] == 'checkout')
     //-- 订单确认
     /*------------------------------------------------------ */
 
+	// 刷新购物车
+	update_cart();
+	
     /* 取得购物类型 */
     $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
 
@@ -468,9 +515,6 @@ elseif ($_REQUEST['step'] == 'checkout')
 
     $_SESSION['flow_consignee'] = $consignee;
     $smarty->assign('consignee', $consignee);*/
-    
-    // 刷新购物车
-    update_cart();
     
     // 对商品信息赋值
     $cart_goods = cart_goods($flow_type); // 取得商品列表，计算合计
@@ -1314,7 +1358,7 @@ elseif ($_REQUEST['step'] == 'done')
 
     // 取得购物类型
     $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
-
+	
     // 检查购物车中是否有商品
     $sql = "SELECT COUNT(*) FROM " . $ecs->table('cart') .
         " WHERE " . get_cart_cond() .
@@ -1328,6 +1372,21 @@ elseif ($_REQUEST['step'] == 'done')
     if (isset($_POST['checkout_time']) && intval($_POST['checkout_time']) < time() - 3600)
     {
     	show_message('订单提交超时', '重新确认订单', 'flow.php?step=checkout', 'error');
+    }
+    
+    // 检查购物车中是否有限时抢购商品过期
+    $now = time();
+    $sql = "SELECT count(c.rec_id) FROM " . $ecs->table('cart', 'c') . ',' . $ecs->table('flash_sale', 'f') .
+    " WHERE c.extension_code = 'flash_sale' AND c.extension_id = f.id AND (f.start_time > $now OR f.end_time <= $now OR f.is_on_sale = 0)";
+    if ($db->getOne($sql) > 0)
+    {
+    	show_message('订单中有已经过期的限时抢购商品，请重新提交订单', '重新提交订单', 'flow.php?step=checkout', 'error');
+    }
+    
+    // 检查限时抢购限购数量
+    if (!check_cartgoods_number())
+    {
+    	show_message('限时抢购商品超过限购数量，请重新提交订单', '重新提交订单', 'flow.php?step=checkout', 'error');
     }
     
     /* 检查商品库存 */
@@ -1643,9 +1702,9 @@ elseif ($_REQUEST['step'] == 'done')
     /* 插入订单商品 */
     $sql = "INSERT INTO " . $ecs->table('order_goods') . "( " .
                 "order_id, goods_id, goods_name, goods_sn, product_id, goods_number, market_price, ".
-                "goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, goods_attr_id, free_more) ".
+                "goods_price, goods_attr, is_real, extension_code, extension_id, parent_id, is_gift, goods_attr_id, free_more) ".
             " SELECT '$new_order_id', goods_id, goods_name, goods_sn, product_id, goods_number, market_price, ".
-                "goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, goods_attr_id, free_more".
+                "goods_price, goods_attr, is_real, extension_code, extension_id, parent_id, is_gift, goods_attr_id, free_more".
             " FROM " .$ecs->table('cart') .
             " WHERE ".get_cart_cond()." AND rec_type = '$flow_type'";
     $db->query($sql);
@@ -2390,7 +2449,7 @@ function flow_update_cart($arr)
             }
 
             /* 处理超值礼包 */
-            if ($goods['extension_code'] == 'package_buy')
+            if ($goods['extension_code'] == 'package_buy' || $goods['extension_code'] == 'flash_sale')
             {
                 //更新购物车中的商品数量
                 $sql = "UPDATE " .$GLOBALS['ecs']->table('cart').

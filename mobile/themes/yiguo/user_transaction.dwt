@@ -332,7 +332,9 @@ jQuery(function($){
           <tr>
             <td rowspan="2" width="60" align="center" valign="middle" style="border-bottom:1px #CCCCCC dashed">
             <a href="goods.php?id={$goods.goods_id}" target="_blank"><img src="{$site_url}{$goods.goods_thumb}" width="60" height="60" /></a></td>
-            <td>{$goods.goods_name}<br/><span class="goods_attr">{$goods.goods_attr}</span>{if $goods.free_more}<span class="freemore">{$goods.free_more_desc}</span>{/if}</td>
+            <td>{if $goods.extension_code eq 'flash_sale'}<span class="red-flag">限时抢购</span>{/if}
+                <span>{$goods.goods_name}<span><br/>
+                <span class="goods_attr">{$goods.goods_attr}</span>{if $goods.free_more}<span class="freemore">{$goods.free_more_desc}</span>{/if}</td>
           </tr>
           <tr>
             <td style="border-bottom:1px #CCCCCC dashed">价格：{$goods.goods_price} × {$goods.goods_number}<br>小计：{$goods.subtotal}</td>

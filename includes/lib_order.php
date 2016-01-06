@@ -1049,7 +1049,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     if ($parent > 0)
     {
         $sql = "SELECT COUNT(*) FROM " . $GLOBALS['ecs']->table('cart') .
-                " WHERE goods_id='$parent' AND " . get_cart_cond() . " AND extension_code <> 'package_buy'";
+                " WHERE goods_id='$parent' AND " . get_cart_cond() . " AND extension_code <> 'flash_sale'";
         if ($GLOBALS['db']->getOne($sql) == 0)
         {
             $GLOBALS['err']->add($GLOBALS['_LANG']['no_basic_goods'], ERR_NO_BASIC_GOODS);
@@ -1175,7 +1175,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                 "FROM " . $GLOBALS['ecs']->table('cart') .
                 " WHERE " . get_cart_cond() .
                 " AND parent_id = 0" .
-                " AND extension_code <> 'package_buy' " .
+                " AND extension_code <> 'flash_sale' " .
                 " AND goods_id " . db_create_in(array_keys($basic_list)) .
                 " GROUP BY goods_id";
         $res = $GLOBALS['db']->query($sql);
@@ -1193,7 +1193,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                 "FROM " . $GLOBALS['ecs']->table('cart') .
                 " WHERE " . get_cart_cond() .
                 " AND goods_id = '$goods_id'" .
-                " AND extension_code <> 'package_buy' " .
+                " AND extension_code <> 'flash_sale' " .
                 " AND parent_id " . db_create_in(array_keys($basic_count_list)) .
                 " GROUP BY parent_id";
         $res = $GLOBALS['db']->query($sql);
@@ -1243,7 +1243,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         $sql = "SELECT goods_number FROM " .$GLOBALS['ecs']->table('cart').
                 " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
                 " AND parent_id = 0 AND goods_attr = '" .$goods_attr. "' " .
-                " AND extension_code <> 'package_buy' " .
+                " AND extension_code <> 'flash_sale' " .
                 " AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";//by mike add
 
         $row = $GLOBALS['db']->getRow($sql);
@@ -1266,7 +1266,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
                        " , goods_price = '$goods_price'".
                        " WHERE " . get_cart_cond() . " AND goods_id = '$goods_id' ".
                        " AND parent_id = 0 AND goods_attr = '" .$goods_attr. "' " .
-                       " AND extension_code <> 'package_buy' " .
+                       " AND extension_code <> 'flash_sale' " .
                        "AND rec_type = 'CART_GENERAL_GOODS' AND group_id=''";
                 $GLOBALS['db']->query($sql);
             }

@@ -1563,7 +1563,7 @@ function recalculate_price()
             "LEFT JOIN " . $GLOBALS['ecs']->table('member_price') . " AS mp ".
                     "ON mp.goods_id = g.goods_id AND mp.user_rank = '" . $_SESSION['user_rank'] . "' ".
             "WHERE " .get_cart_cond('c.'). " AND c.parent_id = 0 AND c.is_gift = 0 AND c.goods_id > 0 " .
-            "AND c.rec_type = '" . CART_GENERAL_GOODS . "' AND c.extension_code <> 'package_buy'";
+            "AND c.rec_type = '" . CART_GENERAL_GOODS . "' AND c.extension_code <> 'flash_sale'";
 
             $res = $GLOBALS['db']->getAll($sql);
 
@@ -2099,5 +2099,18 @@ function get_cart_cond($prefix = '')
 	}
 
 	return $cond;
+}
+
+/**
+ * 获取门店列表
+ * 
+ * @return array
+ */
+function get_shop_list()
+{
+	global $ecs, $db;
+
+	$sql = "SELECT * FROM " . $ecs->table('shop') . " WHERE status = 1 ORDER BY `order` ASC ";
+	return $db->getAll($sql);
 }
 ?>

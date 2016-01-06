@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url('iconfont.eot?z74l49');
-	src:url('iconfont.eot?z74l49#iefix') format('embedded-opentype'),
-		url('iconfont.ttf?z74l49') format('truetype'),
-		url('iconfont.woff?z74l49') format('woff'),
-		url('iconfont.svg?z74l49#icomoon') format('svg');
+	src:url('iconfont.eot?sccc1u');
+	src:url('iconfont.eot?sccc1u#iefix') format('embedded-opentype'),
+		url('iconfont.ttf?sccc1u') format('truetype'),
+		url('iconfont.woff?sccc1u') format('woff'),
+		url('iconfont.svg?sccc1u#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -23,6 +23,18 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-chronometer:before {
+    content: "\e914";
+}
+.icon-time:before {
+    content: "\e915";
+}
+.icon-location:before {
+    content: "\e911";
+}
+.icon-home:before {
+    content: "\e912";
+}
 .icon-plus:before {
 	content: "\e040";
 }
@@ -94,11 +106,5 @@
 }
 .icon-arrow-left:before {
 	content: "\e910";
-}
-.icon-location:before {
-	content: "\e911";
-}
-.icon-home:before {
-	content: "\e912";
 }
 

@@ -1,16 +1,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!--循环分类下商品 begin-->
-<section class="item_show_box1 region">
+<section class="cat-goods region">
 <!-- {foreach name=goods from=$cat_goods item=goods}-->
     <div class="goodsItem" id="goods{$goods.id}">
         <div class="thumb">
             <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.name|escape:html}" />
         </div>
         <div class="desc">
-            <div class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></div>
             <!--{if $goods.free_more_desc}-->
-            <div class="freemore">{$goods.free_more_desc}</div>
+            <span class="freemore red-flag">{$goods.free_more_desc}</span>
             <!--{/if}-->
+            <span class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></span>
         </div>
         <div class="price">
             <!-- {if $goods.promote_price neq ""} --> 

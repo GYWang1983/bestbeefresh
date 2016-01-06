@@ -232,21 +232,18 @@ Template Type: type_0
 	.item_show_box1  header span{ float:left}
 	.item_show_box1  header .more{float:right;  margin:0.55rem 0.3rem 0 0}
 	.item_show_box1 .item_tags{ margin:0.6rem; }
-	.item_show_box1 .item_tags a{
-	height: 1.8rem;
-	line-height: 1.8rem;
-	border: 1px solid #ececec;
-	text-align: center;
-	color: #666;
-	float: left;
-	margin: 0.4rem 0.4rem 0 0;
-	padding: 0 0.6rem;font-size: 0.8rem;overflow:hidden}
+	.item_show_box1 .item_tags a{height: 1.8rem;line-height: 1.8rem;border: 1px solid #ececec;text-align: center;color: #666;float: left;margin: 0.4rem 0.4rem 0 0;padding: 0 0.6rem;font-size: 0.8rem;overflow:hidden;}
+	
+	.text-red{color:#ec5151;}
+	.text-green{color:#4d9546;}
+	.text-gray{color:#999;}
+	.text-black{color:#000;}
+	
 	.goodsItem{width:100%; padding:5px;border-bottom: solid 1px #aaa;min-height:90px;clear:both;background-color:#fff;}
 	.goodsItem .thumb{display:inline-block;width:25%;max-width:90px;padding:0.2rem;float:left;}
 	.goodsItem .desc{display:inline-block;width:68%;padding-left: 0.5rem;}
 	.goodsItem .desc .title{font-size:14px;}
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
-	.freemore{display:inline-block;color:#fff;font-size:12px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
 	.goodsItem .price{display:inline-block;width:68%;line-height:25px;}
 	.goodsItem .price .amount_desc{color:#999;font-size:12px;font-weight: normal;}
 	.goodsItem .cart {display:inline-block;width:70%;height:25px}
@@ -256,6 +253,13 @@ Template Type: type_0
 	.goodsItem .cart .num{width:40px;margin:0 5px;border: solid 1px #7dbe76;text-align:center;line-height:20px;font-weight: bolder;}
 	.goodsItem img{width:100%;height:auto;}
 	.goodsItem del{height:1rem; line-height:1rem; font-size:0.4rem  }
+	
+	.flash-sale .goodsItem .flash_time{font-size:15px;letter-spacing:1px;display:inline-block;width:68%;}
+	.flash-sale .goodsItem .leftempty{display:inline-block;width:25%;}
+	
+	.red-flag {display:inline-block;color:#fff;font-size:12px;letter-spacing:2px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
+	
+	
 	/*页脚*/
 	.footer{height:60px;color: #aaa;font-size: 0.6rem;}
 	.footer .in{position:relative; height:2.8rem; margin:0 -0.6rem; padding:0 3.5rem; background-color:#B9B9B9;}

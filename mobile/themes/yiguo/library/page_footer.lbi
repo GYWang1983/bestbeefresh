@@ -27,7 +27,7 @@
         <div class="global-nav__nav-item">
             <a href="user.php" class="global-nav__nav-link">
                 <i class="icon-user"></i>
-                <span class="global-nav__nav-tit">取货</span>
+                <span class="global-nav__nav-tit">我的</span>
             </a>
         </div>
     </div>

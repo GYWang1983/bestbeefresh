@@ -1,15 +1,22 @@
 $(function() {
 
 	$(".cart .icon-plus").click(function(e) {
-	   var goods_id = $(e.target).parents('.cart').attr('data');
-	   addToCart(goods_id);
+	   var dom = $(e.target).parents('.cart'),
+	   	   goods_id = dom.attr('data'),
+	       ext = dom.attr('ext');
+	   addToCart(goods_id, 0, ext);
 	});
 	$(".cart .icon-minus").click(function(e) {
-	   var goods_id = $(e.target).parents('.cart').attr('data');
-	   var num = parseInt($(e.target).parents('.cart').children('.num').text());
+	   var dom = $(e.target).parents('.cart'),
+	       goods_id = dom.attr('data'),
+	       ext = dom.attr('ext'),
+	       num = parseInt(dom.children('.num').text());
 	   if (num > 1) {
-		   decFromCart(goods_id);
+		   decFromCart(goods_id, 0, ext);
+	   } else {
+		   
 	   }
+		   
     });
 	
 	$(".payment_box").click(selectPayment);

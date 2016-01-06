@@ -1,7 +1,9 @@
 /* *
  * 添加商品到购物车 
+ * 
+ * 商品id
  */
-function addToCart(goodsId, parentId)
+function addToCart(goodsId, parentId, ext)
 {
   var goods        = new Object();
   var spec_arr     = new Array();
@@ -27,17 +29,19 @@ function addToCart(goodsId, parentId)
   goods.spec     = spec_arr;
   goods.goods_id = goodsId;
   goods.number   = number;
+  goods.extension_code = ext || '';
   goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
 
   Ajax.call('flow.php?step=add_to_cart', 'goods=' + $.toJSON(goods), addToCartResponse, 'POST', 'JSON');
 }
 
 
-function decFromCart(goodsId, parentId) {
+function decFromCart(goodsId, parentId, ext) {
 	
   var goods        = new Object();
   goods.goods_id = goodsId;
   goods.number   = 1;
+  goods.extension_code = ext || '';
   goods.parent   = (typeof(parentId) == "undefined") ? 0 : parseInt(parentId);
 
   Ajax.call('flow.php?step=dec_from_cart', 'goods=' + $.toJSON(goods), addToCartResponse, 'POST', 'JSON');
@@ -131,11 +135,15 @@ function addToCartResponse(result)
   {
 	//显示购物车数量
 	$('#carId').text(result.cart_number);
-	if (cart !== undefined) {
-		var goods_id = result.goods_id;
-		cart[goods_id] = result.goods_number;
-		$('#goods' + goods_id + ' .cart .num').text(result.goods_number);
+
+	if (result.flash_id) {
+		flash[result.flash_id] = result.goods_number;
+		$('#flash' + result.flash_id + ' .cart .num').text(result.goods_number);
+	} else {
+		cart[result.goods_id] = result.goods_number;
+		$('#goods' + result.goods_id + ' .cart .num').text(result.goods_number);
 	}
+	
 	if ($('#goods_subtotal').length > 0) {
 		$('#goods_subtotal').text(result.cart_total.goods_price);
 	}
@@ -143,7 +151,12 @@ function addToCartResponse(result)
 	//动画
 	var cartbtn = $('.global-nav i.icon-cart');
 	if (result.diff_number > 0 && cartbtn.length > 0) {
-		var ops = $('#goods' + result.goods_id + ' .thumb img');
+		if (result.flash_id) {
+			var ops = $('#flash' + result.flash_id + ' .thumb img');
+		} else {
+			var ops = $('#goods' + result.goods_id + ' .thumb img');
+		}
+		
 		if (ops.length > 0) {
 			var nps = ops.clone().css({"position":"absolute", "top": ops.offset().top, "left": ops.offset().left, "z-index": 9999999, "width":40, "height":40}).show();
 			nps.appendTo("body").animate({top:cartbtn.offset().top, left:cartbtn.offset().left, width: 20, height:20}, {duration:500, callback: function(){}, complete: function(){nps.remove()} });
