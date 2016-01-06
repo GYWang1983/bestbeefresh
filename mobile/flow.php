@@ -1886,6 +1886,39 @@ elseif ($_REQUEST['step'] == 'pay')
 		show_message('订单不需要支付');
 	}
 	
+	// 检查订单中是否有已过期的限时抢购
+	$now = time();
+	$sql = "SELECT count(g.rec_id) FROM " . $ecs->table('order_goods', 'g') . ',' . $ecs->table('flash_sale', 'f') .
+		" WHERE g.extension_code = 'flash_sale' AND g.extension_id = f.id AND g.order_id = {$order_id} " . 
+		" AND (f.start_time > $now OR f.end_time <= $now OR f.is_on_sale = 0)";
+	if ($db->getOne($sql) > 0)
+	{
+		show_message('订单中的限时抢购商品已过期');
+	}
+	
+	// 检查限时抢购限购数量
+	$sql = "SELECT g.goods_name, g.extension_id, sum(g.goods_number) AS goods_number, f.order_limit_num FROM " 
+		. $ecs->table('order_goods', 'g') . "," . $ecs->table('flash_sale', 'f') .
+		" WHERE g.extension_code = 'flash_sale' AND g.extension_id = f.id AND g.order_id = {$order_id} " .
+		" AND f.order_limit_num > 0 GROUP BY g.extension_id";
+	$result = $db->getAll($sql);
+	if (!empty($result))
+	{
+		foreach ($result as &$row)
+		{
+			$sql = "SELECT sum(g.goods_number) AS goods_number FROM " . 
+				$ecs->table('order_info', 'o') . "," . $ecs->table('order_goods', 'g') . 
+				" WHERE o.order_id = g.order_id AND g.extension_code = 'flash_sale' AND g.extension_id = $row[extension_id] " .
+				" AND o.pay_status = " . PS_PAYED . " AND o.user_id = " . $order['user_id'] . 
+				" GROUP BY g.extension_code, g.extension_id";
+			$buy_num = $db->getOne($sql);
+			if ($buy_num + $row['goods_number'] > $row['order_limit_num'])
+			{
+				show_message($row['goods_name']. '每人只能抢购' . $row['order_limit_num'] . '份');
+			}
+		}
+	}
+	
 	//TODO: 需要重新计算订单金额，重新处理余额、积分、红包
 	
 	
