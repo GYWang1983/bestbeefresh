@@ -246,7 +246,7 @@ Template Type: type_0
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
 	.goodsItem .price{display:inline-block;width:68%;line-height:25px;}
 	.goodsItem .price .amount_desc{color:#999;font-size:12px;font-weight: normal;}
-	.goodsItem .cart {display:inline-block;width:70%;height:25px}
+	.goodsItem .cart {display:inline-block;width:60%;height:25px;float:right;margin-right:2rem;margin-bottom:0.5rem;}
 	.goodsItem .cart div{display:inline-block;float:right;}
 	.goodsItem .cart .btn{width:20px;margin:0 5px;font-size:22px;color:#4d9546;}
 	.goodsItem .cart .drop-goods{color:#ccc!important;margin-left:20px;}
@@ -255,10 +255,8 @@ Template Type: type_0
 	.goodsItem del{height:1rem; line-height:1rem; font-size:0.4rem  }
 	
 	.flash-sale .goodsItem .flash_time{font-size:15px;letter-spacing:1px;display:inline-block;width:68%;}
-	.flash-sale .goodsItem .leftempty{display:inline-block;width:25%;}
 	
 	.red-flag {display:inline-block;color:#fff;font-size:12px;letter-spacing:2px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
-	
 	
 	/*页脚*/
 	.footer{height:60px;color: #aaa;font-size: 0.6rem;}

@@ -20,12 +20,12 @@ var flash = {insert name='cart_flash_number'};
             <!--{/if}-->
         </div>
         {insert name="flash_sale_time" start_time="$goods.start_time" end_time="$goods.end_time"}
-        <div class="leftempty">&nbsp;</div>
         <div class="cart" data="{$goods.id}" style="display:none;">
             <div class="btn icon-plus"></div>
             <div class="num">0</div>
             <div class="btn icon-minus"></div>
         </div>
+        <div style="clear:both;"></div>
     </div>
 <!-- {/foreach} -->
 </section>

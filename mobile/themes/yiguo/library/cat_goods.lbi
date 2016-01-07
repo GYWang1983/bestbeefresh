@@ -27,6 +27,7 @@
             <div class="num">0</div>
             <div class="btn icon-minus"></div>
         </div>
+        <div style="clear:both;"></div>
     </div>
 <!-- {/foreach} -->
 </section>
