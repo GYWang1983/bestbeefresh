@@ -22,6 +22,7 @@ var shop_title = '{$config.shop_title}';
 var shop_desc = '{$config.shop_desc}';
 var shop_logo = '{$config.site_url}/{$config.shop_logo}';
 var site_url = '{$config.site_url}';
+var themes = '{$ectouch_themes}';
 </script>
 </head>
 <body>
@@ -160,6 +161,6 @@ var flash = {insert name='cart_flash_number'};
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.json.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/ectouch.js"></script>
-<script type="text/javascript" src="{$ectouch_themes}/js/index.js"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/index.js?v=3"></script>
 </body>
 </html>

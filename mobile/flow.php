@@ -1377,7 +1377,8 @@ elseif ($_REQUEST['step'] == 'done')
     // 检查购物车中是否有限时抢购商品过期
     $now = time();
     $sql = "SELECT count(c.rec_id) FROM " . $ecs->table('cart', 'c') . ',' . $ecs->table('flash_sale', 'f') .
-    " WHERE c.extension_code = 'flash_sale' AND c.extension_id = f.id AND (f.start_time > $now OR f.end_time <= $now OR f.is_on_sale = 0)";
+    	" WHERE c.extension_code = 'flash_sale' AND c.extension_id = f.id AND (f.start_time > $now OR f.end_time <= $now OR f.is_on_sale = 0) AND " .
+    	get_cart_cond('c.');
     if ($db->getOne($sql) > 0)
     {
     	show_message('订单中有已经过期的限时抢购商品，请重新提交订单', '重新提交订单', 'flow.php?step=checkout', 'error');

@@ -413,7 +413,7 @@ function get_flash_sale_goods()
 		
 	$sql = "SELECT f.*, g.goods_name, g.goods_thumb FROM " . 
 		$ecs->table('flash_sale', 'f') . ',' . $ecs->table('goods', 'g') . 
-		" WHERE f.goods_id = g.goods_id AND f.date = '$today' AND f.is_on_sale = 1" .
+		" WHERE f.goods_id = g.goods_id AND f.date = '$today'" .
 		" ORDER BY f.start_time, f.order, g.sort_order ";
 	if ($num > 0)
 	{

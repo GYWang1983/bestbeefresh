@@ -265,4 +265,11 @@ define('SMS_REGISTER',    1);
 define('SMS_GETPASSWORD', 2);
 define('SMS_REBIND',      3);
 define('SMS_WXBIND',      4);
+
+/* 限时抢购状态 */
+define('FLASH_WAIT',    1); //未开始
+define('FLASH_OPEN',    2); //抢购中
+define('FLASH_END',     3); //已结束
+define('FLASH_SOLDOUT', 4); //售罄
+
 ?>

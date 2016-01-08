@@ -55,6 +55,9 @@ $(function() {
     	if (timeObj.attr('status') == 2) {
     		el.find('.cart').show();
     		startFlashTimer(el, timeObj.attr('remain'), 0);
+    	} else if (timeObj.attr('status') == 4) {
+    		var thumb = timeObj.parent().find('.thumb');
+    		$('<img class="soldout" src="' + themes + '/images/soldout.png" />').appendTo(thumb);
     	}
     });
     

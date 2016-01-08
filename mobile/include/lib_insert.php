@@ -436,24 +436,31 @@ function insert_cart_flash_sale_number($flash_id)
 
 function insert_flash_sale_time($arr)
 {
+	$goods = $arr['goods'];
 	$now = time();
 	$remain = 0;
 	
-	if ($arr[start_time] > $now)
+	if ($goods['is_on_sale'] == 0)
 	{
-		$text = "<span class=\"icon-time\">" . date('H:i', $arr['start_time']) . "准时开抢</span>";
-		$class = 'text-green';
-		$status = 1;
+		$text = "<span class=\"icon-time\">抢光了</span>";
+		$class = 'text-gray';
+		$status = FLASH_SOLDOUT;
 	}
-	elseif ($arr[end_time] < $now)
+	elseif ($goods['start_time'] > $now)
+	{
+		$text = "<span class=\"icon-time\">" . date('H:i', $goods['start_time']) . "准时开抢</span>";
+		$class = 'text-green';
+		$status = FLASH_WAIT;
+	}
+	elseif ($goods['end_time'] < $now)
 	{
 		$text = "<span class=\"icon-time\">已结束</span>";
 		$class = 'text-gray';
-		$status = 3;
+		$status = FLASH_END;
 	}
 	else
 	{
-		$remain = $arr[end_time] - $now;
+		$remain = $goods['end_time'] - $now;
 		$h = floor($remain / 3600);
 		$m = floor(($remain - $h * 3600) / 60);
 		$s = $remain % 60;
@@ -461,7 +468,7 @@ function insert_flash_sale_time($arr)
 		$timer = ($h > 0 ? "{$h}时" : '') . ($m > 0 ? "{$m}分" : '') . "{$s}秒";
 		$text = "<span class=\"icon-time\">{$timer}</span>";
 		$class = 'text-black';
-		$status = 2;
+		$status = FLASH_OPEN;
 	}
 	
 	$html = "<div class=\"flash_time {$class}\" remain=\"$remain\" status=\"{$status}\">{$text}</div>";
