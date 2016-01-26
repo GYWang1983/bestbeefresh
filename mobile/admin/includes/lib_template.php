@@ -125,6 +125,7 @@ $page_libs = array(
         //'/library/category_tree.lbi' => 0,
         //'/library/top10.lbi' => 0,
         //'/library/invoice_query.lbi' => 0,
+    	'/library/index_board.lbi' => 0,
         '/library/recommend_best.lbi' => 3,
         '/library/recommend_new.lbi' => 3,
         '/library/recommend_hot.lbi' => 3,

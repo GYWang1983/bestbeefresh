@@ -67,18 +67,18 @@ var flash = {insert name='cart_flash_number'};
             <span class="title">{$goods.goods_name|escape:html}</span>
         </div>
         <div class="price">
-            <span> {$goods.promote_price} </span> 
+            <span> {$goods.promote_price_formated} </span> 
             <!--{if $goods.amount_desc}-->
             <span class="amount_desc"> / {$goods.amount_desc}</span>
             <!--{/if}-->
         </div>
-        <div class="time" start="{$goods.start_time}" end="{$goods.end_time}">
-        </div>
-        <div class="cart" data="{$goods.id}" stock="">
+        {insert name="flash_sale_time" goods="$goods"}
+        <div class="cart" data="{$goods.id}" style="display:none;">
             <div class="btn icon-plus"></div>
             <div class="num">0</div>
             <div class="btn icon-minus"></div>
         </div>
+        <div style="clear:both;"></div>
     </div>
 <!-- {/foreach} -->
 </section>
@@ -94,10 +94,10 @@ var flash = {insert name='cart_flash_number'};
             <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.name|escape:html}" />
         </div>
         <div class="desc">
-            <div class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></div>
             <!--{if $goods.free_more_desc}-->
-            <div class="freemore red-flag">{$goods.free_more_desc}</div>
+            <span class="freemore red-flag">{$goods.free_more_desc}</span>
             <!--{/if}-->
+            <span class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></span>
         </div>
         <div class="price">
             <!-- {if $goods.promote_price neq ""} --> 
@@ -114,6 +114,7 @@ var flash = {insert name='cart_flash_number'};
             <div class="num">0</div>
             <div class="btn icon-minus"></div>
         </div>
+        <div style="clear:both;"></div>
     </div>
 <!-- {/foreach} -->
 </section>

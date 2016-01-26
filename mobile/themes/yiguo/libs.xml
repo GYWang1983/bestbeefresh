@@ -162,6 +162,7 @@
       <lib>invoice_query</lib>
       <lib>vote_list</lib>
       <lib>email_list</lib>
+      <lib>index_board</lib>
     </region>
     <region name="">
       <lib>recommend_best</lib>
