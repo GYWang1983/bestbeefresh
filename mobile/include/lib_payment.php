@@ -188,6 +188,26 @@ function order_paid($log_id, $pay_status = PS_PAYED, $note = '')
 					}
                 }*/
 
+                // 检查限时抢购促销数量
+                $sql = "select f.id, f.promote_num, sum(b.goods_number) AS sale_num FROM " .
+					$GLOBALS['ecs']->table('order_goods', 'a') . "," . $GLOBALS['ecs']->table('order_goods', 'b') . "," . 
+					$GLOBALS['ecs']->table('order_info', 'o') . "," . $GLOBALS['ecs']->table('flash_sale', 'f') .
+					" WHERE a.extension_code = b.extension_code AND a.extension_id = b.extension_id AND f.id = a.extension_id AND " .
+					" o.order_id = b.order_id AND o.pay_status = " . PS_PAYED . " AND a.extension_code = 'flash_sale' AND a.order_id = '$order_id' " .
+					" GROUP BY a.extension_id";
+                $result = $GLOBALS['db']->getAll($sql);
+                if (!empty($result))
+                {
+                	foreach ($result as $flash)
+                	{
+                		if ($flash['promote_num'] > 0 && $flash['promote_num'] <= $flash['sale_num'])
+                		{
+                			$sql = "UPDATE " . $GLOBALS['ecs']->table('flash_sale') . " SET is_on_sale = 0 WHERE id = '$flash[id]'";
+                			$GLOBALS['db']->query($sql);
+                		}
+                	}
+                }
+                
                 /* 对虚拟商品的支持 */
                 $virtual_goods = get_virtual_goods($order_id);
                 if (!empty($virtual_goods))

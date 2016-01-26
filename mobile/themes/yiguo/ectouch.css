@@ -240,7 +240,7 @@ Template Type: type_0
 	.text-black{color:#000;}
 	
 	.goodsItem{width:100%; padding:5px;border-bottom: solid 1px #aaa;min-height:90px;clear:both;background-color:#fff;}
-	.goodsItem .thumb{display:inline-block;width:25%;max-width:90px;padding:0.2rem;float:left;}
+	.goodsItem .thumb{display:inline-block;width:25%;max-width:90px;padding:0.2rem;float:left;position:relative;}
 	.goodsItem .desc{display:inline-block;width:68%;padding-left: 0.5rem;}
 	.goodsItem .desc .title{font-size:14px;}
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
@@ -252,7 +252,8 @@ Template Type: type_0
 	.goodsItem .cart .drop-goods{color:#ccc!important;margin-left:20px;}
 	.goodsItem .cart .num{width:40px;margin:0 5px;border: solid 1px #7dbe76;text-align:center;line-height:20px;font-weight: bolder;}
 	.goodsItem img{width:100%;height:auto;}
-	.goodsItem del{height:1rem; line-height:1rem; font-size:0.4rem  }
+	.goodsItem del{height:1rem; line-height:1rem; font-size:0.4rem;}
+	.goodsItem img.soldout{position:absolute;width:100%;left:0;top:0;}
 	
 	.flash-sale .goodsItem .flash_time{font-size:15px;letter-spacing:1px;display:inline-block;width:68%;}
 	
