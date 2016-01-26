@@ -1547,6 +1547,11 @@ function address_info($address_id)
  */
 function user_bonus($user_id, $goods_amount = 0)
 {
+	if (empty($user_id))
+	{
+		return array();
+	}
+	
     //$day    = getdate();
     //$today  = local_mktime(23, 59, 59, $day['mon'], $day['mday'], $day['year']);
 	$today = time();
@@ -1556,11 +1561,11 @@ function user_bonus($user_id, $goods_amount = 0)
                 $GLOBALS['ecs']->table('user_bonus') . " AS b " .
             "WHERE t.type_id = b.bonus_type_id " .
             "AND t.use_start_date <= '$today' " .
-            "AND b.expire_time >= '$today' " .
+            "AND b.expire_time > '$today' " .
             "AND t.min_goods_amount <= '$goods_amount' " .
-            "AND b.user_id<>0 " .
             "AND b.user_id = '$user_id' " .
-            "AND b.order_id = 0";
+            "AND b.order_id = 0 " . 
+    		"ORDER BY b.amount DESC, b.expire_time ASC";
     return $GLOBALS['db']->getAll($sql);
 }
 

@@ -1105,7 +1105,8 @@ function get_user_bouns_list($user_id, $num = 10, $start = 0)
     $sql = "SELECT u.bonus_sn, u.order_id, b.type_name, u.amount, b.min_goods_amount, b.use_start_date, u.expire_time ".
            " FROM " .$GLOBALS['ecs']->table('user_bonus'). " AS u ,".
            $GLOBALS['ecs']->table('bonus_type'). " AS b".
-           " WHERE u.bonus_type_id = b.type_id AND u.user_id = '" .$user_id. "'";
+           " WHERE u.bonus_type_id = b.type_id AND u.user_id = '$user_id'" . 
+    	   " ORDER BY u.used_time ASC, u.expire_time DESC";
     $res = $GLOBALS['db']->selectLimit($sql, $num, $start);
     $arr = array();
 
@@ -1125,16 +1126,16 @@ function get_user_bouns_list($user_id, $num = 10, $start = 0)
             }
             else if ($row['expire_time'] < $cur_date)
             {
-                $row['status'] = $GLOBALS['_LANG']['overdue'];
+                $row['status'] = '<span class="text-gray">' . $GLOBALS['_LANG']['overdue'] . '</span>';
             }
             else
             {
-                $row['status'] = $GLOBALS['_LANG']['not_use'];
+                $row['status'] = '<span class="text-green">' . $GLOBALS['_LANG']['not_use'] . '</span>';
             }
         }
         else
         {
-            $row['status'] = '<a href="user.php?act=order_detail&order_id=' .$row['order_id']. '" >' .$GLOBALS['_LANG']['had_use']. '</a>';
+            $row['status'] = '<a href="user.php?act=order_detail&order_id=$row[order_id]" class="text-gray" >' .$GLOBALS['_LANG']['had_use']. '</a>';
         }
 
         $row['use_startdate']   = date($GLOBALS['_CFG']['date_format'] . ' H:i', $row['use_start_date']);

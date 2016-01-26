@@ -534,12 +534,12 @@ elseif ($_REQUEST['step'] == 'checkout')
      * 取得购物流程设置
      */
     $smarty->assign('config', $_CFG);
+    
     /*
      * 取得订单信息
      */
     $order = flow_order_info();
-    $smarty->assign('order', $order);
-
+    
     /* 计算折扣 */
     if ($flow_type != CART_EXCHANGE_GOODS && $flow_type != CART_GROUP_BUY_GOODS)
     {
@@ -553,10 +553,7 @@ elseif ($_REQUEST['step'] == 'checkout')
      * 计算订单的费用
      */
     $total = order_fee($order, $cart_goods, $consignee);
-    $smarty->assign('total', $total);
-    $smarty->assign('shopping_money', sprintf($_LANG['shopping_money'], $total['formated_goods_price']));
-    $smarty->assign('market_price_desc', sprintf($_LANG['than_market_price'], $total['formated_market_price'], $total['formated_saving'], $total['save_rate']));
-
+    
     /* 取得配送列表 */
     /*$region            = array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']);
     $shipping_list     = available_shipping_list($region);
@@ -640,6 +637,71 @@ elseif ($_REQUEST['step'] == 'checkout')
         }
     }*/
 
+    /* 取得包装与贺卡 */
+    if ($total['real_goods_count'] > 0)
+    {
+    	/* 只有有实体商品,才要判断包装和贺卡 */
+    	if (!isset($_CFG['use_package']) || $_CFG['use_package'] == '1')
+    	{
+    		/* 如果使用包装，取得包装列表及用户选择的包装 */
+    		$smarty->assign('pack_list', pack_list());
+    	}
+    
+    	/* 如果使用贺卡，取得贺卡列表及用户选择的贺卡 */
+    	if (!isset($_CFG['use_card']) || $_CFG['use_card'] == '1')
+    	{
+    		$smarty->assign('card_list', card_list());
+    	}
+    }
+    
+    $user_info = user_info($_SESSION['user_id']);
+    
+    /* 如果使用余额，取得用户余额 */
+    if ((!isset($_CFG['use_surplus']) || $_CFG['use_surplus'] == '1')
+    		&& $_SESSION['user_id'] > 0
+    		&& $user_info['user_money'] > 0)
+    {
+    	// 能使用余额
+    	$smarty->assign('allow_use_surplus', 1);
+    	$smarty->assign('your_surplus', $user_info['user_money']);
+    }
+    
+    /* 如果使用积分，取得用户可用积分及本订单最多可以使用的积分 */
+    if ((!isset($_CFG['use_integral']) || $_CFG['use_integral'] == '1')
+    		&& $_SESSION['user_id'] > 0
+    		&& $user_info['pay_points'] > 0
+    		&& ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS))
+    {
+    	// 能使用积分
+    	$smarty->assign('allow_use_integral', 1);
+    	$smarty->assign('order_max_integral', flow_available_points());  // 可用积分
+    	$smarty->assign('your_integral',      $user_info['pay_points']); // 用户积分
+    }
+    
+    /* 如果使用红包，取得用户可以使用的红包及用户选择的红包 */
+    if ((!isset($_CFG['use_bonus']) || $_CFG['use_bonus'] == '1')
+    		&& ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS))
+    {
+    	// 取得用户可用红包
+    	$user_bonus = user_bonus($_SESSION['user_id'], $total['goods_price']);
+    	if (!empty($user_bonus))
+    	{
+    		foreach ($user_bonus AS &$val)
+    		{
+    			$val['bonus_money_formated'] = price_format($val['type_money'], false);
+    		}
+    		$smarty->assign('bonus_list', $user_bonus);
+    
+    		//默认使用第一个红包,重新计算费用
+    		$order['bonus_id'] = $user_bonus[0]['bonus_id'];
+    		$order['bonus'] = $user_bonus[0]['amount'];
+    		$total = order_fee($order, $cart_goods, $consignee);
+    	}
+    	 
+    	// 能使用红包
+    	$smarty->assign('allow_use_bonus', 1);
+    }
+    
     /* 取得支付列表 */
 	$payment_list = available_payment_list(false, $cod_fee, true, is_wechat_browser());
 	if(!empty($payment_list))
@@ -672,66 +734,6 @@ elseif ($_REQUEST['step'] == 'checkout')
 	}
 	$smarty->assign('payment_list', $payment_list);
     
-    
-    /* 取得包装与贺卡 */
-    if ($total['real_goods_count'] > 0)
-    {
-        /* 只有有实体商品,才要判断包装和贺卡 */
-        if (!isset($_CFG['use_package']) || $_CFG['use_package'] == '1')
-        {
-            /* 如果使用包装，取得包装列表及用户选择的包装 */
-            $smarty->assign('pack_list', pack_list());
-        }
-
-        /* 如果使用贺卡，取得贺卡列表及用户选择的贺卡 */
-        if (!isset($_CFG['use_card']) || $_CFG['use_card'] == '1')
-        {
-            $smarty->assign('card_list', card_list());
-        }
-    }
-
-    $user_info = user_info($_SESSION['user_id']);
-
-    /* 如果使用余额，取得用户余额 */
-    if ((!isset($_CFG['use_surplus']) || $_CFG['use_surplus'] == '1')
-        && $_SESSION['user_id'] > 0
-        && $user_info['user_money'] > 0)
-    {
-        // 能使用余额
-        $smarty->assign('allow_use_surplus', 1);
-        $smarty->assign('your_surplus', $user_info['user_money']);
-    }
-
-    /* 如果使用积分，取得用户可用积分及本订单最多可以使用的积分 */
-    if ((!isset($_CFG['use_integral']) || $_CFG['use_integral'] == '1')
-        && $_SESSION['user_id'] > 0
-        && $user_info['pay_points'] > 0
-        && ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS))
-    {
-        // 能使用积分
-        $smarty->assign('allow_use_integral', 1);
-        $smarty->assign('order_max_integral', flow_available_points());  // 可用积分
-        $smarty->assign('your_integral',      $user_info['pay_points']); // 用户积分
-    }
-
-    /* 如果使用红包，取得用户可以使用的红包及用户选择的红包 */
-    if ((!isset($_CFG['use_bonus']) || $_CFG['use_bonus'] == '1')
-        && ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS))
-    {
-        // 取得用户可用红包
-        $user_bonus = user_bonus($_SESSION['user_id'], $total['goods_price']);
-        if (!empty($user_bonus))
-        {
-            foreach ($user_bonus AS $key => $val)
-            {
-                $user_bonus[$key]['bonus_money_formated'] = price_format($val['type_money'], false);
-            }
-            $smarty->assign('bonus_list', $user_bonus);
-        }
-        // 能使用红包
-        $smarty->assign('allow_use_bonus', 1);
-    }
-
     /* 如果使用缺货处理，取得缺货处理列表 */
     if (!isset($_CFG['use_how_oos']) || $_CFG['use_how_oos'] == '1')
     {
@@ -760,6 +762,11 @@ elseif ($_REQUEST['step'] == 'checkout')
         $smarty->assign('inv_type_list', $inv_type_list);
     }
 
+    $smarty->assign('order', $order);
+    $smarty->assign('total', $total);
+    $smarty->assign('shopping_money', sprintf($_LANG['shopping_money'], $total['formated_goods_price']));
+    $smarty->assign('market_price_desc', sprintf($_LANG['than_market_price'], $total['formated_market_price'], $total['formated_saving'], $total['save_rate']));
+    
     $smarty->assign('checkout_time', time());
     $smarty->assign('order_attention', order_attention($order));
     
