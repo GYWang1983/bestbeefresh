@@ -191,7 +191,6 @@ Template Type: type_0
 	.new-tbl-type {display:table;width:100%;}
 	.new-tbl-cell {display:table-cell;}
 	.new-msale-lst { height:8rem; padding:0.9rem 0;width:100%;}
-	.new-msale-lst .new-tbl-cell { }
 	.new-msale-lst .new-tbl-cell a {display:block; text-align:center;  position:relative; width:7.5rem;  } 
 	.new-msale-lst .new-tbl-cell img {vertical-align:top; width:100px; height:100px; margin-bottom:0.3rem  }
 	.item_show_box2{ text-align:center; position:relative; padding:0.3rem 0}
@@ -665,11 +664,8 @@ Template Type: type_0
 	.itemlist li .inputBg{ width:20%; text-align:center}
 	.itemlist li p{ color:#999}
 	/* div表格化 */
-	.table_box{}
-	.table_box { }
 	.table_box dl{ padding:0.5rem 0; display:table; width:100% }
 	.table_box dd{display:table-cell; }
-	.table_box dd .inputBg{ }
 	/* 文字 */
     .f6{ font-size:0.8rem; color:#1CA2E1;  height:1.8rem; line-height:1.8rem; padding:0; margin-right:2.8rem; display:inline-block; border:none ; background:none; vertical-align:top; }
 	/* 合作登录 */
@@ -736,27 +732,28 @@ Template Type: type_0
 		-moz-transform: rotate(45deg);
 		-o-transform: rotate(45deg);
 		top:1rem; right:0.5rem; }
-	.table_box2 .modRadio{ background-color: #B3B3B3; border-radius: 2px;color: #FFFFFF;display: inline-block;height: 19px;line-height: 19px;overflow: hidden;padding: 1px; text-align: center; width: 38px;}
-	.table_box2 .modRadio .fl { margin-left: 1px;}
-	.table_box2 .modRadio i {  background: none repeat scroll 0 0 #FFFFFF;border-radius: 2px;display: inline-block;height: 17px;margin: 1px 1px 0 0;width: 17px;
+	.table_box2 select{width:100%;height:100%;}
+	.table_box2 select option{line-height:10px;}
+	.table_box2 .modRadio{background-color: #B3B3B3; border-radius: 2px;color: #FFFFFF;display: inline-block;height: 19px;line-height: 19px;overflow: hidden;padding: 1px; text-align: center; width: 38px;}
+	.table_box2 .modRadio .fl {margin-left: 1px;}
+	.table_box2 .modRadio i {background: none repeat scroll 0 0 #FFFFFF;border-radius: 2px;display: inline-block;height: 17px;margin: 1px 1px 0 0;width: 17px;
 	    -webkit-transform: none;
 	    -moz-transform: none;
 		-o-transform: none;
 		top:0; right:0;
 		position: static ; 
-		}
-	.table_box2 .modRadio  .fl {float: left;}
+    }
+	.table_box2 .modRadio .fl{float: left;}
 	.fr {float: right;}
 		
 	/* 订单确认页表格_底部模块 */	
-	.table_box3 .dd1{ text-align:left}		
-	.table_box3 .dd1 a{ color:#5498db}
-	.table_box3 .dd2{ text-align:center}		
-	.table_box3 .dd3{ text-align:right}	
-	  .modify{ background:#5498db; color:#FFF; display:inline-block; padding:0 0.5rem; float:right; }	
+	.table_box3 .dd1{text-align:left}		
+	.table_box3 .dd1 a{color:#5498db}
+	.table_box3 .dd2{text-align:center}		
+	.table_box3 .dd3{text-align:right}	
+	.modify{ background:#5498db; color:#FFF; display:inline-block; padding:0 0.5rem; float:right; }	
 	.f4_b{ color: #ec5151;display: inline-block; }
-	
-	.select_city select{}
+
 /* ====================
      提交订单页面
 ==================== */
@@ -1039,7 +1036,22 @@ ul.order_list_tab li.active{color: #4d9546;border-bottom: solid 2px #4d9546;}
     white-space: nowrap;
 }
 .side img{ width:100%; height:auto;}
-
 .order{padding:0rem 0.7rem 0 0.7rem;}
-
 #captcha.inputBg, #mobile_code.inputBg{width:85%;}
+
+/* loading pane */
+.loading {position:absolute;z-index:9999;width:100%;height:100%;top:0;left:0;background-color:#333;opacity:0.5;-moz-opacity:0.5;}
+.loading .loader{margin:0px auto;width:50px;height:60px;text-align:center;font-size:10px;} 
+.loading .loader > div {background-color: #4d9546;height:100%;width: 6px;display:inline-block;opacity:1;-moz-opacity:1;-webkit-animation: stretchdelay 1.2s infinite ease-in-out;animation: stretchdelay 1.2s infinite ease-in-out;}
+.loading .loader .rect2 {-webkit-animation-delay: -1.1s;animation-delay: -1.1s;}
+.loading .loader .rect3 {-webkit-animation-delay: -1.0s;animation-delay: -1.0s;}
+.loading .loader .rect4 {-webkit-animation-delay: -0.9s;animation-delay: -0.9s;}
+.loading .loader .rect5 {-webkit-animation-delay: -0.8s;animation-delay: -0.8s;}
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) } 
+  20% { -webkit-transform: scaleY(1.0) }
+}
+@keyframes stretchdelay {
+  0%, 40%, 100% {transform: scaleY(0.4);-webkit-transform: scaleY(0.4);}
+  20% {transform: scaleY(1.0);-webkit-transform: scaleY(1.0);}
+}

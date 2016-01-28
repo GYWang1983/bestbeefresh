@@ -9,7 +9,7 @@
 <meta name="format-detection" content="telephone=no" />
 <link href="{$ectouch_themes}/images/touch-icon.png" rel="apple-touch-icon-precomposed" />
 <link href="{$ectouch_themes}/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-<link href="{$ectouch_themes}/ectouch.css" rel="stylesheet" type="text/css" />
+<link href="{$ectouch_themes}/ectouch.css?v=20160128" rel="stylesheet" type="text/css" />
 <link href="{$ectouch_themes}/css/iconfont.css?v=20151103" type="text/css" rel="stylesheet"/>
 {* 包含脚本文件 *}
 {insert_scripts files='common.js,shopping_flow.js,transport_jquery.js,utils.js'}
@@ -311,25 +311,20 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     <input name="payment" type="hidden" value ="-1"/>
     <!--{/if}-->
     <section class="order_box padd1 radius5" style="padding-top:0.3rem;padding-bottom:0.3rem;">
-      <div class="table_box table_box2" style=" margin-bottom:0.5rem"> 
+      <div class="table_box table_box2"> 
         <!-- {if $allow_use_bonus and count($bonus_list) > 0} 是否使用红包 -->
         <dl>
           <dd class="dd1"> {$lang.use_bonus} </dd>
-          <dd class="dd2" id="selected4">{if $order.bonus_id gt 0}{$order.bonus|money}{else}不使用{/if}</dd>  
-          <i></i>
+          <dd class="dd2">
+            <select id="bonus" name="bonus" onchange="changeBonus(this.value);">
+              <option value="0">不使用</option>
+              <!-- {foreach from=$bonus_list item=bonus} -->
+              <option value="{$bonus.bonus_id}" {if $order.bonus_id eq $bonus.bonus_id}selected{/if}>{$bonus.amount}元（{$bonus.expire_time|timestamp:'m-d H:i'}过期）</option>
+              <!-- {/foreach} -->
+            </select>
+          </dd>
         </dl>
-		<div class="dl_box" id="bonus_box" style="display:none;">
-          <!-- {foreach from=$bonus_list item=bonus} -->
-          <p>
-            <input name="bonus" type="radio" id="bonus_{$bonus.bonus_id}" class="radio" value="{$bonus.bonus_id}" {if $order.bonus_id eq $bonus.bonus_id}checked{/if}  onclick="changeBonus(this.value)" /> <label for="bonus_{$bonus.bonus_id}">{$bonus.amount}元（{$bonus.expire_time|timestamp:'Y-m-d H:i'}过期）</label>
-          </p>
-          <!-- {/foreach} -->
-          <p>
-            <input name="bonus" type="radio" class="radio" value="0" {if $order.bonus_id eq 0}checked{/if} onclick="changeBonus(this.value)" /> 不使用
-          </p>
-		</div>
         <!-- {/if} 是否使用红包 --> 
-
         <!-- {if $pack_list} 是否有包装 -->
         <dl class="b_no">
           <dd class="dd1">{$lang.goods_package}</dd>
@@ -357,12 +352,10 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <!-- {/foreach} 循环贺卡 -->
 		</div>
         <!-- {/if} 是否使用贺卡 --> 
-		<div class="dl_box">
-		  <dl>
-            <dd class="c333">留言备注</dd>
-			<dd><input placeholder="请输入订单备注" name="postscript" type="text" size="20" /></dd>
-		  </dl>
-		</div>	
+		<dl>
+          <dd class="dd1">留言备注</dd>
+          <dd class="dd2"><input placeholder="请输入订单备注" name="postscript" type="text" size="20" /></dd>
+		</dl>	
       </div>
     </section>
     <section class="order_box padd1 radius5" style="padding-top:0;padding-bottom:0;">
@@ -403,7 +396,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
         </div>
     </section>
     <div class="blank1"></div>
-    <input type="submit" name="submit" value="提交订单" class="c-btn3" />
+    <input id="submit_order" type="submit" name="submit" value="提交订单" class="c-btn3" />
     <input type="hidden" name="checkout_time" value="{$checkout_time}" />
     <input type="hidden" name="step" value="done" />
   </form>
@@ -693,9 +686,17 @@ jQuery(function($){
 </script>
 <!-- 结束用户登录注册界面 --> 
 <!-- {/if} -->
-
 <div class="blank3"></div>
 <div style="width:1px; height:1px; overflow:hidden">{foreach from=$lang.p_y item=pv}{$pv}{/foreach}</div>
+<div class="loading" style="display:none;">
+  <div class="loader">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+  </div>
+</div>
 </body>
 <script type="text/javascript">
 var process_request = "{$lang.process_request}";
@@ -707,5 +708,18 @@ var compare_no_goods = "{$lang.compare_no_goods}";
 var btn_buy = "{$lang.btn_buy}";
 var is_cancel = "{$lang.is_cancel}";
 var select_spe = "{$lang.select_spe}";
+
+$(function(){
+    $(document).ajaxSend(function(){
+        $('.loading').height($(this).height());
+        $('.loading').show();
+        $('body').css('overflow', 'hidden');
+        $('.loader').css('margin-top', $(window).height()/2 + $(this).scrollTop() - 60);
+    });
+    $(document).ajaxComplete(function(){
+        $('.loading').hide();
+        $('body').css('overflow', 'auto');
+    });
+});
 </script>
 </html>

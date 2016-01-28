@@ -244,26 +244,22 @@ function orderSelectedResponse(result)
 
   try
   {
-	 if( result.pay_name){
-		 document.getElementById("selected2").innerHTML = result.pay_name;
-	     document.getElementById("payment").style.display = 'none';
-		 }
-     if( result.pack_fee_formated){
-		 
-		 document.getElementById("selected5").innerHTML = result.pack_fee_formated;
-	     document.getElementById("package_box").style.display = 'none';
-	    }
-	 if( result.card_fee_formated){
-		 
-		  document.getElementById("selected6").innerHTML = result.card_fee_formated;
-	      document.getElementById("card_box").style.display = 'none';
-		 }
+	if(result.pay_name){
+	  document.getElementById("selected2").innerHTML = result.pay_name;
+	  document.getElementById("payment").style.display = 'none';
+    }
+    if(result.pack_fee_formated){	 
+	  document.getElementById("selected5").innerHTML = result.pack_fee_formated;
+	  document.getElementById("package_box").style.display = 'none';
+	}
+	if(result.card_fee_formated){ 
+	  document.getElementById("selected6").innerHTML = result.card_fee_formated;
+	  document.getElementById("card_box").style.display = 'none';
+	}
 	
     var layer = document.getElementById("ECS_ORDERTOTAL");
-
     layer.innerHTML = (typeof result == "object") ? result.content : result;
 
-   
     if (result.payment != undefined)
     {
       var surplusObj = document.forms['theForm'].elements['surplus'];
@@ -379,16 +375,12 @@ function changeBonusResponse(obj)
   if (obj.error)
   {
     alert(obj.error);
-    try
-    {
-      document.getElementById('ECS_BONUS').value = '0';
-    }
-    catch (ex) { }
+    $('#bonus').val(0);
   }
   else
   {
-	document.getElementById('selected4').innerHTML = obj.bonus_formated; 
-	document.getElementById('bonus_box').style.display="none";
+	//document.getElementById('selected4').innerHTML = obj.bonus_formated; 
+	//document.getElementById('bonus_box').style.display="none";
     orderSelectedResponse(obj.content);
   }
 }
