@@ -46,13 +46,14 @@ if (isset($set_modules) && $set_modules == TRUE)
     return;
 }
 
-$sql = "SELECT order_id, confirm_time FROM " . $ecs->table('order_info') . " WHERE order_status = " . OS_CONFIRMED . " AND shipping_status = " . SS_PREPARING;
+$sql = "SELECT o.order_id, o.confirm_time, s.open_time, s.close_time FROM " . $ecs->table('order_info', 'o') . ',' . $ecs->table('shop', 's') . 
+		" WHERE o.shop_id = s.shop_id AND o.order_status = " . OS_CONFIRMED . " AND shipping_status = " . SS_PREPARING;
 $rs = $db->getAll($sql);
 
 $shipping_time = time();
 foreach ($rs as $order)
 {
-	$pickup_time = get_order_pickup_time(0, $order['confirm_time']);
+	$pickup_time = get_order_pickup_time(0, $order['confirm_time'], $order['open_time'], $order['close_time']);
 	$db->autoExecute($ecs->table('order_info'), array(
 		'shipping_status'  => SS_SHIPPED,
 		'shipping_time'    => $shipping_time,

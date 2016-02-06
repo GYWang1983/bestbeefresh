@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>{$page_title} 触屏版</title>
+<title>{$page_title}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -31,7 +31,7 @@ var cart={}, flash={};
 <div id="page">
   <header id="header">
     <div class="header_l"> <a class="ico_10" href="index.php"> 返回 </a> </div>
-    <h1>购物车</h1>
+    <h1 class="shop_name" style="padding-left:50px;">{insert name='shop_name'}</h1>
     <div class="header_r"></div>
   </header>
 </div>
@@ -272,13 +272,13 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     <section class="order_box padd1 radius5">
         <div class="table_box table_box1">
           <dl>
-            <dd class="dd1" style="width:80px;">取货手机号</dd>
+            <dd class="dd1" style="width:60px;">手机号</dd>
             <dd class="dd2">{$smarty.session.mobile}</dd>
           </dl>
           <dl>
-            <dd class="dd1" style="width:80px;">提货地址</dd>
-            <dd class="dd2">{$config.shop_address}</dd>
-            <dd class="dd2 shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$config.shop_address_coord}&referer=bestbeefresh" target="_blank"></a></dd>
+            <dd class="dd1" style="width:60px;">提货地址</dd>
+            <dd class="dd2">{$shop.shop_name}<br/>{$shop.address}</dd>
+            <dd class="dd2 shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$shop.latitude},{$shop.longitude}&referer=bestbeefresh" target="_blank"></a></dd>
           </dl>
         </div>
     </section>
@@ -397,6 +397,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
     </section>
     <div class="blank1"></div>
     <input id="submit_order" type="submit" name="submit" value="提交订单" class="c-btn3" />
+    <input type="hidden" name="shop_id" value="{$smarty.session.default_shop}" />
     <input type="hidden" name="checkout_time" value="{$checkout_time}" />
     <input type="hidden" name="step" value="done" />
   </form>

@@ -33,17 +33,18 @@ function update_user_info()
 
     /* 查询会员信息 */
     $time = date('Y-m-d');
-    $sql = 'SELECT u.user_money,u.mobile_phone, u.pay_points, u.user_rank, u.rank_points, '.
+    $sql = 'SELECT u.user_money,u.mobile_phone, u.pay_points, u.user_rank, u.rank_points, u.default_shop, '.
             ' u.last_login, u.last_ip'.
             ' FROM ' .$GLOBALS['ecs']->table('users'). ' AS u ' .
             " WHERE u.user_id = '$_SESSION[user_id]'";
     if ($row = $GLOBALS['db']->getRow($sql))
     {
         /* 更新SESSION */
-        $_SESSION['last_time']   = $row['last_login'];
-        $_SESSION['last_ip']     = $row['last_ip'];
-        $_SESSION['login_fail']  = 0;
-        $_SESSION['mobile']      = $row['mobile_phone'];
+        $_SESSION['last_time']    = $row['last_login'];
+        $_SESSION['last_ip']      = $row['last_ip'];
+        $_SESSION['login_fail']   = 0;
+        $_SESSION['mobile']       = $row['mobile_phone'];
+        $_SESSION['default_shop'] = $row['default_shop'];
 
         /*判断是否是特殊等级，可能后台把特殊会员组更改普通会员组*/
         if($row['user_rank'] >0)

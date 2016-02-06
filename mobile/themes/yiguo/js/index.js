@@ -1,15 +1,30 @@
 
 $(function() {
 	
-	// category menu
-	//$('nav#menu').show().mmenu();
+	// shop menu
+	$('nav#top-shop-menu').mmenu({
+		autoHeight: true,
+		navbar: {
+			title: '选择提货门店'
+		},
+		offCanvas: {
+			position : 'right',
+			zposition: 'front'
+		},
+		backButton: {close: true},
+		extensions: ['fullscreen']
+	}).show();
+	
+	$('.shop_item').click(function() {
+		window.location.href = $(this).attr('href');
+	});
 	
 	// image lazyload
 	$('.goodsItem .thumb img').lazyload({ 
 		effect:'fadeIn' 
 	});
 	
-	$('#get_search_box').click(function(){
+	/*$('#get_search_box').click(function(){
 		$(".mm-page").children('div').hide();
 		$("#main-search").css('position','fixed').css('top','0px').css('width','100%').css('z-index','999').show();
 		//$('#keywordBox').focus();
@@ -17,7 +32,7 @@ $(function() {
 	$("#main-search .close").click(function(){
 		$(".mm-page").children('div').show();
 		$("#main-search").hide();
-	});
+	});*/
 	
 	
 	$(".flash-sale .cart .icon-plus").click(function(e) {
@@ -75,6 +90,10 @@ $(function() {
 	    wx.onMenuShareWeibo(share_meta);
 	    wx.onMenuShareQZone(share_meta);
     });
+    
+    if (default_shop == 0) {
+    	$('#select_shop').click();
+    }
 });
 
 

@@ -62,19 +62,14 @@ if (!empty($orders))
 		'confirm_time' => $now,
 	);
 
-	$pickup_time = get_order_pickup_time($locktime);
 	$code_obj = array(
 		'create_time'  => $now,
-		'start_time'   => $pickup_time['start'],
-		'end_time'     => $pickup_time['end'],
-		'abandon_time' => $pickup_time['start'] + 3600 * intval($_CFG['shipping_limit_time']),
 		'status'       => 1
 	);
 	
 	$pack_date = date('Ymd', $pickup_time['start']);
 	$pack_obj = array(
 		'create_date' => $pack_date,
-		'expire_time' => $code_obj['abandon_time'],
 	);
 	
 	$users = array();
@@ -82,12 +77,17 @@ if (!empty($orders))
 	foreach ($orders as $o)
 	{
 		$user_id = $o['user_id'];
+
+		$pickup_time = get_order_pickup_time($locktime, 0, $o['shop_open_time'], $o['shop_close_time']);
 		
 		// 生成取货码
 		if (!in_array($user_id, $users))
 		{
 			$code_obj['code']    = make_pickup_code($o);
 			$code_obj['user_id'] = $user_id;
+			$code_obj['start_time']   = $pickup_time['start'];
+			$code_obj['end_time']     = $pickup_time['end'];
+			$code_obj['abandon_time'] = $pickup_time['start'] + 3600 * intval($_CFG['shipping_limit_time']);
 			$db->autoExecute($ecs->table('pickup_code'), $code_obj);
 			
 			$users[] = $user_id;
@@ -97,6 +97,7 @@ if (!empty($orders))
 		if (!array_key_exists($user_id, $packs))
 		{
 			$pack_obj['user_id'] = $user_id;
+			$pack_obj['expire_time'] = $code_obj['abandon_time'];
 			$db->autoExecute($ecs->table('pickup_pack'), $pack_obj);
 			$pack_id = $db->insert_id();
 			$packs[$user_id] = $pack_id;

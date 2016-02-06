@@ -627,6 +627,21 @@ function load_config()
     {
         $arr = $data;
     }
+    
+    $shop = read_static_cache('shop_list');
+    if ($shop)
+    {
+    	$arr['shop'] = $shop;
+    }
+    else
+    {
+    	$sql = "SELECT * FROM " . $GLOBALS['ecs']->table('shop') . ' WHERE status > 0';
+        $rs = $GLOBALS['db']->getAll($sql);
+        foreach ($rs as &$shop)
+        {
+        	$arr['shop'][$shop['shop_id']] = $shop;
+        }
+    }
 
     return $arr;
 }
@@ -2828,5 +2843,10 @@ function get_free_more_number($free_more, $number)
 	}
 
 	return floor($number / intval($arr[0])) * intval($arr[1]);
+}
+
+function check_shop($shop_id)
+{
+	return $shop_id > 0 && !empty($GLOBALS['_CFG']['shop'][$shop_id]);
 }
 ?>

@@ -453,7 +453,18 @@ elseif ($_REQUEST['step'] == 'checkout')
     /*------------------------------------------------------ */
     //-- 订单确认
     /*------------------------------------------------------ */
-
+	//check shop
+	if (!check_shop($_SESSION['default_shop']))
+	{
+		$_SESSION['default_shop'] = 0;
+		show_message('取货门店无效', '重新选择', 'index.php');
+	}
+	else
+	{
+		$shop = $_CFG['shop'][$_SESSION['default_shop']];
+		$smarty->assign('shop', $shop);
+	}
+	
 	// 刷新购物车
 	update_cart();
 	
@@ -768,7 +779,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     $smarty->assign('market_price_desc', sprintf($_LANG['than_market_price'], $total['formated_market_price'], $total['formated_saving'], $total['save_rate']));
     
     $smarty->assign('checkout_time', time());
-    $smarty->assign('order_attention', order_attention($order));
+    $smarty->assign('order_attention', order_attention($order, $shop));
     
     /* 保存 session */
     $_SESSION['flow_order'] = $order;
@@ -1362,7 +1373,7 @@ elseif ($_REQUEST['step'] == 'done')
 {
     include_once('include/lib_clips.php');
     include_once('include/lib_payment.php');
-
+    
     // 取得购物类型
     $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
 	
@@ -1379,6 +1390,13 @@ elseif ($_REQUEST['step'] == 'done')
     if (isset($_POST['checkout_time']) && intval($_POST['checkout_time']) < time() - 3600)
     {
     	show_message('订单提交超时', '重新确认订单', 'flow.php?step=checkout', 'error');
+    }
+    
+    //check shop
+    $shop_id = intval($_POST['shop_id']);
+    if (!check_shop($shop_id))
+    {
+    	show_message('取货门店无效', '重新选择', 'index.php', 'error');
     }
     
     // 检查购物车中是否有限时抢购商品过期
@@ -1441,6 +1459,7 @@ elseif ($_REQUEST['step'] == 'done')
     $_POST['postscript'] = isset($_POST['postscript']) ? compile_str($_POST['postscript']) : '';
 
     $order = array(
+    	'shop_id'		  => $shop_id,
         'shipping_id'     => intval($_POST['shipping']),
         'pay_id'          => intval($_POST['payment']),
         'pack_id'         => isset($_POST['pack']) ? intval($_POST['pack']) : 0,
@@ -2993,11 +3012,11 @@ function cart_favourable_amount($favourable)
 /**
  * 获取下单提醒说明文字
  */
-function order_attention($order)
+function order_attention($order, $shop)
 {
 	global $_CFG;
 	
-	$ptime = get_order_pickup_time();
+	$ptime = get_order_pickup_time(0, 0, $shop['open_time'], $shop['close_time']);
 	$tpl = new cls_template();
 	
 	

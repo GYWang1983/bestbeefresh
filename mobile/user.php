@@ -1105,7 +1105,7 @@ elseif ($action == 'async_order_list')
             if ($order_cs == CS_UNPICK || $order_cs == CS_CONFIRMED)
             {
             	//显示取货时间
-            	$ptime = get_order_pickup_time($vo['pay_time']);
+            	$ptime = get_order_pickup_time($vo['pay_time'], 0, $vo['shop_open_time'], $vo['shop_close_time']);
             	$ptime_html = '<br>请在以下时间段内取货：<br>' . date('m/d H:i', $ptime[start]) . ' ~ ' . date('m/d H:i', $ptime[end]);
             }
             

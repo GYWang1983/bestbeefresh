@@ -628,6 +628,21 @@ function load_config()
         $arr = $data;
     }
 
+    $shop = read_static_cache('shop_list');
+    if ($shop)
+    {
+    	$arr['shop'] = $shop;
+    }
+    else
+    {
+    	$sql = "SELECT * FROM " . $GLOBALS['ecs']->table('shop') . ' WHERE status > 0';
+    	$rs = $GLOBALS['db']->getAll($sql);
+    	foreach ($rs as &$shop)
+    	{
+    		$arr['shop'][$shop['shop_id']] = $shop;
+    	}
+    }
+    
     return $arr;
 }
 

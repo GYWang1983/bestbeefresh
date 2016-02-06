@@ -38,6 +38,32 @@ if ($act == 'cat_rec')
     $result['content'] = $smarty->fetch('library/recommend_' . $rec_array[$rec_type] . '.lbi');
     die($json->encode($result));
 }
+elseif ($act == 'select_shop')
+{
+	$shop_id = intval($_REQUEST['id']);
+
+	//check shop
+	if (!check_shop($shop_id))
+	{
+		$_SESSION['default_shop'] = 0;
+		show_message('取货门店无效', '重新选择', 'index.php');
+	}
+	
+	if ($shop_id)
+	{
+		if ($_SESSION['user_id'] > 0)
+		{
+			//update user data
+			$sql = "UPDATE " . $ecs->table('users') . " SET default_shop = '$shop_id' WHERE user_id = '$_SESSION[user_id]'";
+			$db->query($sql);
+		}
+
+		$_SESSION['default_shop'] = $shop_id;
+	}
+	
+	ecs_header("Location: index.php\n");
+	exit;
+}
 
 /*------------------------------------------------------ */
 //-- 判断是否存在缓存，如果存在则调用缓存，反之读取相应内容
@@ -109,6 +135,7 @@ if (!$smarty->is_cached('index.dwt', $cache_id))
     /* 页面中的动态内容 */
     assign_dynamic('index');
 }
+
 $smarty->assign('config', $_CFG);
 $smarty->display('index.dwt', $cache_id);
 

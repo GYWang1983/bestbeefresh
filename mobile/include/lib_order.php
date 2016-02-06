@@ -3226,7 +3226,7 @@ function get_order_lock_deadline($basetime = NULL)
  * @param $paytime 支付时间
  * @return Array
  */
-function get_order_pickup_time($paytime = NULL, $comfirm_time = 0)
+function get_order_pickup_time($paytime = NULL, $comfirm_time = 0, $shop_open_time = '11:00', $shop_close_time = '19:00')
 {
 	global $_CFG;
 
@@ -3243,13 +3243,13 @@ function get_order_pickup_time($paytime = NULL, $comfirm_time = 0)
 	$start = new DateTime('@' . $locktime);
 	$start->setTimezone($tz);
 
-	if (strcmp($_CFG['order_lock_time'], $_CFG['shop_open_time']) > 0)
+	if (strcmp($_CFG['order_lock_time'], $shop_open_time) > 0)
 	{
 		//第二天开门取货
 		$start->modify('+1 day');
 	}
 
-	$arr_op = explode(':', $_CFG['shop_open_time']);
+	$arr_op = explode(':', $shop_open_time);
 	$start->setTime(intval($arr_op[0]), intval($arr_op[1]), 0);
 
 	$end = new DateTime();
@@ -3258,12 +3258,12 @@ function get_order_pickup_time($paytime = NULL, $comfirm_time = 0)
 
 	$end->modify('+' . $_CFG['shipping_limit_time'] . ' hour');
 
-	if (strcmp($end->format('H:i'), $_CFG['shop_open_time']) <= 0)
+	if (strcmp($end->format('H:i'), $shop_open_time) <= 0)
 	{
 		$end->modify('-1 day');
 	}
 
-	$arr_ed = explode(':', $_CFG['shop_close_time']);
+	$arr_ed = explode(':', $shop_close_time);
 	$end->setTime(intval($arr_ed[0]), intval($arr_ed[1]), 0);
 
 	return array(

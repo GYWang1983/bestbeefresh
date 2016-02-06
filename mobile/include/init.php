@@ -46,7 +46,7 @@ if (DIRECTORY_SEPARATOR == '\\') {
 }
 
 if (defined('DEBUG_MODE') == false) {
-    define('DEBUG_MODE', 2);
+    define('DEBUG_MODE', 0);
 }
 
 if (PHP_VERSION >= '5.1' && !empty($timezone)) {
@@ -145,7 +145,7 @@ if (!defined('INIT_NO_SMARTY')) {
     header('Cache-control: private');
     header('Content-type: text/html; charset=' . EC_CHARSET);
 
-    /* 创建 Smarty 对象。 */
+    // 创建 Smarty 对象
     require(ROOT_PATH . 'include/cls_template.php');
     $smarty = new cls_template;
 
@@ -232,9 +232,9 @@ if (!defined('INIT_NO_USERS')) {
             setcookie("ECS[user_id]", '', $time, '/');
             setcookie("ECS[password]", '', $time, '/');
         } else {
-            $_SESSION['user_id'] = $row['user_id'];
+            $_SESSION['user_id']   = $row['user_id'];
             $_SESSION['user_name'] = $row['user_name'];
-            $_SESSION['mobile'] = $row['mobile_phone'];
+            $_SESSION['mobile']    = $row['mobile_phone'];
             update_user_info();
         }
     }

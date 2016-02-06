@@ -282,10 +282,11 @@ function get_user_orders($user_id, $condition = '', $num = 10, $start = 0)
     	$condition = 'AND ' . $condition;
     }
     
-    $sql = "SELECT order_id, order_sn, order_status, shipping_id, shipping_status, pay_status, add_time, pay_time, " .
-           "(goods_amount + shipping_fee + insure_fee + pay_fee + pack_fee + card_fee + tax - discount) AS total_fee ".
-           " FROM " .$GLOBALS['ecs']->table('order_info') .
-           " WHERE user_id = '$user_id' $condition ORDER BY add_time DESC";
+    $sql = "SELECT o.order_id, o.order_sn, o.order_status, o.shipping_id, o.shipping_status, o.pay_status, o.add_time, o.pay_time, " .
+           "(o.goods_amount + o.shipping_fee + o.insure_fee + o.pay_fee + o.pack_fee + o.card_fee + o.tax - o.discount) AS total_fee, ".
+           "s.shop_name, s.shop_id, s.open_time AS shop_open_time, s.close_time AS shop_close_time " .
+           " FROM " . $GLOBALS['ecs']->table('order_info', 'o') . ',' . $GLOBALS['ecs']->table('shop', 's') .
+           " WHERE o.shop_id = s.shop_id AND o.user_id = '$user_id' $condition ORDER BY o.add_time DESC";
     $res = $GLOBALS['db']->SelectLimit($sql, $num, $start);
 
     while ($row = $GLOBALS['db']->fetchRow($res))

@@ -474,4 +474,26 @@ function insert_flash_sale_time($arr)
 	$html = "<div class=\"flash_time {$class}\" remain=\"$remain\" status=\"{$status}\">{$text}</div>";
 	return $html;
 }
+
+// 用户选择的提货门店
+function insert_shop_id()
+{
+	return $_SESSION['default_shop'] ?: 0;
+}
+
+// 用户选择的提货门店名称
+function insert_shop_name()
+{
+	$shop_name = "请选择取货门店...";
+	if (!empty($_SESSION['default_shop']))
+	{
+		$shop = $GLOBALS['_CFG']['shop'][$_SESSION['default_shop']];
+		if (!empty($shop))
+		{
+			$shop_name = $shop['shop_name'];
+		}
+	}
+
+	return $shop_name;
+}
 ?>

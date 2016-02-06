@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>{$page_title} 触屏版</title>
+<title>{$page_title}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -23,6 +23,7 @@ var shop_desc = '{$config.shop_desc}';
 var shop_logo = '{$config.site_url}/{$config.shop_logo}';
 var site_url = '{$config.site_url}';
 var themes = '{$ectouch_themes}';
+var default_shop = {insert name='shop_id'};
 </script>
 </head>
 <body>
@@ -30,16 +31,9 @@ var themes = '{$ectouch_themes}';
 <div id="page">
   <header id="header">
     <!--<div class="header_l"> <a class="ico_02" href="#menu"> 菜单栏 </a> </div>-->
-    <h1> {$shop_name} </h1>
+    <h1 class="shop_name">{insert name='shop_name'}</h1>
+    <div class="header_r"><a id="select_shop" class="icon-location" href="#top-shop-menu">&nbsp;</a></div>
     <!--
-    <div class="header_r"><a class="icon-location" href="flow.php">&nbsp;</a></div>
-    <nav id="top-shop-menu">
-      <ul>
-        {foreach from=$config.shop.list item=shop}
-        <li><a _href="index.php?change_shop={$shop.shop_id}">{$shop.shop_name}{$shop.address}{$shop.address}{$shop.coord_qq}</a></li>
-        {/foreach}
-      </ul>
-    </nav>
     <div class="header_ad">
       <img src="{$ectouch_themes}/images/header_ad.jpg" />
     </div>
@@ -124,7 +118,7 @@ var flash = {insert name='cart_flash_number'};
 </div>
 <!--content e--> 
 <!-- #BeginLibraryItem "/library/page_footer.lbi" --><!-- #EndLibraryItem --> 
-<nav id="menu" style="display:None">
+<nav id="menu" style="display:none">
   <ul>
     <!--{foreach from=$categories item=cat}-->
     <li> <a href="{$cat.url}"> {$cat.name|escape:html} </a>
@@ -141,6 +135,18 @@ var flash = {insert name='cart_flash_number'};
       </ul>
     </li>
     <!--{/foreach}-->
+  </ul>
+</nav>
+<nav id="top-shop-menu" style="display:none;">
+  <ul>
+    {foreach from=$config.shop item=shop}
+    <li>
+      <span class="shop_item" href="index.php?act=select_shop&id={$shop.shop_id}">
+        <div class="shop_name">{$shop.shop_name}</div>
+        <div class="address">{$shop.address}</div>
+      </span>
+    </li>
+    {/foreach}
   </ul>
 </nav>
 <!--搜索弹出框-->
