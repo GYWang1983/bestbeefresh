@@ -54,6 +54,7 @@ var cart={}, flash={};
         <div class="desc">
             <div class="title">
                 {if $goods.extension_code eq 'flash_sale'}<span class="red-flag">限时抢购</span>{/if}
+                {if $goods.free_more_desc}<span class="red-flag">{$goods.free_more_desc}</span>{/if}
                 <a href="goods.php?id={$goods.goods_id}">{$goods.goods_name|escape:html}</a>
                 <!-- {if $goods.parent_id gt 0} 配件 --> 
                 <span style="color:#FF0000">（{$lang.accessories}）</span> 
@@ -65,9 +66,6 @@ var cart={}, flash={};
             <!-- {if $goods.goods_attr && $show_goods_attribute eq 1} 显示商品属性 -->
             <div class="amount_desc">{$goods.goods_attr|nl2br}</div>
             <!-- {/if} -->
-            <!--{if $goods.free_more_desc}-->
-            <div class="freemore">{$goods.free_more_desc}</div>
-            <!--{/if}-->
         </div>
         <div class="price">{$goods.goods_price}</div>
         <!-- {if $goods.goods_id gt 0 && $goods.is_gift eq 0 && $goods.parent_id eq 0} 普通商品可修改数量 -->
@@ -78,6 +76,7 @@ var cart={}, flash={};
             <div class="btn icon-minus"></div>
         </div>
         <!-- {/if} -->
+        <div style="clear:both;"></div>
     </div>
     <!-- {/foreach} -->
     <input type="hidden" name="step" value="update_cart" />
