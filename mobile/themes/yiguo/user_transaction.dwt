@@ -428,7 +428,10 @@ jQuery(function($){
         </tr>
         <!--{if $order.order_status eq OS_UNCONFIRMED or $order.order_status eq OS_CONFIRMED}-->
         <tr>
-            <td>提货地址：{$config.shop_address}<span class="shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$config.shop_address_coord}&referer=bestbeefresh" target="_blank"></a></span></td>
+            <td>提货门店：{$shop.shop_name}</td>
+        </tr>
+        <tr>
+            <td>地址：{$shop.address}<span class="shop_location"><a class="icon-location" href="http://apis.map.qq.com/uri/v1/geocoder?coord={$shop.latitude},{$shop.longitude}&referer=bestbeefresh" target="_blank"></a></span></td>
         </tr>
         <!--{/if}-->
         <tr>

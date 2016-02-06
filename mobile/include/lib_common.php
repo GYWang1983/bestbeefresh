@@ -2849,4 +2849,9 @@ function check_shop($shop_id)
 {
 	return $shop_id > 0 && !empty($GLOBALS['_CFG']['shop'][$shop_id]);
 }
+
+function get_shop($shop_id)
+{
+	return $GLOBALS['_CFG']['shop'][$shop_id];
+}
 ?>

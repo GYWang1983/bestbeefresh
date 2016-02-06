@@ -1178,7 +1178,6 @@ elseif ($action == 'order_detail')
     if ($order === false)
     {
         $err->show($_LANG['back_home_lnk'], './');
-
         exit;
     }
 
@@ -1232,6 +1231,7 @@ elseif ($action == 'order_detail')
     $order['order_cs'] = get_order_custom_status($order);
     $order['order_cs_desc'] = $_LANG['cs'][$order['order_cs']];
     
+    $shop = get_shop($order['shop_id']);
     if ($order['order_cs'] == CS_UNPICK)
     {
     	//获取取货码
@@ -1239,16 +1239,18 @@ elseif ($action == 'order_detail')
     			" WHERE user_id = $user_id AND status = 1 AND abandon_time > " . time() .
     			" ORDER BY create_time ASC LIMIT 1";
     	$pcode = $db->getRow($sql);
-    	
+
     	if (!empty($pcode))
     	{
-    		$order['pickup_time_start'] = date('m/d H:i', $pcode['start_time']);
-    		$order['pickup_time_end'] = date('m/d H:i', $pcode['end_time']);
+    		$ptime = get_order_pickup_time(NULL, $order['confirm_time'], $shop['open_time'], $shop['close_time']);
+    		$order['pickup_time_start'] = date('m/d H:i', $ptime['start']);
+    		$order['pickup_time_end'] = date('m/d H:i', $ptime['end']);
     		$order['pickup_code'] = $pcode['code'];
     	}
     }
     
     $smarty->assign('order',      $order);
+    $smarty->assign('shop',       $shop);
     $smarty->assign('goods_list', $goods_list);
     $smarty->display('user_transaction.dwt');
 }
