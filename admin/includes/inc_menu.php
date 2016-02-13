@@ -47,9 +47,10 @@ $modules['03_promotion']['10_auction']              = 'auction.php?act=list';
 $modules['03_promotion']['12_favourable']           = 'favourable.php?act=list';
 $modules['03_promotion']['13_wholesale']            = 'wholesale.php?act=list';
 $modules['03_promotion']['14_package_list']         = 'package.php?act=list';
-//$modules['03_promotion']['ebao_commend']            = 'ebao_commend.php?act=list';
+//$modules['03_promotion']['ebao_commend']          = 'ebao_commend.php?act=list';
 $modules['03_promotion']['15_exchange_goods']       = 'exchange_goods.php?act=list';
-$modules['03_promotion']['16_flash_sale']       = 'flash_sale.php?act=list';
+$modules['03_promotion']['16_flash_sale']           = 'flash_sale.php?act=list';
+$modules['03_promotion']['17_bargain_goods']        = 'bargain_goods.php?act=list';
 
 $modules['04_order']['02_order_list']               = 'order.php?act=list';
 $modules['04_order']['03_order_query']              = 'order.php?act=order_query';
