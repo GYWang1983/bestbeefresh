@@ -1,8 +1,8 @@
 <?php
 /**
- * ECSHOP 取货页面
+ * 微信API类库
  * ============================================================================
- * * 版权所有 2015-2015 南京蜂蚁网络科技有限公司，并保留所有权利。
+ * * 版权所有 2015-2016 南京蜂蚁网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.bestbeefresh.com；
  * ----------------------------------------------------------------------------
  * 这不是一个自由软件！您只能在不用于商业目的的前提下对程序代码进行修改和
@@ -289,6 +289,25 @@ class WechatApi {
     	$result = $this->http_post($url, $data);
     	$result = json_decode($result, true);
     	return $result;
+    }
+    
+    /**
+     * 获取用户信息
+     * 
+     * @param string $openid 用户OPENID
+     */
+    public function get_user_info($openid) {
+    	
+    	$acctoken = $this->cfg['access_token'];
+    	$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token={$acctoken}&openid={$openid}&lang=zh_CN";
+    	
+    	$str = file_get_contents($url);
+    	$json = json_decode($str, true);
+    	if (!empty($json['errcode'])) {
+    		return array();
+    	}
+    	
+    	return $json;
     }
     
     /**
