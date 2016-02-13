@@ -49,7 +49,7 @@ $timestamp = time();
 $str = "jsapi_ticket=$jsapi_ticket&noncestr=$noncestr&timestamp=$timestamp&url=$refer";
 $signature = sha1($str);
 
-$api = $_GET['api'];
+$api = htmlspecialchars($_GET['api']);
 $api_list = explode(',', $api);
 foreach ($api_list as $a) {
     $apis[] = "'" . trim($a) . "'";
