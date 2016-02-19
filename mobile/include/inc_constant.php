@@ -64,6 +64,7 @@ define('CART_GROUP_BUY_GOODS',      1); // 团购商品
 define('CART_AUCTION_GOODS',        2); // 拍卖商品
 define('CART_SNATCH_GOODS',         3); // 夺宝奇兵
 define('CART_EXCHANGE_GOODS',       4); // 积分商城
+define('CART_BARGAIN_GOODS',        5); // 砍价活动
 
 /* 订单状态 */
 define('OS_UNCONFIRMED',            0); // 未确认
@@ -266,10 +267,10 @@ define('SMS_GETPASSWORD', 2);
 define('SMS_REBIND',      3);
 define('SMS_WXBIND',      4);
 
-/* 限时抢购状态 */
-define('FLASH_WAIT',    1); //未开始
-define('FLASH_OPEN',    2); //抢购中
-define('FLASH_END',     3); //已结束
-define('FLASH_SOLDOUT', 4); //售罄
+/* 商品状态 */
+define('GOODS_WAIT',    1); //未开始
+define('GOODS_OPEN',    2); //抢购中
+define('GOODS_END',     3); //已结束
+define('GOODS_SOLDOUT', 4); //售罄
 
 ?>

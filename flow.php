@@ -1663,6 +1663,7 @@ elseif ($_REQUEST['step'] == 'done')
         'how_oos'         => isset($_LANG['oos'][$_POST['how_oos']]) ? addslashes($_LANG['oos'][$_POST['how_oos']]) : '',
         'need_insure'     => isset($_POST['need_insure']) ? intval($_POST['need_insure']) : 0,
         'user_id'         => $_SESSION['user_id'],
+    	'mobile' 		  => $_SESSION['mobile'],
         'add_time'        => gmtime(),
         'order_status'    => OS_UNCONFIRMED,
         'shipping_status' => SS_UNSHIPPED,
@@ -1752,7 +1753,6 @@ elseif ($_REQUEST['step'] == 'done')
     {
         $order[$key] = addslashes($value);
     }*/
-    $order['mobile'] = $_SESSION['mobile'];
     
    /* 判断是不是实体商品 */
     foreach ($cart_goods AS $val)

@@ -1,6 +1,6 @@
 <?php 
 
-function weixin_oauth($callback) {
+function weixin_oauth($callback, $scope = 'BASE') {
 	global $db;
 	
 	$rs = $db->getRow("SELECT * FROM `wxch_config` WHERE `id` = 1");
@@ -11,7 +11,16 @@ function weixin_oauth($callback) {
 		
 		$param ['redirect_uri'] = $callback . (strpos($callback, '?') > 0 ? '&' : '?') . 'oauth=1';
 		$param ['response_type'] = 'code';
-		$param ['scope'] = 'snsapi_base';  //'snsapi_userinfo';
+		
+		if ($scope == 'INFO')
+		{
+			$param ['scope'] = 'snsapi_userinfo';
+		}
+		else
+		{
+			$param ['scope'] = 'snsapi_base';
+		}
+
 		$url = 'https://open.weixin.qq.com/connect/oauth2/authorize?' . http_build_query ( $param ) . '#wechat_redirect';
 		ecs_header("Location: $url\n");
 		exit;
@@ -51,6 +60,28 @@ function weixin_oauth($callback) {
 	    	}
 
 		}
+		
+		if ($token['scope'] == 'snsapi_userinfo')
+		{
+			$url = "https://api.weixin.qq.com/sns/userinfo?access_token={$token[access_token]}&openid={$token[openid]}&lang=zh_CN";
+			$content = file_get_contents ( $url );
+			$info = json_decode ( $content, true );
+			
+			// 更新微信用户数据
+			$db->autoExecute('wxch_user', array (
+					//'subscribe' => $info['subscribe'],
+					'nickname'  => $info['nickname'],
+					'sex'       => $info['sex'],
+					'city'      => $info['city'],
+					'country'   => $info['country'],
+					'province'  => $info['province'],
+					'language'  => $info['language'],
+					'headimgurl'     => $info['headimgurl'],
+					//'subscribe_time' => $info['subscribe_time'],
+					'dateline'		 => time(),
+			), 'UPDATE', 'uid = ' . $user_info['uid']);
+		}
+		
 		
 		$_SESSION['openid'] = $token['openid'];
 		return $user_info;

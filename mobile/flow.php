@@ -469,10 +469,16 @@ elseif ($_REQUEST['step'] == 'checkout')
 	update_cart();
 	
     /* 取得购物类型 */
-    $flow_type = isset($_SESSION['flow_type']) ? intval($_SESSION['flow_type']) : CART_GENERAL_GOODS;
+    $flow_type = isset($_REQUEST['flow_type']) ? intval($_REQUEST['flow_type']) : CART_GENERAL_GOODS;
+    $_SESSION['flow_type'] = $flow_type;
 
     /* 团购标志 */
-    if ($flow_type == CART_GROUP_BUY_GOODS)
+    if ($flow_type == CART_GENERAL_GOODS)
+    {
+    	unset($_SESSION['extension_code']);
+		unset($_SESSION['extension_id']);
+    }
+    elseif ($flow_type == CART_GROUP_BUY_GOODS)
     {
         $smarty->assign('is_group_buy', 1);
     }
@@ -531,7 +537,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     $cart_goods = cart_goods($flow_type); // 取得商品列表，计算合计
     $smarty->assign('goods_list', $cart_goods);
 
-    /* 对是否允许修改购物车赋值 */
+    // 对是否允许修改购物车赋值
     if ($flow_type != CART_GENERAL_GOODS || $_CFG['one_step_buy'] == '1')
     {
         $smarty->assign('allow_edit_cart', 0);
@@ -541,113 +547,20 @@ elseif ($_REQUEST['step'] == 'checkout')
         $smarty->assign('allow_edit_cart', 1);
     }
 
-    /*
-     * 取得购物流程设置
-     */
+    // 取得购物流程设置
     $smarty->assign('config', $_CFG);
     
-    /*
-     * 取得订单信息
-     */
+    // 取得订单信息
     $order = flow_order_info();
     
-    /* 计算折扣 */
-    if ($flow_type != CART_EXCHANGE_GOODS && $flow_type != CART_GROUP_BUY_GOODS)
-    {
-        $discount = compute_discount();
-        $smarty->assign('discount', $discount['discount']);
-        $favour_name = empty($discount['name']) ? '' : join(',', $discount['name']);
-        $smarty->assign('your_discount', sprintf($_LANG['your_discount'], $favour_name, price_format($discount['discount'])));
-    }
-
-    /*
-     * 计算订单的费用
-     */
+	// 计算订单的费用
     $total = order_fee($order, $cart_goods, $consignee);
     
-    /* 取得配送列表 */
-    /*$region            = array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']);
-    $shipping_list     = available_shipping_list($region);
-    $cart_weight_price = cart_weight_price($flow_type);
-    $insure_disabled   = true;
-    $cod_disabled      = true;
-
-    // 查看购物车中是否全为免运费商品，若是则把运费赋为零
-    $sql = 'SELECT count(*) FROM ' . $ecs->table('cart') . " WHERE " . get_cart_cond(). " AND `extension_code` != 'package_buy' AND `is_shipping` = 0";
-    $shipping_count = $db->getOne($sql);
-
-    foreach ($shipping_list AS $key => $val)
-    {
-        $shipping_cfg = unserialize_config($val['configure']);
-        $shipping_fee = ($shipping_count == 0 AND $cart_weight_price['free_shipping'] == 1) ? 0 : shipping_fee($val['shipping_code'], unserialize($val['configure']),
-        $cart_weight_price['weight'], $cart_weight_price['amount'], $cart_weight_price['number']);
-
-        $shipping_list[$key]['format_shipping_fee'] = price_format($shipping_fee, false);
-        $shipping_list[$key]['shipping_fee']        = $shipping_fee;
-        $shipping_list[$key]['free_money']          = price_format($shipping_cfg['free_money'], false);
-        $shipping_list[$key]['insure_formated']     = strpos($val['insure'], '%') === false ?
-            price_format($val['insure'], false) : $val['insure'];
-
-        // 当前的配送方式是否支持保价
-        if ($val['shipping_id'] == $order['shipping_id'])
-        {
-            $insure_disabled = ($val['insure'] == 0);
-            $cod_disabled    = ($val['support_cod'] == 0);
-        }
-    }
-
-    $smarty->assign('shipping_list',   $shipping_list);
-    $smarty->assign('insure_disabled', $insure_disabled);
-    $smarty->assign('cod_disabled',    $cod_disabled);
-
-    if ($order['shipping_id'] == 0)
-    {
-        $cod        = true;
-        $cod_fee    = 0;
-    }
-    else
-    {
-        $shipping = shipping_info($order['shipping_id']);
-        $cod = $shipping['support_cod'];
-
-        if ($cod)
-        {
-            // 如果是团购，且保证金大于0，不能使用货到付款
-            if ($flow_type == CART_GROUP_BUY_GOODS)
-            {
-                $group_buy_id = $_SESSION['extension_id'];
-                if ($group_buy_id <= 0)
-                {
-                    show_message('error group_buy_id');
-                }
-                $group_buy = group_buy_info($group_buy_id);
-                if (empty($group_buy))
-                {
-                    show_message('group buy not exists: ' . $group_buy_id);
-                }
-
-                if ($group_buy['deposit'] > 0)
-                {
-                    $cod = false;
-                    $cod_fee = 0;
-
-                    // 赋值保证金
-                    $smarty->assign('gb_deposit', $group_buy['deposit']);
-                }
-            }
-
-            if ($cod)
-            {
-                $shipping_area_info = shipping_area_info($order['shipping_id'], $region);
-                $cod_fee            = $shipping_area_info['pay_fee'];
-            }
-        }
-        else
-        {
-            $cod_fee = 0;
-        }
-    }*/
-
+    // 计算折扣 
+    $smarty->assign('discount', $total['discount']);
+    $favour_name = empty($total['discount_name']) ? '' : join(',', $total['discount_name']);
+    $smarty->assign('your_discount', sprintf($_LANG['your_discount'], $favour_name, $total['discount_formated']));
+    
     /* 取得包装与贺卡 */
     if ($total['real_goods_count'] > 0)
     {
@@ -689,7 +602,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     	$smarty->assign('your_integral',      $user_info['pay_points']); // 用户积分
     }
     
-    /* 如果使用红包，取得用户可以使用的红包及用户选择的红包 */
+    // 如果使用红包，取得用户可以使用的红包及用户选择的红包
     if ((!isset($_CFG['use_bonus']) || $_CFG['use_bonus'] == '1')
     		&& ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS))
     {
@@ -713,7 +626,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     	$smarty->assign('allow_use_bonus', 1);
     }
     
-    /* 取得支付列表 */
+    // 取得支付列表
 	$payment_list = available_payment_list(false, $cod_fee, true, is_wechat_browser());
 	if(!empty($payment_list))
 	{
@@ -1476,12 +1389,13 @@ elseif ($_REQUEST['step'] == 'done')
         'how_oos'         => isset($_LANG['oos'][$_POST['how_oos']]) ? addslashes($_LANG['oos'][$_POST['how_oos']]) : '',
         'need_insure'     => isset($_POST['need_insure']) ? intval($_POST['need_insure']) : 0,
         'user_id'         => $_SESSION['user_id'],
+        'mobile'          => $_SESSION['mobile'],
         'add_time'        => gmtime(),
         'order_status'    => OS_UNCONFIRMED,
         'shipping_status' => SS_UNSHIPPED,
         'pay_status'      => PS_UNPAYED,
         'agency_id'       => get_agency_by_regions(array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district']))
-        );
+    );
 
     /* 扩展信息 */
     if (isset($_SESSION['flow_type']) && intval($_SESSION['flow_type']) != CART_GENERAL_GOODS)
@@ -1565,7 +1479,6 @@ elseif ($_REQUEST['step'] == 'done')
     {
         $order[$key] = addslashes($value);
     }*/
-    $order['mobile'] = $_SESSION['mobile'];
 
    /* 判断是不是实体商品 */
     foreach ($cart_goods AS $val)
@@ -1593,9 +1506,9 @@ elseif ($_REQUEST['step'] == 'done')
     $order['tax']          = $total['tax'];
 
     // 购物车中的商品能享受红包支付的总额
-    $discount_amout = compute_discount_amount();
+    //$discount_amout = compute_discount_amount();
     // 红包和积分最多能支付的金额为商品总额
-    $temp_amout = $order['goods_amount'] - $discount_amout;
+    $temp_amout = $order['goods_amount'] - $order['discount'];
     if ($temp_amout <= 0)
     {
         $order['bonus_id'] = 0;
@@ -1736,11 +1649,17 @@ elseif ($_REQUEST['step'] == 'done')
             " WHERE ".get_cart_cond()." AND rec_type = '$flow_type'";
     $db->query($sql);
     
-    /* 修改拍卖活动状态 */
-    if ($order['extension_code']=='auction')
+    if ($order['extension_code'] == 'auction')
     {
+    	// 修改拍卖活动状态
         $sql = "UPDATE ". $ecs->table('goods_activity') ." SET is_finished='2' WHERE act_id=".$order['extension_id'];
         $db->query($sql);
+    }
+    elseif ($order['extension_code'] == 'bargain')
+    {
+    	// 修改砍价活动
+    	$sql = "UPDATE ". $ecs->table('user_bargain') . " SET status = 2 WHERE bargain_id = $order[extension_id] AND user_id = $order[user_id]";
+    	$db->query($sql);
     }
 
     /* 处理余额、积分、红包 */

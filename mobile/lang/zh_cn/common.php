@@ -717,6 +717,7 @@ $_LANG['fat_price'] = '享受现金减免';
 $_LANG['fat_discount'] = '享受价格折扣';
 $_LANG['orgtotal'] = '原始价格';
 $_LANG['heart_buy'] = '心动不如行动';
+$_LANG['bargain_goods'] = '砍价啦';
 
 /* 其他模板涉及常用语言项 */
 $_LANG['label_regist'] = '用户注册';

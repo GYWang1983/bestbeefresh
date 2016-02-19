@@ -402,7 +402,6 @@ function get_promote_goods($cats = '')
 
 /**
  * 获取限时促销商品
- * 
  */
 function get_flash_sale_goods()
 {
@@ -428,6 +427,37 @@ function get_flash_sale_goods()
 		$goods['url']    = build_uri('goods', array('gid' => $goods['goods_id']), $goods['goods_name']);
 	}
 	
+	return $result;
+}
+
+/**
+ * 获取砍价商品
+ */
+function get_bargain_goods()
+{
+	global $ecs, $db;
+
+	$num = get_library_number("bargain_goods");
+	$now = time();
+
+	$sql = "SELECT b.*, g.goods_name, g.goods_thumb, g.shop_price, g.amount_desc FROM " .
+			$ecs->table('bargain_goods', 'b') . ',' . $ecs->table('goods', 'g') .
+			" WHERE b.goods_id = g.goods_id AND b.start_time <= '$now' AND b.end_time > '$now'" .
+			" AND b.status > 0 " .
+			" ORDER BY b.order ASC ";
+	if ($num > 0)
+	{
+		$sql .= " LIMIT $num";
+	}
+
+	$result = $db->getAll($sql);
+	foreach ($result as &$goods)
+	{
+		$goods['shop_price_formated'] = price_format($goods['shop_price']);
+		$goods['thumb'] = get_image_path($goods['goods_id'], $goods['goods_thumb'], true);
+		$goods['url']   = build_uri('goods', array('gid' => $goods['goods_id']), $goods['goods_name']);
+	}
+
 	return $result;
 }
 

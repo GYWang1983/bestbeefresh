@@ -139,6 +139,7 @@ $page_libs = array(
         //'/library/email_list.lbi' => 0,
         //'/library/vote_list.lbi' => 0,
     	'/library/flash_sale.lbi' => 3,
+    	'/library/bargain_goods.lbi' => 3,
     ),
     'goods' => array(
         '/library/ur_here.lbi' => 0,

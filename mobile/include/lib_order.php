@@ -608,17 +608,24 @@ function order_fee($order, $goods, $consignee = NULL)
     $total['saving_formated']       = price_format($total['saving'], false);
 
     /* 折扣 */
-    if ($order['extension_code'] != 'group_buy')
+    if ($order['extension_code'] == 'bargain')
     {
-        $discount = compute_discount();
-        $total['discount'] = $discount['discount'];
-        if ($total['discount'] > $total['goods_price'])
-        {
-            $total['discount'] = $total['goods_price'];
-        }
+    	$discount = bargain_discount($goods);
     }
+    
+    elseif ($order['extension_code'] == 'group_buy')
+    {
+    	$discount = array('discount'=>0, 'name'=>'');
+    }
+    else
+    {
+    	$discount = compute_discount();
+    }
+    
+    $total['discount'] = $discount['discount'] < $total['goods_price'] ? $discount['discount'] : $total['goods_price'];
     $total['discount_formated'] = price_format($total['discount'], false);
-
+    $total['discount_name'] = price_format($discount['name'], false);
+    
     /* 税额 */
     if (!empty($order['need_inv']) && $order['inv_type'] != '')
     {
@@ -2719,6 +2726,34 @@ function compute_discount()
     }
 
     return array('discount' => $discount, 'name' => $favourable_name);
+}
+
+/**
+ * 
+ * @param unknown $cart_goods
+ */
+function bargain_discount($cart_goods)
+{
+	global $db, $ecs, $_LANG;
+	
+	$discount = 0;
+	if (empty($cart_goods))
+	{
+		return array('discount' => $discount, 'name' => '');
+	}
+	
+	foreach ($cart_goods as &$goods)
+	{
+		if ($goods['extension_code'] != 'bargain')
+		{
+			continue;
+		}
+			
+		$sql = "SELECT bargain_price FROM " . $ecs->table('user_bargain') . " WHERE bargain_id = $goods[extension_id] AND user_id = $goods[user_id]";
+		$discount += $db->getOne($sql);
+	}
+	
+	return array('discount' => $discount, 'name' => $_LANG['bargain_goods']);
 }
 
 /**

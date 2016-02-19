@@ -69,7 +69,7 @@ Template Type: type_0
 	.blank1{height:0.4rem; line-height:0.4rem;/* _margin:-3px 0;*/ clear:both; visibility:hidden;}
 	.blank2{height:0.6rem; line-height:0.6rem; clear:both; visibility:hidden;}
 	.blank3{height:1rem; line-height:1rem; clear:both; visibility:hidden;}
-	.mr-t20{margin-top:20px}
+	/*.mr-t20{margin-top:20px}*/
 	.mr-t30{margin-top:30px}
 	.clearfix:after{content:"."; display:block; height:0; clear:both;visibility:hidden;}
 	*html .clearfix{height:1%;}
@@ -254,9 +254,10 @@ Template Type: type_0
 	.goodsItem img{width:100%;height:auto;}
 	.goodsItem del{height:1rem; line-height:1rem; font-size:0.4rem;}
 	.goodsItem img.soldout{position:absolute;width:100%;left:0;top:0;}
+
+    .bargain-goods a.button {display: block;float:right;background-color: #4d9546;color: #fff;border: 0;height: 1.5rem;line-height: 1.5rem;width: 90px;-webkit-box-flex: 1;-webkit-user-select: none;font-size: 1rem;text-align:center;}
 	
 	.flash-sale .goodsItem .flash_time{font-size:15px;letter-spacing:1px;display:inline-block;width:68%;}
-	
 	.red-flag {display:inline-block;color:#fff;font-size:12px;letter-spacing:2px;font-weight:bold;background-color:#ec5151;padding:1px 5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
 	
 	/*页脚*/

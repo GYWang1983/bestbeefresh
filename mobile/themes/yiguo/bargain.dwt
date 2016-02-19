@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=yes">
+<meta name="format-detection" content="email=no">
+<link href="{$ectouch_themes}/ectouch.css?v=20151228" rel="stylesheet" type="text/css" />
+<link href="{$ectouch_themes}/css/iconfont.css?v=20151212" type="text/css" rel="stylesheet"/>
+<link href="{$ectouch_themes}/css/bargain.css?v=20160212" type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="{$ectouch_themes}/js/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div class="canjia">
+    <div class="banner">
+        <div class="gdtgg">
+            <a href="{$bargain.goods_url}">
+                <div class="gdt"><img src="{$site_url}{$bargain.thumb}" id="mykj"  /></div>
+            </a>
+            <!--<a href="#"><img onclick="hdsm()" src="{$ectouch_themes}/images/bargain/hdsm.png" id="t_hdsm" /></a>-->
+            <div class="gg">{$bargain.goods_name}<!--{if $bargain.amount_desc}-->{$bargain.amount_desc}<!--{/if}--></div>
+        </div>
+    </div>
+    <div class="main">
+        <div class="yilou">
+            <div class="yj"><span class="yj_z">原价：{$bargain.shop_price_formated} 元</span></div>
+            <!--<div class="sy"><img class="yj_t" src="{$ectouch_themes}/images/bargain/surplus.png" /><span class="yj_z">剩余数量:10</span></div>-->
+        </div>
+        <div class="guodu">&nbsp;</div>
+        <div class="erlou">
+            <div class="erlou2">
+                <h4 id="hdsj_z">活动时间</h4>
+                <p id="hdsj_z2">{$bargain.start_time|timestamp:Y年m月d日}——{$bargain.end_time|timestamp:Y年m月d日}</p>
+            </div>
+        </div>
+        <div class="guodu2">&nbsp;</div>
+        <div class="sanlou">
+            <!--{if $act eq 'other' || $user.subscribe eq 1}-->
+            <div class="hhdd">
+                <h3 class="hdsmx">{$user.nickname}的"{$bargain.goods_name}"</h3>
+                <p class="hdsmnum userhd">现价{$bargain.new_price|money}元</p>
+                <img src="{$ectouch_themes}/images/bargain/la.png" id="kkan"/>
+                <p class="hdsmnum">分享给好友，请TA帮你砍价</p>
+                <p class="hdsmnum">邀请越多好友，砍价越多！</p>
+            </div>
+            <!--{if $bargain.user_bargain_status eq '1'}-->  
+            <div class="shann">
+                <!--{if $act eq 'my'}-->
+                <a href="#"><img src="{$ectouch_themes}/images/bargain/zjkj.png" id="btkj" {if !empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
+                <a href="#"><img src="{$ectouch_themes}/images/bargain/zrbm.png" class="fx" id="zrbm"/></a>
+                <a href="bargain.php?act=done&id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/ljgm.png" id="goumai" {if empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
+                <!--{else}-->
+                <!--{if empty($bargain.my_bargain_price)}-->
+                <a href="#"><img src="{$ectouch_themes}/images/bargain/btkj.png" id="btkj"/></a>
+                <!--{else}-->
+                <a href="#"><img src="{$ectouch_themes}/images/bargain/btfx.png" class="fx" id="btfx"/></a>
+                <!--{/if}-->
+                <a href="bargain.php?id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/wyyq.png" class="attend" id="wyyqq"/></a>
+                <!--{/if}-->
+            </div>
+            <!--{else}-->
+            <div class="shann hdsmnum">活动已结束</div>
+            <!--{/if}-->
+            <!--{else}-->
+            <div class="hhdd">
+                <p class="hdsmnum">您还没有关注“最鲜蜂”公众帐号</p>
+                <p class="hdsmnum">请长按下图二维码，关注后再参加活动</p>
+                <img class="qrcode" src="{$ectouch_themes}/images/qrcode.jpg" alt="qrcode">
+            </div>
+            <!--{/if}-->
+        </div>
+        <!--{if $act eq 'other' || $user.subscribe eq 1}-->
+        <div class="guodu3">&nbsp;</div>
+        <div class="silou">
+            <div class="silou2">
+                <p class="kjlj"><span class="kjgxx">砍价贡献</span><span class="ljkxx">累计砍下{$bargain.bargain_price|money}元</span></p>
+                <div id="hrrr"></div>
+                <!--{foreach name=friends from=$bargain.detail item=friend}-->
+                <div class="imgsg"><img src="{$friend.headimgurl}" class="touxn" /><p class='zuihz'><span class='namenc'>{$friend.nickname}</span><span class='monjia'>{if $friend.price > 0}- {else}+ {/if}{$friend.formated_price}元</span></p></div>
+                <!--{/foreach}-->
+                <!--{if empty($bargain.my_bargain_price)}-->
+                <div id="my_bargain" class="imgsg" style="display:none;"><img src="{$user.headimgurl}" class="touxn" /><p class='zuihz'><span class='namenc'>{$user.nickname}</span><span class='monjia'></span></p></div>
+                <!--{/if}-->
+                <br/><br/>
+            </div>
+        </div>
+        <!--{/if}-->
+        <div class="cb">&nbsp;</div>
+        <div class="cbb">&nbsp;</div>
+    </div>
+    <!--分享-->
+    <div class="close_fx">
+    <div id="fx">
+        <div class="fxjj"></div>
+        <div class="fxchuang">
+            <img src="{$ectouch_themes}/images/bargain/zharbm.png" id="fxxf" />
+        </div>
+    </div>
+    </div>
+</div>
+<!-- #BeginLibraryItem "/library/page_footer.lbi" --><!-- #EndLibraryItem --> 
+<script>
+var user_bargain_id = {$bargain.user_bargain_id};
+var act = '{$act}';
+
+var share_meta = {
+    title: '我正在{$config.shop_title}买水果,大家快来帮我砍价吧!', // 分享标题
+    desc: '小伙伴们，大家快来帮我砍价，已经砍掉{$bargain.bargain_price}元了，快来助我一臂之力吧!', // 分享描述
+    link: '{$site_url}/bargain.php?act=other&ubid={$bargain.user_bargain_id}', // 分享链接
+    imgUrl: '{$site_url}{$bargain.thumb}', // 分享图标
+    success: function () {
+        $('#fx').hide();
+    }, //成功回调
+    cancel: function () {
+    } //失败回调
+};
+</script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript" src="weixin/wxjsconfig.php?api=onMenuShareTimeline,onMenuShareAppMessage,onMenuShareQQ,onMenuShareWeibo,onMenuShareQZone,getLocation,openLocation"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/bargain.js?v=1"></script>
+</body>
+</html>

@@ -444,19 +444,19 @@ function insert_flash_sale_time($arr)
 	{
 		$text = "<span class=\"icon-time\">抢光了</span>";
 		$class = 'text-gray';
-		$status = FLASH_SOLDOUT;
+		$status = GOODS_SOLDOUT;
 	}
 	elseif ($goods['start_time'] > $now)
 	{
 		$text = "<span class=\"icon-time\">" . date('H:i', $goods['start_time']) . "准时开抢</span>";
 		$class = 'text-green';
-		$status = FLASH_WAIT;
+		$status = GOODS_WAIT;
 	}
 	elseif ($goods['end_time'] < $now)
 	{
 		$text = "<span class=\"icon-time\">已结束</span>";
 		$class = 'text-gray';
-		$status = FLASH_END;
+		$status = GOODS_END;
 	}
 	else
 	{
@@ -468,7 +468,31 @@ function insert_flash_sale_time($arr)
 		$timer = ($h > 0 ? "{$h}时" : '') . ($m > 0 ? "{$m}分" : '') . "{$s}秒";
 		$text = "<span class=\"icon-time\">{$timer}</span>";
 		$class = 'text-black';
-		$status = FLASH_OPEN;
+		$status = GOODS_OPEN;
+	}
+	
+	$html = "<div class=\"flash_time {$class}\" remain=\"$remain\" status=\"{$status}\">{$text}</div>";
+	return $html;
+}
+
+// 砍价活动剩余商品数量
+function insert_bargain_goods_amount($arr)
+{
+	$goods = $arr['goods'];
+	
+	if ($goods['status'] == 4)
+	{
+		$text = "<span class=\"icon-time\">抢光了</span>";
+		$class = 'text-gray';
+		$status = GOODS_SOLDOUT;
+	}
+	else
+	{
+		$end   = date('Y-m-d', $goods['end_time']);
+		
+		$text = "<span class=\"icon-time\">{$end}结束</span>";
+		$class = 'text-black';
+		$status = GOODS_OPEN;
 	}
 	
 	$html = "<div class=\"flash_time {$class}\" remain=\"$remain\" status=\"{$status}\">{$text}</div>";

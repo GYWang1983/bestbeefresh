@@ -1,0 +1,24 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<section class="bargain-goods region">
+<!-- {foreach name=goods from=$bargain_goods item=goods}-->
+    <div class="goodsItem" id="bargain{$goods.id}">
+        <div class="thumb">
+            <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.goods_name|escape:html}" />
+        </div>
+        <div class="desc">
+            <span class="red-flag">{$lang.bargain_goods}</span>
+            <span class="title">{$goods.goods_name|escape:html}</span>
+        </div>
+        <div class="price">
+            <span> {$goods.shop_price_formated} </span> 
+            <!--{if $goods.amount_desc}-->
+            <span class="amount_desc"> / {$goods.amount_desc}</span>
+            <!--{/if}-->
+        </div>
+        <div class="cart" data="{$goods.id}">
+            <a class="button radius5" href="bargain.php?id={$goods.id}">我要参加</a>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+<!-- {/foreach} -->
+</section>

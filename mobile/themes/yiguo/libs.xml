@@ -169,6 +169,7 @@
       <lib>recommend_new</lib>
       <lib>recommend_hot</lib>
       <lib>flash_sale</lib>
+      <lib>bargain_goods</lib>
     </region>
   </file>
   <file name="message.dwt"/>
