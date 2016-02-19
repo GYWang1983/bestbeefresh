@@ -946,6 +946,10 @@ function price_format($price, $change_price = true)
     {
      $price=0;
     }
+    
+    $neg = $price < 0 ? '-' : '';
+    $price = abs($price);
+    
     if ($change_price && defined('ECS_ADMIN') === false)
     {
         switch ($GLOBALS['_CFG']['price_format'])
@@ -980,7 +984,7 @@ function price_format($price, $change_price = true)
         $price = number_format($price, 2, '.', '');
     }
 
-    return sprintf($GLOBALS['_CFG']['currency_format'], $price);
+    return $neg . sprintf($GLOBALS['_CFG']['currency_format'], $price);
 }
 
 /**

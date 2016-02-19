@@ -104,6 +104,15 @@ function is_time($time)
 }
 
 /**
+ * 判断请求是否是Ajax请求
+ */
+function is_ajax()
+{
+	return isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+			&& strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+}
+
+/**
  * 获得查询时间和次数，并赋值给smarty
  *
  * @access  public
@@ -946,6 +955,10 @@ function price_format($price, $change_price = true)
     {
      $price=0;
     }
+    
+    $neg = $price < 0 ? '-' : '';
+    $price = abs($price);
+    
     if ($change_price && defined('ECS_ADMIN') === false)
     {
         switch ($GLOBALS['_CFG']['price_format'])
@@ -980,7 +993,7 @@ function price_format($price, $change_price = true)
         $price = number_format($price, 2, '.', '');
     }
 
-    return sprintf($GLOBALS['_CFG']['currency_format'], $price);
+    return $neg . sprintf($GLOBALS['_CFG']['currency_format'], $price);
 }
 
 /**
