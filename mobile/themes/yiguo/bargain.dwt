@@ -40,30 +40,32 @@
         <div class="sanlou">
             <!--{if $act eq 'other' || $user.subscribe eq 1}-->
             <div class="hhdd">
-                <h3 class="hdsmx">{$user.nickname}的"{$bargain.goods_name}"</h3>
+                <h3 class="hdsmx">{if $act eq 'my'}我{else}{$user.nickname}{/if}的"{$bargain.goods_name}"</h3>
                 <p class="hdsmnum userhd">现价{$bargain.new_price|money}元</p>
                 <img src="{$ectouch_themes}/images/bargain/la.png" id="kkan"/>
                 <p class="hdsmnum">分享给好友，请TA帮你砍价</p>
                 <p class="hdsmnum">邀请越多好友，砍价越多！</p>
             </div>
-            <!--{if $bargain.user_bargain_status eq '1'}-->  
             <div class="shann">
-                <!--{if $act eq 'my'}-->
+            <!--{if $act eq 'my'}-->
+                <!--{if $bargain.user_bargain_status eq '1'}-->
                 <a href="#"><img src="{$ectouch_themes}/images/bargain/zjkj.png" id="btkj" {if !empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
                 <a href="#"><img src="{$ectouch_themes}/images/bargain/zrbm.png" class="fx" id="zrbm"/></a>
                 <a href="bargain.php?act=done&id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/ljgm.png" id="goumai" {if empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
                 <!--{else}-->
-                <!--{if empty($bargain.my_bargain_price)}-->
-                <a href="#"><img src="{$ectouch_themes}/images/bargain/btkj.png" id="btkj"/></a>
-                <!--{else}-->
-                <a href="#"><img src="{$ectouch_themes}/images/bargain/btfx.png" class="fx" id="btfx"/></a>
+                <div class="shann hdsmnum">活动已结束</div>
+                <!--{/if}-->
+            <!--{else}-->
+                <!--{if $bargain.user_bargain_status eq '1'}-->
+                    <!--{if empty($bargain.my_bargain_price)}-->
+                    <a href="#"><img src="{$ectouch_themes}/images/bargain/btkj.png" id="btkj"/></a>
+                    <!--{else}-->
+                    <a href="#"><img src="{$ectouch_themes}/images/bargain/btfx.png" class="fx" id="btfx"/></a>
+                    <!--{/if}-->
                 <!--{/if}-->
                 <a href="bargain.php?id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/wyyq.png" class="attend" id="wyyqq"/></a>
-                <!--{/if}-->
-            </div>
-            <!--{else}-->
-            <div class="shann hdsmnum">活动已结束</div>
             <!--{/if}-->
+            </div>
             <!--{else}-->
             <div class="hhdd">
                 <p class="hdsmnum">您还没有关注“最鲜蜂”公众帐号</p>

@@ -187,6 +187,12 @@ elseif ($act == 'other')
 	{
 		show_message('砍价活动不存在', '返回首页', 'index.php', 'error');
 	}
+	
+	if ($bargain['user_id'] == $_SESSION['user_id'])
+	{
+		// 通过别人的链接进入自己的活动页面
+		$act = 'my';
+	}
 }
 elseif ($act == 'done')
 {
