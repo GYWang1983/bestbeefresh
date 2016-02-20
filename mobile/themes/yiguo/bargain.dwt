@@ -40,7 +40,7 @@
         <div class="sanlou">
             <!--{if $act eq 'other' || $user.subscribe eq 1}-->
             <div class="hhdd">
-                <h3 class="hdsmx">{if $act eq 'my'}我{else}{$user.nickname}{/if}的"{$bargain.goods_name}"</h3>
+                <h3 class="hdsmx">{if $act eq 'my'}我{else}{$bargain.nickname}{/if}的"{$bargain.goods_name}"</h3>
                 <p class="hdsmnum userhd">现价{$bargain.new_price|money}元</p>
                 <img src="{$ectouch_themes}/images/bargain/la.png" id="kkan"/>
                 <p class="hdsmnum">分享给好友，请TA帮你砍价</p>
@@ -111,7 +111,7 @@ var act = '{$act}';
 var share_meta = {
     title: '我正在{$config.shop_title}买水果,大家快来帮我砍价吧!', // 分享标题
     desc: '小伙伴们，大家快来帮我砍价，已经砍掉{$bargain.bargain_price}元了，快来助我一臂之力吧!', // 分享描述
-    link: '{$site_url}/bargain.php?act=other&ubid={$bargain.user_bargain_id}', // 分享链接
+    link: '{$config.site_url}/bargain.php?act=other&ubid={$bargain.user_bargain_id}', // 分享链接
     imgUrl: '{$site_url}{$bargain.thumb}', // 分享图标
     success: function () {
         $('#fx').hide();

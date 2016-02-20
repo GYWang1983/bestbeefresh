@@ -30,7 +30,8 @@ $(function() {
 	        }
 	        
 	        // 显示砍价结果
-	        $('#my_bargain .monjia').text(result.bargain_price + '元');
+	        var neg = result.bargain_price > 0 ? '-' : '+';
+	        $('#my_bargain .monjia').text(neg + ' ' + result.bargain_price + '元');
 	        $('#my_bargain').show();
 	        $('.ljkxx').text('累计砍下' + result.total_bargain_price + '元');
 	        $('.userhd').text('现价' + result.now_price +'元');

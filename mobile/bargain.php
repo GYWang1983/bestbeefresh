@@ -284,7 +284,7 @@ function check_user_bargain($bargain_id, $user_id)
 {
 	global $ecs, $db;
 	
-	$sql = "SELECT id FROM " . $ecs->table('user_bargain') . " WHERE bargain_id = {$bargain_id} AND $user_id = {$user_id}";
+	$sql = "SELECT id FROM " . $ecs->table('user_bargain') . " WHERE bargain_id = {$bargain_id} AND user_id = {$user_id}";
 	$user_bargain_id = $db->getOne($sql);
 	
 	return $user_bargain_id;
@@ -300,10 +300,12 @@ function get_user_bargain_detail($user_bargain_id)
 {
 	global $ecs, $db;
 	
-	$sql = "SELECT b.*, g.goods_name, g.goods_sn, g.goods_thumb, g.shop_price, g.amount_desc, " . 
+	$sql = "SELECT b.*, g.goods_name, g.goods_sn, g.goods_thumb, g.shop_price, g.amount_desc, w.nickname, " . 
 			"u.id AS user_bargain_id,u.user_id, u.bargain_id, u.bargain_price, u.status AS user_bargain_status FROM " .
-			$ecs->table('goods', 'g') . ','  . $ecs->table('bargain_goods', 'b')  . ',' . $ecs->table('user_bargain', 'u') .
-			" WHERE u.bargain_id = b.id AND b.goods_id = g.goods_id AND u.id = {$user_bargain_id}";
+			$ecs->table('goods', 'g') . ','  . $ecs->table('bargain_goods', 'b')  . ',' . 
+			$ecs->table('user_bargain', 'u') . ', wxch_user AS w' .
+			" WHERE u.bargain_id = b.id AND b.goods_id = g.goods_id AND w.uid = u.user_id" .
+			" AND u.id = {$user_bargain_id}";
 	$bargain = $db->getRow($sql);
 	if (empty($bargain))
 	{
