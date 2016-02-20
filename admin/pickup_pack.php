@@ -71,7 +71,8 @@ elseif ($_REQUEST['act'] == 'print_shipping')
 {
 	$print_date = empty($_REQUEST['print_date']) ? date('Ymd', time()) : trim($_REQUEST['print_date']);
 	$sql = "SELECT p.*, u.mobile_phone, g.goods_sn, g.goods_name, g.goods_attr, g.free_more, " .
-		" sum(g.goods_number) AS goods_number FROM " .
+		" sum(g.goods_number) AS goods_number, group_concat(o.order_sn SEPARATOR ', ') AS order_sn, " .
+		" group_concat(o.postscript SEPARATOR '; ') AS postscript FROM " .
 		$ecs->table('pickup_pack', 'p') . ',' . $ecs->table('users', 'u') . ',' .
 		$ecs->table('order_info', 'o') . ',' . $ecs->table('order_goods', 'g') .
 		" WHERE p.user_id = u.user_id AND p.id = o.package_id AND o.order_id = g.order_id " .
@@ -89,13 +90,14 @@ elseif ($_REQUEST['act'] == 'print_shipping')
 		{
 			$pack_id = $rs['id'];
 			
-			$sql = "SELECT order_sn FROM " . $ecs->table('order_info') . " WHERE package_id = '$pack_id' AND order_status != " . OS_CANCELED;
-			$order_sn =$db->getCol($sql);
+			//$sql = "SELECT order_sn FROM " . $ecs->table('order_info') . " WHERE package_id = '$pack_id' AND order_status != " . OS_CANCELED;
+			//$order_sn =$db->getCol($sql);
 			
 			$packlist[$pack_id] = array(
 				'sn' => substr($rs['create_date'], 6, 2) . '-' . $rs['pos_row'] . '-' . str_pad($rs['pos_sn'], 2, '0', STR_PAD_LEFT),
 				'mobile_phone' => $rs['mobile_phone'],
-				'order_sn'     => implode(', ', $order_sn),
+				'order_sn'     => $rs['order_sn'], //implode(', ', $order_sn),
+				'postscript'   => $rs['postscript'],
 				'goods_list'   => array(),
 			);
 		}
