@@ -195,6 +195,6 @@ var flash = {insert name='cart_flash_number'};
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.json.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript" src="{$ectouch_themes}/js/ectouch.js"></script>
-<script type="text/javascript" src="{$ectouch_themes}/js/index.js?v=3"></script>
+<script type="text/javascript" src="{$ectouch_themes}/js/index.js?v=5"></script>
 </body>
 </html>
