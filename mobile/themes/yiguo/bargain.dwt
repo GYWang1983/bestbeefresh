@@ -53,17 +53,14 @@
                 <a href="#"><img src="{$ectouch_themes}/images/bargain/zrbm.png" class="fx" id="zrbm"/></a>
                 <a href="bargain.php?act=done&id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/ljgm.png" id="goumai" {if empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
                 <!--{else}-->
-                <div class="shann hdsmnum">活动已结束</div>
+                <div class="shann hdsmnum">砍价已结束</div>
                 <!--{/if}-->
             <!--{else}-->
                 <!--{if $bargain.user_bargain_status eq '1'}-->
-                    <!--{if empty($bargain.my_bargain_price)}-->
-                    <a href="#"><img src="{$ectouch_themes}/images/bargain/btkj.png" id="btkj"/></a>
-                    <!--{else}-->
-                    <a href="#"><img src="{$ectouch_themes}/images/bargain/btfx.png" class="fx" id="btfx"/></a>
-                    <!--{/if}-->
+                <a href="#"><img src="{$ectouch_themes}/images/bargain/btkj.png" id="btkj" {if !empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
+                <a href="#"><img src="{$ectouch_themes}/images/bargain/btfx.png" class="fx" id="btfx" {if empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
                 <!--{/if}-->
-                <a href="bargain.php?id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/wyyq.png" class="attend" id="wyyqq"/></a>
+                <a href="bargain.php?id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/wyyq.png" class="attend" id="wyyqq" /></a>
             <!--{/if}-->
             </div>
             <!--{else}-->
