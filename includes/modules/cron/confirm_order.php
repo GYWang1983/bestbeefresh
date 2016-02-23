@@ -67,7 +67,7 @@ if (!empty($orders))
 		'status'       => 1
 	);
 	
-	$pack_date = date('Ymd', $pickup_time['start']);
+	$pack_date = date('Ymd', $now);
 	$pack_obj = array(
 		'create_date' => $pack_date,
 	);
