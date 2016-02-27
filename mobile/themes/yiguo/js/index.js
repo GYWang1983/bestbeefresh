@@ -84,8 +84,8 @@ $(function() {
 			position : 'right',
 			zposition: 'front'
 		},
-		backButton: {close: true},
-		extensions: ['fullscreen']
+		//extensions: ['fullscreen'],
+		backButton: {close: true}
 	}).show();
 	
 	$('.shop_item').click(function() {
@@ -93,7 +93,7 @@ $(function() {
 	});
     
     if (default_shop == 0) {
-    	$('#select_shop').click();
+    	$('.select-shop-overlay .popup').show();
     }
 });
 

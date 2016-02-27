@@ -1,7 +1,7 @@
 .global-nav{
 	position: fixed;
 	bottom: 0;
-	z-index: 1013;
+	z-index: 700;
 	display:-webkit-box;
 	display:-webkit-flex;
 	display:-ms-flexbox;

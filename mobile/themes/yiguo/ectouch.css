@@ -125,7 +125,7 @@ Template Type: type_0
      首页模块
 ==================== */
 	/*头部*/
-	#header{z-index:999;background-color:#4d9546;position:fixed;top:0;left:0;width:100%;height:3rem;display:block;}
+	#header{z-index:1999;background-color:#4d9546;position:fixed;top:0;left:0;width:100%;height:3rem;display:block;}
 	#header h1{color: #fff;font-size: 1.2rem;line-height: 3rem;text-align:center;  font-weight:normal;}
 	#header .header_r{position: absolute;top: 0;right: 0;}
 	#header .header_r a {width: 3rem;height:3rem;display:block;padding: 0 0.2rem;text-align:right;line-height:3rem;color:#fff;font-size:22px;}
@@ -1062,3 +1062,9 @@ ul.order_list_tab li.active{color: #4d9546;border-bottom: solid 2px #4d9546;}
 .mm-navbar{background-color:#4d9546;}
 .mm-title {color:#fff!important;font-size:1.2rem;}
 #top-shop-menu .mm-next{width:15%;}
+
+/* 选择门店提醒 */
+.select-shop-overlay .popup{ display:none; }
+.select-shop-overlay .fxjj{height:100%; margin:0 auto;  position:absolute; top:0px; z-index:800;width:100%; background:#000;filter:alpha(opactiy=50); -moz-opacity:0.5; opacity:0.5; display:block}
+.select-shop-overlay .message{ margin:0 auto; position:fixed; top:0.25rem; width:100%; z-index:999; display:block; text-align:center}
+.select-shop-overlay .message img{width:11.075rem; float:right; margin-right: 2rem; margin-top: 3rem;}

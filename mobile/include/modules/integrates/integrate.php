@@ -692,10 +692,11 @@ class integrate
         	$_SESSION['user_id']   = $username['user_id'];
         	$_SESSION['user_name'] = $username['user_name'];
         	$_SESSION['mobile']    = $username['mobile_phone'];
+        	$_SESSION['default_shop'] = intval($username['default_shop']);
         }
         else 
         {
-            $sql = "SELECT user_id, password, mobile_phone FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
+            $sql = "SELECT user_id, password, mobile_phone, default_shop FROM " . $GLOBALS['ecs']->table('users') . " WHERE user_name='$username' LIMIT 1";
             $row = $GLOBALS['db']->getRow($sql);
 
             if ($row)
@@ -703,6 +704,7 @@ class integrate
                 $_SESSION['user_id']   = $row['user_id'];
                 $_SESSION['user_name'] = $username;
                 $_SESSION['mobile']    = $row['mobile_phone'];
+                $_SESSION['default_shop'] = intval($row['default_shop']);
             }
         }
     }
