@@ -52,10 +52,11 @@ $add_day_str = "+{$lead_days} days";
 $t = strtotime($add_day_str);
 $date = date('Y-m-d', $t);
 $time = strtotime($date . ' 23:59:59');
+$begin = strtotime($date);
 
 $sql = "SELECT b.user_id, sum(b.amount) AS amount, count(b.bonus_id) as cnt, u.wxid FROM " . 
 	   $ecs->table('user_bonus', b) . ", wxch_user AS u " .
-	   " WHERE b.user_id = u.uid AND b.order_id = 0 AND b.expire_time <= {$time}" . 
+	   " WHERE b.user_id = u.uid AND b.order_id = 0 AND b.expire_time >= {$begin} AND b.expire_time < {$time} + 1" . 
 	   " GROUP BY b.user_id ";
 $query = $db->query($sql);
 
@@ -74,6 +75,7 @@ $wechat = new WechatApi();
 
 while ($rs = $db->fetch_array($query))
 {
+	//if ($rs['user_id'] != 1) continue;
 	$param['first']['value'] = "您有{$rs[cnt]}张优惠券明天即将过期，请在过期前使用。";
 	$param['keynote1']['value'] = "共计{$rs[amount]}元优惠券";
 	$param['keynote2']['value'] = date('Y年n月j日', $time);
