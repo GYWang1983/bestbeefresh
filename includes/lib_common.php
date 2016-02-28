@@ -1305,6 +1305,9 @@ function clear_tpl_files($is_cache = true, $ext = '')
     {
         $tmp_dir = 'temp';
     }
+    
+    $mobile_tmp_dir = 'mobile/data';
+    
     if ($is_cache)
     {
         $cache_dir = ROOT_PATH . $tmp_dir . '/caches/';
@@ -1315,11 +1318,25 @@ function clear_tpl_files($is_cache = true, $ext = '')
             $hash_dir = $cache_dir . dechex($i);
             $dirs[] = $hash_dir . '/';
         }
+        
+        // mobile
+        $m_cache_dir = ROOT_PATH . $mobile_tmp_dir . '/caches/';
+        $dirs[] = ROOT_PATH . $mobile_tmp_dir . '/query_caches/';
+        $dirs[] = ROOT_PATH . $mobile_tmp_dir . '/static_caches/';
+        for($i = 0; $i < 16; $i++)
+        {
+        	$hash_dir = $m_cache_dir . dechex($i);
+        	$dirs[] = $hash_dir . '/';
+        }
     }
     else
     {
         $dirs[] = ROOT_PATH . $tmp_dir . '/compiled/';
         $dirs[] = ROOT_PATH . $tmp_dir . '/compiled/admin/';
+        
+        // mobile
+        $dirs[] = ROOT_PATH . $mobile_tmp_dir . '/compiled/';
+        $dirs[] = ROOT_PATH . $mobile_tmp_dir . '/compiled/admin/';
     }
 
     $str_len = strlen($ext);
