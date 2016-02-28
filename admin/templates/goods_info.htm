@@ -144,6 +144,11 @@
             </td>
           </tr>
           <tr>
+            <td class="label">促销标签：</td>
+            <td><input type="text" name="promote_tag" value="{$goods.promote_tag}" size="50" />
+            </td>
+          </tr>
+          <tr>
             <td class="label"><a href="javascript:showNotice('giveIntegral');" title="{$lang.form_notice}"><img src="images/notice.gif" width="16" height="16" border="0" alt="{$lang.form_notice}"></a> {$lang.lab_give_integral}</td>
             <td><input type="text" name="give_integral" value="{$goods.give_integral}" size="20" />
             <br /><span class="notice-span" {if $help_open}style="display:block" {else} style="display:none" {/if} id="giveIntegral">{$lang.notice_give_integral}</span></td>

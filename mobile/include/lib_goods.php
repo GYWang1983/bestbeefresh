@@ -822,7 +822,7 @@ function assign_cat_goods($cat_id, $num = 0, $from = 'web', $order_rule = '')
 
     $sql = 'SELECT g.goods_id, g.goods_name, g.market_price, g.shop_price AS org_price, ' .
                 "IFNULL(mp.user_price, g.shop_price * '$_SESSION[discount]') AS shop_price, ".
-               'g.promote_price, promote_start_date, promote_end_date, g.goods_brief, g.goods_thumb, g.goods_img, g.free_more, g.amount_desc ' .
+               'g.promote_price, promote_start_date, promote_end_date, g.goods_brief, g.goods_thumb, g.goods_img, g.free_more, g.amount_desc, g.promote_tag ' .
             "FROM " . $GLOBALS['ecs']->table('goods') . ' AS g '.
             "LEFT JOIN " . $GLOBALS['ecs']->table('member_price') . " AS mp ".
                     "ON mp.goods_id = g.goods_id AND mp.user_rank = '$_SESSION[user_rank]' ".
@@ -864,6 +864,7 @@ function assign_cat_goods($cat_id, $num = 0, $from = 'web', $order_rule = '')
         $goods[$idx]['free_more']    = $row['free_more'];
         $goods[$idx]['free_more_desc'] = get_free_more_desc($row['free_more']);
         $goods[$idx]['amount_desc']  = $row['amount_desc'];
+        $goods[$idx]['promote_tag']  = $row['promote_tag'];
     }
 
     if ($from == 'web')

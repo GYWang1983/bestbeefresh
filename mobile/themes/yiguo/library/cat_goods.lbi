@@ -10,6 +10,9 @@
             <!--{if $goods.free_more_desc}-->
             <span class="freemore red-flag">{$goods.free_more_desc}</span>
             <!--{/if}-->
+            <!--{if $goods.promote_tag}-->
+            <span class="promote_tag red-flag">{$goods.promote_tag}</span>
+            <!--{/if}-->
             <span class="title"><a href="{$goods.url}">{$goods.name|escape:html}</a></span>
         </div>
         <div class="price">
