@@ -18,6 +18,9 @@ var flash = {insert name='cart_flash_number'};
             <!--{if $goods.amount_desc}-->
             <span class="amount_desc"> / {$goods.amount_desc}</span>
             <!--{/if}-->
+            <!--{if $goods.order_limit_num gt 0}-->
+            <span class="order_limit">（限抢{$goods.order_limit_num}份）</span>
+            <!--{/if}-->
         </div>
         {insert name="flash_sale_time" goods="$goods"}
         <div class="cart" data="{$goods.id}" style="display:none;">

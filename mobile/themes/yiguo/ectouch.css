@@ -243,9 +243,11 @@ Template Type: type_0
 	.goodsItem .thumb{display:inline-block;width:25%;max-width:90px;padding:0.2rem;float:left;position:relative;}
 	.goodsItem .desc{display:inline-block;width:68%;padding-left: 0.5rem;}
 	.goodsItem .desc .title{font-size:14px;}
+	.goodsItem .desc .title a{color:#333;}
 	.goodsItem .desc .amount_desc{display:inline-block;color:#ccc;}
 	.goodsItem .price{display:inline-block;width:68%;line-height:25px;}
-	.goodsItem .price .amount_desc{color:#999;font-size:12px;font-weight: normal;}
+	.goodsItem .price .amount_desc{color:#999;font-size:12px;font-weight:normal;}
+	.goodsItem .price .order_limit{color:#333;font-size:14px;font-weight:normal;margin-left:5px;}
 	.goodsItem .cart {display:inline-block;width:60%;height:25px;float:right;margin-right:2rem;margin-bottom:0.5rem;}
 	.goodsItem .cart div{display:inline-block;float:right;}
 	.goodsItem .cart .btn{width:20px;margin:0 5px;font-size:22px;color:#4d9546;}
