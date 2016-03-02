@@ -3071,11 +3071,20 @@ elseif ($_REQUEST['act'] == 'operate')
         exit;
     }
     // 打印采购单
-    elseif (isset($_POST['print_prepare']))
+    elseif (isset($_POST['print_prepare']) || isset($_POST['summary']))
     {
+    	if ($_POST['print_prepare'])
+    	{
+    		$cond = " AND a.order_status = 1 AND a.shipping_status = 3 ";
+    	}
+    	else
+    	{
+    		$cond = " AND a.order_status = 0 AND a.pay_status = 2 ";
+    	}
+    	
     	$sql = "SELECT a.user_id, b.goods_sn, b.goods_name, b.goods_attr, b.goods_price, SUM(b.goods_number) AS goods_number, b.free_more FROM " .
       		$ecs->table('order_info', 'a') . ',' . $ecs->table('order_goods', 'b') .
-    		" WHERE a.order_id = b.order_id AND a.order_status = 1 AND a.shipping_status = 3" .
+    		" WHERE a.order_id = b.order_id " . $cond .
 			" GROUP BY a.user_id, b.goods_id, b.goods_attr, b.free_more";
     	$query = $db->query($sql);
     	
