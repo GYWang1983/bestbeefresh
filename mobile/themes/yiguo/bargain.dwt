@@ -60,7 +60,9 @@
                 <a href="#"><img src="{$ectouch_themes}/images/bargain/btkj.png" id="btkj" {if !empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
                 <a href="#"><img src="{$ectouch_themes}/images/bargain/btfx.png" class="fx" id="btfx" {if empty($bargain.my_bargain_price)}style="display:none;"{/if} /></a>
                 <!--{/if}-->
+                <!--{if $bargain.status eq '1'}-->
                 <a href="bargain.php?id={$bargain.id}"><img src="{$ectouch_themes}/images/bargain/wyyq.png" class="attend" id="wyyqq" /></a>
+                <!--{/if}-->
             <!--{/if}-->
             </div>
             <!--{else}-->
@@ -78,7 +80,7 @@
                 <p class="kjlj"><span class="kjgxx">砍价贡献</span><span class="ljkxx">累计砍下{$bargain.bargain_price|money}元</span></p>
                 <div id="hrrr"></div>
                 <!--{foreach name=friends from=$bargain.detail item=friend}-->
-                <div class="imgsg"><img src="{$friend.headimgurl}" class="touxn" /><p class='zuihz'><span class='namenc'>{$friend.nickname}</span><span class='monjia'>{if $friend.price > 0}- {else}+ {/if}{$friend.formated_price}元</span></p></div>
+                <div class="imgsg"><img src="{if empty($friend.headimgurl)}{$ectouch_themes}/images/brand_logo.jpg{else}{$friend.headimgurl}{/if}" class="touxn" /><p class='zuihz'><span class='namenc'>{$friend.nickname}&nbsp;</span><span class='monjia'>{if $friend.price > 0}- {else}+ {/if}{$friend.formated_price}元</span></p></div>
                 <!--{/foreach}-->
                 <!--{if empty($bargain.my_bargain_price)}-->
                 <div id="my_bargain" class="imgsg" style="display:none;"><img src="{$user.headimgurl}" class="touxn" /><p class='zuihz'><span class='namenc'>{$user.nickname}</span><span class='monjia'></span></p></div>

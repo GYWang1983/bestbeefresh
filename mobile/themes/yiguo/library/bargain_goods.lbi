@@ -4,6 +4,7 @@
     <div class="goodsItem" id="bargain{$goods.id}">
         <div class="thumb">
             <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.goods_name|escape:html}" />
+            <!--{if $goods.status == 4}--><img class="soldout" src="{$ectouch_themes}/images/soldout.png" /><!--{/if}-->
         </div>
         <div class="desc">
             <span class="red-flag">{$lang.bargain_goods}</span>
@@ -15,9 +16,11 @@
             <span class="amount_desc"> / {$goods.amount_desc}</span>
             <!--{/if}-->
         </div>
+        <!--{if $goods.status == 1}-->
         <div class="cart" data="{$goods.id}">
             <a class="button radius5" href="bargain.php?id={$goods.id}">我要参加</a>
         </div>
+        <!--{/if}-->
         <div style="clear:both;"></div>
     </div>
 <!-- {/foreach} -->

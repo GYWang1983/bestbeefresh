@@ -156,13 +156,21 @@ if ($act == 'my')
 	{
 		if ($wx_user['subscribe'] == 1)
 		{
-			// 创建活动
-			$user_bargain_id = create_user_bargain($bargain_id, $_SESSION['user_id']);
-			if (empty($user_bargain_id))
+			// 检查砍价活动状态
+			$sql = "SELECT * FROM " . $ecs->table('bargain_goods') . " WHERE id = {$bargain_id}";
+			$bargain = $db->getRow($sql);
+			if (empty($bargain))
 			{
 				show_message('砍价活动不存在', '返回首页', 'index.php', 'error');
 			}
 			
+			if ($bargain['status'] == 4)
+			{
+				show_message('水果已经抢光了，去看看其他活动吧', '返回首页', 'index.php', 'error');
+			}
+			
+			// 创建活动
+			$user_bargain_id = create_user_bargain($bargain_id, $_SESSION['user_id']);
 			$bargain = get_user_bargain_detail($user_bargain_id);
 		}
 		else
