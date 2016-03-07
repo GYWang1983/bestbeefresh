@@ -48,7 +48,7 @@
 <dl>
 <dd class="dd3 c999">
 <!-- {if $smarty.session.user_id > 0 and ($config.use_integral or $config.use_bonus)} -->
-  <!-- {if $total.will_get_integral > 0 or $total.will_get_bonus > 0} -->该订单确认后，您将获得<br/><!-- {/if} -->
+  <!-- {if $total.will_get_integral > 0 or !empty($total.will_get_bonus)} -->该订单确认后，您将获得<br/><!-- {/if} -->
   <!-- {if $total.will_get_integral > 0} 是否使用积分-->
      {$points_name}:<font class="f4_b">{$total.will_get_integral}</font>&nbsp;
   <!-- {/if} -->
