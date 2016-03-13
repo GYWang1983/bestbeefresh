@@ -772,7 +772,7 @@ function get_order_detail($order_id, $user_id = 0)
     }
 
     /* 确认时间 支付时间 发货时间 */
-    if ($order['confirm_time'] > 0 && ($order['order_status'] == OS_CONFIRMED || $order['order_status'] == OS_SPLITED || $order['order_status'] == OS_SPLITING_PART))
+    /*if ($order['confirm_time'] > 0 && ($order['order_status'] == OS_CONFIRMED || $order['order_status'] == OS_SPLITED || $order['order_status'] == OS_SPLITING_PART))
     {
         $order['confirm_time'] = sprintf($GLOBALS['_LANG']['confirm_time'], local_date($GLOBALS['_CFG']['time_format'], $order['confirm_time']));
     }
@@ -795,7 +795,7 @@ function get_order_detail($order_id, $user_id = 0)
     else
     {
         $order['shipping_time'] = '';
-    }
+    }*/
 
     return $order;
 
