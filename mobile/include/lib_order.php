@@ -1214,8 +1214,9 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         return false;
     }
 
+    //TODO 取消规格相关逻辑
     /* 如果商品有规格则取规格商品信息 配件除外 */
-    $sql = "SELECT * FROM " .$GLOBALS['ecs']->table('products'). " WHERE goods_id = '$goods_id' LIMIT 0, 1";
+    /*$sql = "SELECT * FROM " .$GLOBALS['ecs']->table('products'). " WHERE goods_id = '$goods_id' LIMIT 0, 1";
     $prod = $GLOBALS['db']->getRow($sql);
 
     if (is_spec($spec) && !empty($prod))
@@ -1225,7 +1226,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
     if (empty($product_info))
     {
         $product_info = array('product_number' => '', 'product_id' => 0);
-    }
+    }*/
 
     /* 检查：库存 */
     if ($GLOBALS['_CFG']['use_storage'] == 1)
@@ -1291,10 +1292,11 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         'rec_type'      => CART_GENERAL_GOODS
     );
 
-    /* 如果该配件在添加为基本件的配件时，所设置的“配件价格”比原价低，即此配件在价格上提供了优惠， */
-    /* 则按照该配件的优惠价格卖，但是每一个基本件只能购买一个优惠价格的“该配件”，多买的“该配件”不享 */
-    /* 受此优惠 */
-    $basic_list = array();
+    // 如果该配件在添加为基本件的配件时，所设置的“配件价格”比原价低，即此配件在价格上提供了优惠，
+    // 则按照该配件的优惠价格卖，但是每一个基本件只能购买一个优惠价格的“该配件”，多买的“该配件”不享 
+    // 受此优惠
+    //TODO: 取消配件逻辑
+    /*$basic_list = array();
     $sql = "SELECT parent_id, goods_price " .
             "FROM " . $GLOBALS['ecs']->table('group_goods') .
             " WHERE goods_id = '$goods_id'" .
@@ -1307,7 +1309,7 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         $basic_list[$row['parent_id']] = $row['goods_price'];
     }
 
-    /* 取得购物车中该商品每个基本件的数量 */
+    // 取得购物车中该商品每个基本件的数量
     $basic_count_list = array();
     if ($basic_list)
     {
@@ -1325,8 +1327,8 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         }
     }
 
-    /* 取得购物车中该商品每个基本件已有该商品配件数量，计算出每个基本件还能有几个该商品配件 */
-    /* 一个基本件对应一个该商品配件 */
+    // 取得购物车中该商品每个基本件已有该商品配件数量，计算出每个基本件还能有几个该商品配件 
+    // 一个基本件对应一个该商品配件 
     if ($basic_count_list)
     {
         $sql = "SELECT parent_id, SUM(goods_number) AS count " .
@@ -1343,38 +1345,38 @@ function addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
         }
     }
 
-    /* 循环插入配件 如果是配件则用其添加数量依次为购物车中所有属于其的基本件添加足够数量的该配件 */
+    // 循环插入配件 如果是配件则用其添加数量依次为购物车中所有属于其的基本件添加足够数量的该配件
     foreach ($basic_list as $parent_id => $fitting_price)
     {
-        /* 如果已全部插入，退出 */
+        // 如果已全部插入，退出 
         if ($num <= 0)
         {
             break;
         }
 
-        /* 如果该基本件不再购物车中，执行下一个 */
+        // 如果该基本件不再购物车中，执行下一个 
         if (!isset($basic_count_list[$parent_id]))
         {
             continue;
         }
 
-        /* 如果该基本件的配件数量已满，执行下一个基本件 */
+        // 如果该基本件的配件数量已满，执行下一个基本件
         if ($basic_count_list[$parent_id] <= 0)
         {
             continue;
         }
 
-        /* 作为该基本件的配件插入 */
+        // 作为该基本件的配件插入
         $parent['goods_price']  = max($fitting_price, 0) + $spec_price; //允许该配件优惠价格为0
         $parent['goods_number'] = min($num, $basic_count_list[$parent_id]);
         $parent['parent_id']    = $parent_id;
 
-        /* 添加 */
+        // 添加
         $GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('cart'), $parent, 'INSERT');
 
-        /* 改变数量 */
+        // 改变数量
         $num -= $parent['goods_number'];
-    }
+    }*/
 
     /* 如果数量不为0，作为基本件插入 */
     if ($num > 0)
