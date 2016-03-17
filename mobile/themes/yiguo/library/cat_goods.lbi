@@ -5,6 +5,7 @@
     <div class="goodsItem" id="goods{$goods.id}">
         <div class="thumb">
             <img data-original="{$site_url}{$goods.thumb}" alt="{$goods.name|escape:html}" />
+            <!--{if $config.use_storage == 1 and $goods.goods_number <= 0}--><img class="soldout" src="{$ectouch_themes}/images/soldout.png" /><!--{/if}-->
         </div>
         <div class="desc">
             <!--{if $goods.free_more_desc}-->
@@ -25,11 +26,13 @@
             <span class="amount_desc"> / {$goods.amount_desc}</span>
             <!--{/if}-->
         </div>
+        <!--{if $config.use_storage != 1 or $goods.goods_number > 0}-->
         <div class="cart" data="{$goods.id}">
             <div class="btn icon-plus"></div>
             <div class="num">0</div>
             <div class="btn icon-minus"></div>
         </div>
+        <!--{/if}-->
         <div style="clear:both;"></div>
     </div>
 <!-- {/foreach} -->

@@ -1329,7 +1329,6 @@ elseif ($_REQUEST['step'] == 'done')
     }
     
     /* 检查商品库存 */
-    /* 如果使用库存，且下订单时减库存，则减少库存 */
     if ($_CFG['use_storage'] == '1' && $_CFG['stock_dec_time'] == SDT_PLACE)
     {
         $cart_goods_stock = get_cart_goods();

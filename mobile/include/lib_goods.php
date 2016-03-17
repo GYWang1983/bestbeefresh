@@ -820,7 +820,7 @@ function assign_cat_goods($cat_id, $num = 0, $from = 'web', $order_rule = '')
 {
     $children = get_children($cat_id);
 
-    $sql = 'SELECT g.goods_id, g.goods_name, g.market_price, g.shop_price AS org_price, ' .
+    $sql = 'SELECT g.goods_id, g.goods_name, g.market_price, g.shop_price AS org_price, g.goods_number, ' .
                 "IFNULL(mp.user_price, g.shop_price * '$_SESSION[discount]') AS shop_price, ".
                'g.promote_price, promote_start_date, promote_end_date, g.goods_brief, g.goods_thumb, g.goods_img, g.free_more, g.amount_desc, g.promote_tag ' .
             "FROM " . $GLOBALS['ecs']->table('goods') . ' AS g '.
@@ -853,6 +853,7 @@ function assign_cat_goods($cat_id, $num = 0, $from = 'web', $order_rule = '')
         $goods[$idx]['id']           = $row['goods_id'];
         $goods[$idx]['name']         = $row['goods_name'];
         $goods[$idx]['brief']        = $row['goods_brief'];
+        $goods[$idx]['goods_number'] = $row['goods_number'];
         $goods[$idx]['market_price'] = price_format($row['market_price']);
         $goods[$idx]['short_name']   = $GLOBALS['_CFG']['goods_name_length'] > 0 ?
                                         sub_str($row['goods_name'], $GLOBALS['_CFG']['goods_name_length']) : $row['goods_name'];
