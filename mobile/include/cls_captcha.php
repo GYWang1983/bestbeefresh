@@ -50,7 +50,7 @@ class captcha
         1 => array('captcha_bg1.jpg', 255, 255, 255),
         2 => array('captcha_bg2.jpg', 0, 0, 0),
         3 => array('captcha_bg3.jpg', 0, 0, 0),
-        4 => array('captcha_bg4.jpg', 255, 255, 255),
+        4 => array('captcha_bg4.jpg', 0, 0, 0),
         5 => array('captcha_bg5.jpg', 255, 255, 255),
     );
 
@@ -75,6 +75,13 @@ class captcha
      * @var integer $height
      */
     var $height     = 20;
+
+    /**
+     * 字体大小
+     *
+     * @var integer $height
+     */
+    var $fontSize    = 10;
 
     /**
      * 构造函数
@@ -189,8 +196,19 @@ class captcha
             /* 获得验证码的高度和宽度 */
             $x = ($this->width - (imagefontwidth(5) * $letters)) / 2;
             $y = ($this->height - imagefontheight(5)) / 2;
-            imagestring($img_org, 5, $x, $y, $word, $clr);
+            //imagestring($img_org, 5, $x, $y, $word, $clr);
 
+            $codeNX = 0; // 验证码第N个字符的左边距
+            $fontttf = $this->folder . '5.ttf';
+            for ($i = 0; $i < $letters; $i++) {
+            	$l = substr($word, $i, 1);
+            	$codeNX += mt_rand($this->fontSize*1.4, $this->fontSize*1.6);
+            	// 写一个验证码字符
+            	imagettftext($img_org, $this->fontSize, mt_rand(-40, 40), $codeNX, $this->fontSize*1.6, $clr, $fontttf, $l);
+            }
+
+            $this->_writeCurve($img_org, $clr);
+            
             header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 
             // HTTP/1.1
@@ -265,6 +283,63 @@ class captcha
         shuffle($arr);
 
         return substr(implode('', $arr), 5, $length);
+    }
+    
+    /**
+     * 画一条由两条连在一起构成的随机正弦函数曲线作干扰线(你可以改成更帅的曲线函数)
+     *
+     *      高中的数学公式咋都忘了涅，写出来
+     *		正弦型函数解析式：y=Asin(ωx+φ)+b
+     *      各常数值对函数图像的影响：
+     *        A：决定峰值（即纵向拉伸压缩的倍数）
+     *        b：表示波形在Y轴的位置关系或纵向移动距离（上加下减）
+     *        φ：决定波形与X轴位置关系或横向移动距离（左加右减）
+     *        ω：决定周期（最小正周期T=2π/∣ω∣）
+     *
+     */
+    private function _writeCurve($image, $color) {
+    	$px = $py = 0;
+    
+    	// 曲线前部分
+    	$A = mt_rand(1, $this->height/2);                  // 振幅
+    	$b = mt_rand(-$this->height/4, $this->height/4);   // Y轴方向偏移量
+    	$f = mt_rand(-$this->height/4, $this->height/4);   // X轴方向偏移量
+    	$T = mt_rand($this->height, $this->width*2);  // 周期
+    	$w = (2* M_PI)/$T;
+    
+    	$px1 = 0;  // 曲线横坐标起始位置
+    	$px2 = mt_rand($this->width/2, $this->width * 0.8);  // 曲线横坐标结束位置
+    
+    	for ($px=$px1; $px<=$px2; $px = $px + 1) {
+    		if ($w!=0) {
+    			$py = $A * sin($w*$px + $f)+ $b + $this->height/2;  // y = Asin(ωx+φ) + b
+    			$i = (int) ($this->fontSize/10);
+    			while ($i > 0) {
+    				imagesetpixel($image, $px + $i , $py + $i, $color);  // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多
+    				$i--;
+    			}
+    		}
+    	}
+    
+    	// 曲线后部分
+    	$A = mt_rand(1, $this->height/2);                  // 振幅
+    	$f = mt_rand(-$this->height/4, $this->height/4);   // X轴方向偏移量
+    	$T = mt_rand($this->height, $this->width*2);  // 周期
+    	$w = (2* M_PI)/$T;
+    	$b = $py - $A * sin($w*$px + $f) - $this->height/2;
+    	$px1 = $px2;
+    	$px2 = $this->width;
+    
+    	for ($px=$px1; $px<=$px2; $px=$px+ 1) {
+    		if ($w!=0) {
+    			$py = $A * sin($w*$px + $f)+ $b + $this->height/2;  // y = Asin(ωx+φ) + b
+    			$i = (int) ($this->fontSize/10);
+    			while ($i > 0) {
+    				imagesetpixel($image, $px + $i, $py + $i, $color);
+    				$i--;
+    			}
+    		}
+    	}
     }
 }
 
