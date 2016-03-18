@@ -661,14 +661,13 @@ class cls_template
                     	break;
                     case 'money':
                     	$p = 'price_format(' . $p . ', false)';
+                    	break;
                     case 'substr':
                     	$p = 'substr(' . $p . ',' . $s[1] . ','  . $s[2] . ')';
                     	break;	
-                    	
                     case 'lpad':
                     	$p = 'str_pad(' . $p . ',' . $s[2] . ',' . '"' . $s[1] . '", STR_PAD_LEFT)';
                     	break;
-                    	
                     default:
                         # code...
                         break;

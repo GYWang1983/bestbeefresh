@@ -45,6 +45,9 @@ if (isset($set_modules) && $set_modules == TRUE)
     return;
 }
 
+include_once(ROOT_PATH . 'includes/lib_transaction.php');
+include_once(ROOT_PATH . 'includes/lib_order.php');
+
 make_order_expire($cron);
 make_pickup_code_expire($cron);
 make_verifycode_expire($cron);
@@ -55,8 +58,6 @@ make_verifycode_expire($cron);
 function make_order_expire($cron)
 {
 	global $db, $ecs;
-	
-	include_once(ROOT_PATH . 'includes/lib_transaction.php');
 	
 	$sql = "UPDATE " . $ecs->table('order_info') . " SET `order_status` = " . OS_EXPIRED . " WHERE `order_status` = " . OS_CONFIRMED . 
 			" AND shipping_status = " . SS_SHIPPED . " AND receive_deadline < " . time();

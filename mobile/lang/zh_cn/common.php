@@ -147,7 +147,7 @@ $_LANG['compare_js']['exist'] = '您已经选择了%s';
 $_LANG['compare_js']['count_limit'] = '最多只能选择4个商品进行对比';
 $_LANG['compare_js']['goods_type_different'] = '\"%s\"和已选择商品类型不同无法进行对比';
 
-$_LANG['bonus'] = '优惠券：';
+$_LANG['bonus'] = '优惠券';
 $_LANG['no_comments'] = '暂时还没有任何用户评论';
 $_LANG['give_comments_rank'] = '给出';
 $_LANG['comments_rank'] = '评价';
@@ -320,7 +320,7 @@ $_LANG['booking_process'] = '缺货处理';
 $_LANG['complete_acquisition'] = '该订单完成后，您将获得';
 $_LANG['with_price'] = '以及价值';
 $_LANG['de'] = '的';
-$_LANG['bonus'] = '红包';
+//$_LANG['bonus'] = '红包';
 $_LANG['goods_all_price'] = '商品总价';
 $_LANG['discount'] = '折扣';
 $_LANG['tax'] = '发票税额';

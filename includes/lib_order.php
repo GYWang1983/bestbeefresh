@@ -815,8 +815,7 @@ function order_fee($order, $goods, $consignee = NULL)
         $total['will_get_integral'] = get_give_integral($goods);
     }
     
-    $goods_amount = $total['goods_price'] - $total['bonus'];
-    $total['will_get_bonus']        = $order['extension_code'] == 'exchange_goods' ? 0 : price_format(get_total_bonus($goods_amount), false);
+    $total['will_get_bonus']        = $order['extension_code'] == 'exchange_goods' ? 0 : get_total_bonus($total['amount']);
     $total['formated_goods_price']  = price_format($total['goods_price'], false);
     $total['formated_market_price'] = price_format($total['market_price'], false);
     $total['formated_saving']       = price_format($total['saving'], false);
@@ -3092,7 +3091,7 @@ function order_bonus($order_id)
 	{
 	    
 		$order_time = $order['pay_time'];
-		$amount     = $order['goods_amount'] - $order['bonus']; //$order['money_paid'];
+		$amount     = $order['money_paid'];
 		
 		if ($amount > 0)
 		{
@@ -3505,8 +3504,8 @@ function get_order_pickup_time($paytime = NULL, $comfirm_time = 0)
 	$end->setTime(intval($arr_ed[0]), intval($arr_ed[1]), 0);
 
 	return array(
-			'start' => $start->getTimestamp(),
-			'end'   => $end->getTimestamp()
+		'start' => $start->getTimestamp(),
+		'end'   => $end->getTimestamp()
 	);
 }
 
