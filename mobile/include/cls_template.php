@@ -661,7 +661,14 @@ class cls_template
                     	break;
                     case 'money':
                     	$p = 'price_format(' . $p . ', false)';
+                    case 'substr':
+                    	$p = 'substr(' . $p . ',' . $s[1] . ','  . $s[2] . ')';
                     	break;	
+                    	
+                    case 'lpad':
+                    	$p = 'str_pad(' . $p . ',' . $s[2] . ',' . '"' . $s[1] . '", STR_PAD_LEFT)';
+                    	break;
+                    	
                     default:
                         # code...
                         break;
@@ -1245,7 +1252,9 @@ class cls_template
         {
             foreach ($options AS $key => $val)
             {
-                $out .= $key == $selected ? "<option value=\"$key\" selected>$val</option>" : "<option value=\"$key\">$val</option>";
+            	$k = !empty($arr['value']) ? $val[$arr['value']] : $key;
+            	$v = !empty($arr['text']) ? $val[$arr['text']] : $val;
+                $out .= $k == $selected ? "<option value=\"$k\" selected>$v</option>" : "<option value=\"$k\">$v</option>";
             }
         }
 

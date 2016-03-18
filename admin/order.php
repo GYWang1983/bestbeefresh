@@ -64,6 +64,7 @@ elseif ($_REQUEST['act'] == 'list')
     $smarty->assign('ur_here', $_LANG['02_order_list']);
     $smarty->assign('action_link', array('href' => 'order.php?act=order_query', 'text' => $_LANG['03_order_query']));
 
+    $smarty->assign('shop_list', $_CFG['shop']);   // 订单状态
     $smarty->assign('status_list', $_LANG['cs']);   // 订单状态
 
     $smarty->assign('os_unconfirmed',   OS_UNCONFIRMED);
@@ -4496,7 +4497,7 @@ elseif ($_REQUEST['act'] == 'get_goods_info')
     }
     $goods_list = array();
     $goods_attr = array();
-    $sql = "SELECT o.*, g.goods_thumb, g.goods_number AS storage, o.goods_attr, IFNULL(b.brand_name, '') AS brand_name " .
+    $sql = "SELECT o.*, g.goods_thumb, g.goods_number AS storage, o.goods_attr, o.free_more, IFNULL(b.brand_name, '') AS brand_name " .
             "FROM " . $ecs->table('order_goods') . " AS o ".
             "LEFT JOIN " . $ecs->table('goods') . " AS g ON o.goods_id = g.goods_id " .
             "LEFT JOIN " . $ecs->table('brand') . " AS b ON g.brand_id = b.brand_id " .
@@ -4525,6 +4526,7 @@ elseif ($_REQUEST['act'] == 'get_goods_info')
         $_goods_thumb = (strpos($_goods_thumb, 'http://') === 0) ? $_goods_thumb : $ecs->url() . $_goods_thumb;
         $row['goods_thumb'] = $_goods_thumb;
         $goods_attr[] = explode(' ', trim($row['goods_attr'])); //将商品属性拆分为一个数组
+        $row['free_more_desc'] = get_free_more_desc($row['free_more']);
         $goods_list[] = $row;
     }
     $attr = array();
@@ -4939,6 +4941,7 @@ function order_list()
         }
         $filter['consignee'] = empty($_REQUEST['consignee']) ? '' : trim($_REQUEST['consignee']);
         $filter['mobile'] = empty($_REQUEST['mobile']) ? '' : trim($_REQUEST['mobile']);
+        $filter['shop_id'] = empty($_REQUEST['shop_id']) ? '' : trim($_REQUEST['shop_id']);
         $filter['email'] = empty($_REQUEST['email']) ? '' : trim($_REQUEST['email']);
         $filter['address'] = empty($_REQUEST['address']) ? '' : trim($_REQUEST['address']);
         $filter['zipcode'] = empty($_REQUEST['zipcode']) ? '' : trim($_REQUEST['zipcode']);
@@ -4976,6 +4979,10 @@ function order_list()
         if ($filter['mobile'])
         {
         	$where .= " AND o.mobile LIKE '%" . mysql_like_quote($filter['mobile']) . "'";
+        }
+        if ($filter['shop_id'])
+        {
+        	$where .= " AND o.shop_id = '$filter[shop_id]'";
         }
         if ($filter['email'])
         {
@@ -5130,11 +5137,12 @@ function order_list()
 
         /* 查询 */
         $sql = "SELECT o.order_id, o.order_sn, o.add_time, o.order_status, o.shipping_status, o.order_amount, o.money_paid," .
-                    "o.pay_status, o.consignee, o.address, o.mobile, o.extension_code, o.extension_id, o.bonus, o.pay_name, o.postscript, " .
+                    "o.pay_status, o.consignee, o.address, o.mobile, o.extension_code, o.extension_id, o.bonus, o.pay_name, o.postscript, s.short_name AS shop_name, " .
                     "(" . order_amount_field('o.') . ") AS total_fee, " .
                     "IFNULL(u.user_name, '" .$GLOBALS['_LANG']['anonymous']. "') AS buyer ".
-                " FROM " . $GLOBALS['ecs']->table('order_info') . " AS o " .
-                " LEFT JOIN " .$GLOBALS['ecs']->table('users'). " AS u ON u.user_id=o.user_id ". $where .
+                " FROM " . $GLOBALS['ecs']->table('order_info', 'o') .
+                " LEFT JOIN " . $GLOBALS['ecs']->table('users', 'u') . " ON u.user_id = o.user_id ". 
+                " INNER JOIN " . $GLOBALS['ecs']->table('shop', 's') . " ON o.shop_id = s.shop_id ". $where .
                 " ORDER BY o.{$filter[sort_by]} $filter[sort_order] ".
                 " LIMIT " . ($filter['page'] - 1) * $filter['page_size'] . ",$filter[page_size]";
 

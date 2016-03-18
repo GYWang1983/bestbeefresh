@@ -298,11 +298,9 @@ class captcha
      *        ω：决定周期（最小正周期T=2π/∣ω∣）
      *
      */
-    private function _writeCurve($image) {
+    private function _writeCurve($image, $color) {
     	$px = $py = 0;
-    	
-    	$color = imagecolorallocate($image, 255, 255, 255);
-    	exit;
+    	 
     	// 曲线前部分
     	$A = mt_rand(1, $this->height/2);                  // 振幅
     	$b = mt_rand(-$this->height/4, $this->height/4);   // Y轴方向偏移量

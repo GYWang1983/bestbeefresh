@@ -15,6 +15,7 @@
 
 /* 订单搜索 */
 $_LANG['order_sn'] = '订单号';
+$_LANG['shop'] = '门店';
 $_LANG['consignee'] = '收货人';
 $_LANG['all_status'] = '订单状态';
 

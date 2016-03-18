@@ -490,7 +490,7 @@ class cls_template
 
                 case 'insert' :
                     $t = $this->get_para(substr($tag, 7), false);
-		    $k = preg_replace_callback("/(\'\\$[^,]+)/" , function ($match) {
+		    		$k = preg_replace_callback("/(\'\\$[^,]+)/" , function ($match) {
                         return stripslashes(trim($match[1], "'"));
                     }, var_export($t, true));
                     
@@ -654,7 +654,8 @@ class cls_template
                     	}
                     	$p = 'date(' . $f . ',' . $p . ')';
                     	break;
-
+                    case 'money':
+                    	$p = 'price_format(' . $p . ', false)';
                     case 'substr':
                     	$p = 'substr(' . $p . ',' . $s[1] . ','  . $s[2] . ')';
                     	break;
@@ -1246,7 +1247,9 @@ class cls_template
         {
             foreach ($options AS $key => $val)
             {
-                $out .= $key == $selected ? "<option value=\"$key\" selected>$val</option>" : "<option value=\"$key\">$val</option>";
+            	$k = !empty($arr['value']) ? $val[$arr['value']] : $key;
+            	$v = !empty($arr['text']) ? $val[$arr['text']] : $val;
+                $out .= $k == $selected ? "<option value=\"$k\" selected>$v</option>" : "<option value=\"$k\">$v</option>";
             }
         }
 
