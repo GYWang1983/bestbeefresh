@@ -11,7 +11,12 @@
   <tr>
     <td class="label">{$lang.email}</td>
     <td>
-      <input type="text" name="email" value="{$user.email|escape}" size="34" />{$lang.require_field}</td>
+      <input type="text" name="email" value="{$user.email|escape}" size="34" /></td>
+  </tr>
+  <tr>
+    <td class="label">{$lang.mobile}</td>
+    <td>
+      <input type="text" name="mobile_phone" value="{$user.mobile_phone}" size="15" /></td>
   </tr>
  {if $action eq "add"}
   <tr>
@@ -51,8 +56,8 @@
   </tr>
   {/if}
   {/if}
-   {if $select_role}
-    <tr>
+  {if $select_role}
+  <tr>
    <td class="label">{$lang.select_role}</td>
     <td>
       <select name="select_role">
@@ -61,6 +66,17 @@
         <option value="{$list.role_id}" {if $list.role_id eq $user.role_id} selected="selected" {/if} >{$list.role_name}</option>
         {/foreach}
       </select>
+    </td>
+  </tr>
+  {/if}
+  {if $action neq "modif"}
+  <tr>
+    <td align="left" class="label">设置门店</td>
+    <td>
+      <input type="checkbox" name="shop_list[]" value="all" id="select_all_shop" onchange="toggleAllShop(this);" {if in_array('all', $user_shop)}checked="checked"{/if} />全部
+      {foreach from=$shop_list item=shop}
+      <input type="checkbox" name="shop_list[]" value="{$shop.shop_id}" class="select-shop" {if in_array('all', $user_shop) or in_array($shop.shop_id, $user_shop)}checked="checked"{/if} {if in_array('all', $user_shop)}disabled="disabled"{/if} />{$shop.short_name}
+      {/foreach}
     </td>
   </tr>
   {/if}
@@ -105,7 +121,7 @@
 </table>
 </form>
 </div>
-{insert_scripts files="../js/utils.js,validator.js"}
+{insert_scripts files="jquery-1.11.3.min.js,../js/utils.js,validator.js"}
 <script language="JavaScript">
 var action = "{$action}";
 <!--
@@ -135,6 +151,18 @@ function toggleButtonSatus()
     document.getElementById("btnRemove").disabled = (sel.selectedIndex > -1) ? false : true;
     document.getElementById("btnMoveUp").disabled = (sel.selectedIndex > -1) ? false : true;
     document.getElementById("btnMoveDown").disabled = (sel.selectedIndex > -1) ? false : true;
+}
+
+function toggleAllShop(sel)
+{
+    if ($(sel).is(':checked'))
+    {
+    	$('.select-shop').prop('checked', 'checked').attr('disabled', true);
+    }
+    else
+    {
+    	$('.select-shop').removeAttr('disabled').prop('checked', false);
+    }
 }
 
 /**
@@ -189,8 +217,8 @@ function validate()
   }
 
   validator.required("user_name", user_name_empty);
-  validator.required("email", email_empty, 1);
-  validator.isEmail("email", email_error);
+  //validator.required("email", email_empty, 1);
+  //validator.isEmail("email", email_error);
 
   if (action == "add")
   {

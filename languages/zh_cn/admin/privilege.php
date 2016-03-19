@@ -17,6 +17,8 @@
 $_LANG['user_id'] = '编号';
 $_LANG['user_name'] = '用户名';
 $_LANG['email'] = 'Email地址';
+$_LANG['mobile'] = '手机号';
+$_LANG['openid'] = '微信ID';
 $_LANG['password'] = '密  码';
 $_LANG['join_time'] = '加入时间';
 $_LANG['last_time'] = '最后登录时间';

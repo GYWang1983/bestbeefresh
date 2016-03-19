@@ -16,6 +16,7 @@
 define('IN_ECS', true);
 
 require(dirname(__FILE__) . '/includes/init.php');
+require_once(ROOT_PATH . 'includes/lib_main.php');
 
 /* act操作项的初始化 */
 if (empty($_REQUEST['act']))
@@ -183,7 +184,9 @@ elseif ($_REQUEST['act'] == 'add')
     $smarty->assign('action_link', array('href'=>'privilege.php?act=list', 'text' => $_LANG['admin_list']));
     $smarty->assign('form_act',    'insert');
     $smarty->assign('action',      'add');
-    $smarty->assign('select_role',  get_role_list());
+    $smarty->assign('shop_list',   get_shop_list(true));
+    $smarty->assign('user_shop',   array());
+    $smarty->assign('select_role', get_role_list());
 
     /* 显示页面 */
     assign_query_info();
@@ -218,6 +221,17 @@ elseif ($_REQUEST['act'] == 'insert')
             sys_msg(sprintf($_LANG['email_exist'], stripslashes($_POST['email'])), 1);
         }
     }
+    
+    /* 手机号是否有重复 */
+    if (!empty($_POST['mobile_phone']))
+    {
+    	$is_only = $exc->is_only('mobile_phone', stripslashes($_POST['mobile_phone']));
+    
+    	if (!$is_only)
+    	{
+    		sys_msg(sprintf('手机号已存在', stripslashes($_POST['mobile_phone'])), 1);
+    	}
+    }
 
     /* 获取添加日期及密码 */
     $add_time = gmtime();
@@ -233,12 +247,14 @@ elseif ($_REQUEST['act'] == 'insert')
         $role_id = $_POST['select_role'];
     }
 
-        $sql = "SELECT nav_list FROM " . $ecs->table('admin_user') . " WHERE action_list = 'all'";
-        $row = $db->getRow($sql);
+    $sql = "SELECT nav_list FROM " . $ecs->table('admin_user') . " WHERE action_list = 'all'";
+    $row = $db->getRow($sql);
 
-
-    $sql = "INSERT INTO ".$ecs->table('admin_user')." (user_name, email, password, add_time, nav_list, action_list, role_id) ".
-           "VALUES ('".trim($_POST['user_name'])."', '".trim($_POST['email'])."', '$password', '$add_time', '$row[nav_list]', '$action_list', '$role_id')";
+    // 门店列表
+    $shop_list = implode(",", $_POST['shop_list']);
+    
+    $sql = "INSERT INTO ".$ecs->table('admin_user')." (user_name, email, mobile_phone, password, add_time, nav_list, action_list, role_id, shop_list) ".
+           "VALUES ('".trim($_POST['user_name'])."', '".trim($_POST['email'])."', '".trim($_POST['mobile_phone'])."', '$password', '$add_time', '$row[nav_list]', '$action_list', '$role_id', '$shop_list')";
 
     $db->query($sql);
     /* 转入权限分配列表 */
@@ -278,10 +294,9 @@ elseif ($_REQUEST['act'] == 'edit')
     }
 
     /* 获取管理员信息 */
-    $sql = "SELECT user_id, user_name, email, password, agency_id, role_id FROM " .$ecs->table('admin_user').
+    $sql = "SELECT user_id, user_name, email, mobile_phone, password, agency_id, role_id, shop_list FROM " .$ecs->table('admin_user').
            " WHERE user_id = '".$_REQUEST['id']."'";
     $user_info = $db->getRow($sql);
-
 
     /* 取得该管理员负责的办事处名称 */
     if ($user_info['agency_id'] > 0)
@@ -303,6 +318,9 @@ elseif ($_REQUEST['act'] == 'edit')
     {
        $smarty->assign('select_role',  get_role_list());
     }
+    
+    $smarty->assign('shop_list',   get_shop_list(true));
+    $smarty->assign('user_shop',   explode(',', $user_info['shop_list']));
     $smarty->assign('form_act',    'update');
     $smarty->assign('action',      'edit');
 
@@ -320,6 +338,7 @@ elseif ($_REQUEST['act'] == 'update' || $_REQUEST['act'] == 'update_self')
     $admin_id    = !empty($_REQUEST['id'])        ? intval($_REQUEST['id'])      : 0;
     $admin_name  = !empty($_REQUEST['user_name']) ? trim($_REQUEST['user_name']) : '';
     $admin_email = !empty($_REQUEST['email'])     ? trim($_REQUEST['email'])     : '';
+    $admin_mobile = !empty($_REQUEST['mobile_phone'])     ? trim($_REQUEST['mobile_phone'])     : '';
     $ec_salt=rand(1,9999);
     $password = !empty($_POST['new_password']) ? ", password = '".md5(md5($_POST['new_password']).$ec_salt)."'"    : '';
     if ($_REQUEST['act'] == 'update')
@@ -357,6 +376,17 @@ elseif ($_REQUEST['act'] == 'update' || $_REQUEST['act'] == 'update_self')
         {
             sys_msg(sprintf($_LANG['email_exist'], stripslashes($admin_email)), 1);
         }
+    }
+    
+    /* 手机号是否有重复 */
+    if (!empty($admin_mobile))
+    {
+    	$is_only = $exc->num('mobile_phone', $admin_mobile, $admin_id);
+    
+    	if ($is_only == 1)
+    	{
+    		sys_msg(sprintf('手机号码已存在', stripslashes($admin_mobile)), 1);
+    	}
     }
 
     //如果要修改密码
@@ -404,27 +434,35 @@ elseif ($_REQUEST['act'] == 'update' || $_REQUEST['act'] == 'update_self')
         $action_list = ', action_list = \''.$row['action_list'].'\'';
         $role_id = ', role_id = '.$_POST['select_role'].' ';
     }
+    
+    // 门店列表
+    $shop_list = $_REQUEST['act'] == 'update' ? ", shop_list = '" . @join(",", $_POST['shop_list']) . "'" : '';
+    
     //更新管理员信息
     if($pwd_modified)
     {
         $sql = "UPDATE " .$ecs->table('admin_user'). " SET ".
                "user_name = '$admin_name', ".
                "email = '$admin_email', ".
+               "mobile_phone = '$admin_mobile', ".
                "ec_salt = '$ec_salt' ".
                $action_list.
                $role_id.
                $password.
                $nav_list.
+               $shop_list.
                "WHERE user_id = '$admin_id'";
     }
     else
     {
         $sql = "UPDATE " .$ecs->table('admin_user'). " SET ".
                "user_name = '$admin_name', ".
-               "email = '$admin_email' ".
+               "email = '$admin_email', ".
+               "mobile_phone = '$admin_mobile' ".
                $action_list.
                $role_id.
                $nav_list.
+               $shop_list.
                "WHERE user_id = '$admin_id'";
     }
 
@@ -639,7 +677,6 @@ elseif ($_REQUEST['act'] == 'update_allot')
     sys_msg($_LANG['edit'] . "&nbsp;" . $admin_name . "&nbsp;" . $_LANG['action_succeed'], 0, $link);
 
 }
-
 /*------------------------------------------------------ */
 //-- 删除一个管理员
 /*------------------------------------------------------ */
@@ -652,8 +689,8 @@ elseif ($_REQUEST['act'] == 'remove')
     /* 获得管理员用户名 */
     $admin_name = $db->getOne('SELECT user_name FROM '.$ecs->table('admin_user')." WHERE user_id='$id'");
 
-    /* demo这个管理员不允许删除 */
-    if ($admin_name == 'demo')
+    /* admin这个管理员不允许删除 */
+    if ($admin_name == 'admin')
     {
         make_json_error($_LANG['edit_remove_cannot']);
     }
@@ -683,19 +720,49 @@ elseif ($_REQUEST['act'] == 'remove')
     ecs_header("Location: $url\n");
     exit;
 }
+/*------------------------------------------------------ */
+//-- 绑定/解绑微信号
+/*------------------------------------------------------ */
+elseif ($_REQUEST['act'] == 'bindwx')
+{
+	admin_priv('admin_manage');
+	
+	/* 获得管理员微信ID */
+	$id = intval($_GET['id']);
+	$user = $db->getRow('SELECT wxid, mobile_phone FROM '.$ecs->table('admin_user')." WHERE user_id='$id'");
+	
+	if (!empty($user['wxid']))
+	{
+		// 解绑
+		$db->query("UPDATE " . $ecs->table('admin_user') . " SET wxid = NULL WHERE user_id='$id'");
+	}
+	elseif (!empty($user['mobile_phone']))
+	{
+		// 绑定
+		$sql = "SELECT w.wxid FROM " . $ecs->table('users', 'u') . ", wxch_user w WHERE w.uid = u.user_id AND u.mobile_phone='$user[mobile_phone]'";
+		$wxid = $db->getOne($sql);
+		if (!empty($wxid))
+		{
+			$db->query("UPDATE " . $ecs->table('admin_user') . " SET wxid = '$wxid' WHERE user_id='$id'");
+		}
+	}
+	
+	ecs_header("Location: privilege.php?act=list\n");
+	exit;
+}
 
 /* 获取管理员列表 */
 function get_admin_userlist()
 {
     $list = array();
-    $sql  = 'SELECT user_id, user_name, email, add_time, last_login '.
+    $sql  = 'SELECT user_id, user_name, mobile_phone, wxid, add_time, last_login '.
             'FROM ' .$GLOBALS['ecs']->table('admin_user').' ORDER BY user_id DESC';
     $list = $GLOBALS['db']->getAll($sql);
 
-    foreach ($list AS $key=>$val)
+    foreach ($list AS &$val)
     {
-        $list[$key]['add_time']     = local_date($GLOBALS['_CFG']['time_format'], $val['add_time']);
-        $list[$key]['last_login']   = local_date($GLOBALS['_CFG']['time_format'], $val['last_login']);
+        $val['add_time']     = local_date($GLOBALS['_CFG']['time_format'], $val['add_time']);
+        $val['last_login']   = local_date($GLOBALS['_CFG']['time_format'], $val['last_login']);
     }
 
     return $list;

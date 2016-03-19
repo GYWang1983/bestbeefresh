@@ -23,19 +23,19 @@
 {/if}
   <table cellpadding="3" cellspacing="1">
     <tr>
-      <th>{$lang.create_date}</th>
-      <th><a href="javascript:listTable.sort('user_id'); ">{$lang.mobile_phone}</a>{$sort_user_id}</th>
-      <th>{$lang.pack_sn}</th>
+      <th><input onclick='listTable.selectAll(this, "checkboxes")' type="checkbox" /><a href="javascript:listTable.sort('user_id'); ">{$lang.pack_sn}</a>{$sort_user_id}</th>
+      <th>{$lang.mobile_phone}</th>
       <th>{$lang.order_num}</th>
+      <th>{$lang.create_date}</th>
       <th><a href="javascript:listTable.sort('expire_time'); ">{$lang.expire_time}</a>{$sort_expire_time}</th>
       <th>{$lang.status}</th>
     </tr>
     {foreach from=$pickup_pack_list item=pack}
     <tr>
-      <td class="first-cell" align="center">{$pack.create_date}</td>
+      <td class="first-cell" align="center"><input type="checkbox" name="checkboxes" value="{$pack.id}" />{$pack.pos_row}-{$pack.pos_sn}</td>
       <td align="center">{$pack.mobile_phone}</td>
-      <td align="center">{$pack.pos_row}-{$pack.pos_sn}</td>
       <td align="center">{$pack.order_num}</td>
+      <td align="center">{$pack.create_date}</td>
       <td align="center">{$pack.expire_time|timestamp:'Y-m-d'}</td>
       <td align="center">{if $pack.status eq 1}打包中{elseif $pack.status eq 2}就绪{elseif $pack.status eq 3}已取{elseif $pack.status eq 4}过期{/if}</td>
     </tr>
@@ -46,6 +46,7 @@
 <table id="page-table" cellspacing="0">
   <tr>
     <td>
+      <input name="set_picked" type="button" id="set_picked" value="设为已取" class="button" onclick="pickup();"/>
       <input name="print_shipping" type="button" id="print_shipping" value="打印分拣单" class="button" onclick="print('shipping');"/>
       <input name="print_label" type="button" id="print_label" value="打印标签" class="button" onclick="print('label');"/>
       <input name="print_date" type="hidden" id='print_date' value="print" />
@@ -73,7 +74,15 @@
   onload = function()
   {
       // 开始检查订单
-      startCheckOrder();
+      // startCheckOrder();
+  }
+  
+  /**
+   * 
+   */
+  function pickup()
+  {
+	  
   }
   
   /**

@@ -2107,11 +2107,13 @@ function get_cart_cond($prefix = '')
  * 
  * @return array
  */
-function get_shop_list()
+function get_shop_list($is_all = false)
 {
 	global $ecs, $db;
 
-	$sql = "SELECT * FROM " . $ecs->table('shop') . " WHERE status = 1 ORDER BY `order` ASC ";
+	$cond = $is_all ? '1 = 1' : 'status = 1';
+	
+	$sql = "SELECT * FROM " . $ecs->table('shop') . " WHERE {$cond} ORDER BY shop_id ASC ";
 	return $db->getAll($sql);
 }
 ?>
