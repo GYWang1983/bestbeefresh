@@ -50,6 +50,7 @@ include_once(ROOT_PATH . 'includes/lib_order.php');
 
 make_order_expire($cron);
 make_pickup_code_expire($cron);
+make_pack_expire($cron);
 make_verifycode_expire($cron);
 
 /**
@@ -82,6 +83,17 @@ function make_pickup_code_expire($cron)
 	global $db, $ecs;
 	
 	$sql = "UPDATE " . $ecs->table('pickup_code') . " SET `status` = 3 WHERE `status` = 1 AND abandon_time < " . time();
+	$db->query($sql);
+}
+
+/**
+ * 包裹过期
+ */
+function make_pack_expire($cron)
+{
+	global $db, $ecs;
+
+	$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET `status` = 3 WHERE `status` = 2 AND expire_time < " . time();
 	$db->query($sql);
 }
 
