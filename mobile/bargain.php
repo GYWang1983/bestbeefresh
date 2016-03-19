@@ -69,11 +69,11 @@ if ($act == 'add')
 	$bargain_limit = $user_bargain['shop_price'] - $user_bargain['min_price'] - $user_bargain['bargain_price'];
 	
 	// 计算随机砍价金额
-	$k = rand(0, 100) <= $user_bargain['success_rate'] ? 1 : -1;
+	$k = mt_rand(0, 100) <= $user_bargain['success_rate'] ? 1 : -1;
 	$pre = $k > 0 ? 'success' : 'fail';
 	$min = $user_bargain["{$pre}_min_price"] * 100;
 	$max = $user_bargain["{$pre}_max_price"] * 100;
-	$rnd = rand($min, $max) * $k / 100;
+	$rnd = mt_rand($min, $max) * $k / 100;
 	$rnd = min($rnd, $bargain_limit);
 		
 	// 插入数据
