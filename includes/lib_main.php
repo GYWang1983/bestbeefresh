@@ -2162,7 +2162,7 @@ function get_shop_list($is_all = false)
 {
 	global $ecs, $db;
 
-	$cond = $is_all ? '1 = 1' : 'status = 1';
+	$cond = $is_all ? '1 = 1' : 'status > 0';
 	
 	$sql = "SELECT * FROM " . $ecs->table('shop') . " WHERE {$cond} ORDER BY shop_id ASC ";
 	return $db->getAll($sql);
