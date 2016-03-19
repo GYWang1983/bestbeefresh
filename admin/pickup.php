@@ -49,9 +49,11 @@ elseif ($action == 'query')
 		exit;
 	}
 	
-	//查询包裹
-	$packlist = get_pickup_packs($user_id);
+	//TODO
+	$shop_id = $_SESSION['shop_list'][0];
 	
+	//查询包裹
+	$packlist = get_pickup_packs($user_id, $shop_id);
 	
 	$packs = array();
 	$pids = array();
@@ -67,14 +69,14 @@ elseif ($action == 'query')
 		}
 	}
 	
-	// Update package status
-	if (!empty($pids))
+	if (empty($pids))
 	{
-		$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET status=3 WHERE id IN (" . implode(',', $pids) . ")";
-		$db->query($sql);
+		echo json_encode(array('errcode' => 10, 'msg' => '没有可以取货的商品'));
+		exit;
 	}
 	
-	$goods = get_pickup_goods($user_id);
+	// 获取商品
+	$goods = get_pickup_goods($pids);
 	if (empty($goods))
 	{
 		echo json_encode(array('errcode' => 10, 'msg' => '没有可以取货的商品'));
@@ -82,7 +84,7 @@ elseif ($action == 'query')
 	}
 	
 	// Update order status
-	$orders = get_pickup_orders($user_id);
+	$orders = get_pickup_orders($pids);
 	if (!empty($orders))
 	{
 		$status = array(
@@ -96,18 +98,13 @@ elseif ($action == 'query')
 		}
 	}
 	
-	// TODO: 多店铺后查询是否还有可取货订单，如果有取货码保持有效
-	
-	// Update pickup code status
-	$sql = "UPDATE " . $ecs->table('pickup_code') . " SET status = 2 WHERE user_id ='$user_id' AND status = 1";
+	// Update package status
+	$sql = "UPDATE " . $ecs->table('pickup_pack') . " SET status=3 WHERE id IN (" . implode(',', $pids) . ")";
 	$db->query($sql);
-	
-	$sql = "SELECT mobile_phone FROM " . $ecs->table('users') . " WHERE user_id = $user_id";
-	$mobile = $db->getOne($sql);
-	 
+		 
 	$response = array(
 		'errcode' => 0,
-		'mobile'  => $mobile,
+		'mobile'  => $orders[0]['mobile'],
 		'goods'   => $goods,
 		'orders'  => $orders,
 		'packs'   => $packs,
@@ -160,14 +157,12 @@ function check_pickup_code($code)
  * 
  * @param integer $user_id
  */
-function get_pickup_packs($user_id)
+function get_pickup_packs($user_id, $shop_id)
 {
 	global $ecs, $db;
 	
-	//TODO: 多门店后只查询当前门店的包裹
-	
 	$sql = "SELECT id, create_date, pos_row, pos_sn, status FROM " . $ecs->table('pickup_pack') . 
-		" WHERE user_id = '$user_id' AND status IN (1, 2)";
+		" WHERE user_id = '$user_id' AND shop_id = '{$shop_id}' AND status = 2";
 	$packs = $db->getAll($sql);
 	return $packs;
 }
@@ -175,15 +170,15 @@ function get_pickup_packs($user_id)
 /**
  * 获取指定用户可取货的商品列表
  * 
- * @param integer $user_id
+ * @param array $pids
  */
-function get_pickup_goods($user_id)
+function get_pickup_goods($pids)
 {
 	global $ecs, $db;
 	
 	$sql = "SELECT og.goods_id, og.goods_sn, og.goods_name, og.goods_attr, sum(og.goods_number) AS goods_number, og.free_more " .
 		" FROM " . $ecs->table('order_info', 'o') . "," . $ecs->table('order_goods', 'og') .
-		" WHERE o.order_id = og.order_id AND o.user_id = $user_id AND o.order_status = " . OS_CONFIRMED . " AND o.shipping_status = " . SS_SHIPPED . 
+		" WHERE o.order_id = og.order_id AND o.package_id IN (" . implode(',', $pids). ")" . 
 		" GROUP BY og.goods_id, og.free_more ORDER BY og.goods_id";
 	$rs = $db->getAll($sql);
 	
@@ -212,15 +207,15 @@ function get_pickup_goods($user_id)
 /**
  * 获取指定用户可取货的订单列表
  *
- * @param integer $user_id
+ * @param array $pids
  */
-function get_pickup_orders($user_id)
+function get_pickup_orders($pids)
 {
 	global $ecs, $db;
 	
-	$sql = "SELECT o.order_id, o.order_sn, o.pay_time, og.goods_id, og.goods_sn, og.goods_name, og.goods_number, og.free_more " .
+	$sql = "SELECT o.order_id, o.order_sn, o.mobile, o.pay_time, og.goods_id, og.goods_sn, og.goods_name, og.goods_number, og.free_more " .
 			" FROM " . $ecs->table('order_info', 'o') . "," . $ecs->table('order_goods', 'og') .
-			" WHERE o.order_id = og.order_id AND o.user_id = $user_id AND o.order_status = " . OS_CONFIRMED . " AND o.shipping_status = " . SS_SHIPPED .
+			" WHERE o.order_id = og.order_id AND o.package_id IN (" . implode(',', $pids) . ")" .
 			" ORDER BY o.order_id";
 	$rs = $db->getAll($sql);
 	
@@ -233,6 +228,7 @@ function get_pickup_orders($user_id)
 			$orders[] = array(
 				'order_id' => $g['order_id'],
 				'order_sn' => $g['order_sn'],
+				'mobile'   => $g['mobile'],
 				'pay_time' => date('Y-m-d H:i', $g['pay_time']),
 				'goods' => array()
 			);

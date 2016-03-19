@@ -87,7 +87,7 @@ elseif ($_REQUEST['act'] == 'signin')
     $ec_salt =$db->getOne($sql);
     $pwd = empty($ec_salt) ? md5($_POST['password']) : md5(md5($_POST['password']).$ec_salt);
     
-    $sql = "SELECT user_id, user_name, password, last_login, action_list, last_login,suppliers_id,ec_salt".
+    $sql = "SELECT user_id, user_name, password, last_login, action_list, shop_list, last_login, suppliers_id, ec_salt".
     		" FROM " . $ecs->table('admin_user') .
     		" WHERE user_name = '$_POST[username]' AND password = '$pwd'";
     $row = $db->getRow($sql);
@@ -106,6 +106,7 @@ elseif ($_REQUEST['act'] == 'signin')
         // 登录成功
         set_admin_session($row['user_id'], $row['user_name'], $row['action_list'], $row['last_login']);
         $_SESSION['suppliers_id'] = $row['suppliers_id'];
+        $_SESSION['shop_list'] = !empty($row['shop_list']) ? explode(',', $row['shop_list']) : array();
 		if(empty($row['ec_salt']))
 	    {
 			$ec_salt=rand(1,9999);

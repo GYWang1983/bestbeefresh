@@ -290,8 +290,6 @@ if ((!isset($_SESSION['admin_id']) || intval($_SESSION['admin_id']) <= 0) &&
     }
 }
 
-/* 微信登录 */
-
 $smarty->assign('token', $_CFG['token']);
 
 if ($_REQUEST['act'] != 'login' && $_REQUEST['act'] != 'signin' &&
@@ -349,7 +347,8 @@ function goto_login($clear_cookie = FALSE)
 	global $_LANG, $_CFG;
 	
 	if (is_wechat_browser())
-	{		
+	{	
+		// 微信登录
 		$callback = $_CFG['site_url'] . $_SERVER['REQUEST_URI'];
 		$user = weixin_oauth($callback);
 	}
@@ -417,6 +416,8 @@ function weixin_oauth($callback) {
 			//login
 			set_admin_session($user_info['user_id'], $user_info['user_name'], $user_info['action_list'], $user_info['last_login']);
 			$_SESSION['openid'] = $token['openid'];
+			$_SESSION['shop_list'] = !empty($user_info['shop_list']) ? explode(',', $user_info['shop_list']) : array();
+			
         	// 更新最后登录时间和IP
         	$db->query("UPDATE " .$ecs->table('admin_user').
                  " SET last_login='" . gmtime() . "', last_ip='" . real_ip() . "'".
