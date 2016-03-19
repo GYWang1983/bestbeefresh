@@ -16,18 +16,20 @@ table{border-collapse:collapse;width:100%;}
 </style>
 <body>
 <!-- {foreach from=$packlist item=pack} -->
-<div class="package">
+<div class="package" {if $pack.page_break eq 1}style="page-break-before:always;"{/if}>
 <table cellpadding="1">
     <tbody>
         <tr>
             <td width="5%" class="check">□</td>
             <td width="20%" class="blod">{$pack.sn}</td>
             <td width="30%">{$pack.mobile_phone}</td>
-            <td align="right">{$date}</td>
+            <td align="right">{$pack.shop_name}</td>
+            <td width="10%" align="right">{$date}</td>
         </tr>
         <tr>
             <td width="5%">&nbsp;</td>
             <td colspan="3">{$pack.order_sn}</td>
+            <td align="right">{$pack.money_paid|money}</td>
         </tr>
     </tbody>
 </table>

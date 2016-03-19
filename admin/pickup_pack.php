@@ -70,36 +70,39 @@ elseif ($_REQUEST['act'] == 'query')
 elseif ($_REQUEST['act'] == 'print_shipping')
 {
 	$print_date = empty($_REQUEST['print_date']) ? date('Ymd', time()) : trim($_REQUEST['print_date']);
-	$sql = "SELECT p.*, u.mobile_phone, g.goods_sn, g.goods_name, g.goods_attr, g.free_more, " .
+	$sql = "SELECT p.*, u.mobile_phone, g.goods_sn, g.goods_name, g.goods_attr, g.free_more, o.order_id, o.money_paid, " .
+		" o.shop_id, s.short_name AS shop_name, " .
 		" sum(g.goods_number) AS goods_number, group_concat(o.order_sn SEPARATOR ', ') AS order_sn, " .
 		" group_concat(o.postscript SEPARATOR '; ') AS postscript FROM " .
 		$ecs->table('pickup_pack', 'p') . ',' . $ecs->table('users', 'u') . ',' .
-		$ecs->table('order_info', 'o') . ',' . $ecs->table('order_goods', 'g') .
-		" WHERE p.user_id = u.user_id AND p.id = o.package_id AND o.order_id = g.order_id " .
+		$ecs->table('order_info', 'o') . ',' . $ecs->table('order_goods', 'g') . ',' . $ecs->table('shop', 's') . 
+		" WHERE p.user_id = u.user_id AND p.id = o.package_id AND o.order_id = g.order_id AND s.shop_id = o.shop_id " .
 		" AND p.create_date = '$print_date' AND o.order_status != " . OS_CANCELED .
-		" GROUP BY p.user_id, g.goods_id, g.goods_attr, g.free_more " .
-		" ORDER BY p.user_id ASC";
+		" GROUP BY o.shop_id, p.user_id, g.goods_id, g.goods_attr, g.free_more " .
+		" ORDER BY o.shop_id, p.user_id ASC";
 	
 	$query = $db->query($sql);
 	
 	$packlist = array();
 	$pack_id = 0;
+	$shop_id = 0;
 	while($rs = $db->fetch_array($query))
 	{
 		if ($pack_id != $rs['id'])
 		{
 			$pack_id = $rs['id'];
 			
-			//$sql = "SELECT order_sn FROM " . $ecs->table('order_info') . " WHERE package_id = '$pack_id' AND order_status != " . OS_CANCELED;
-			//$order_sn =$db->getCol($sql);
-			
 			$packlist[$pack_id] = array(
 				'sn' => substr($rs['create_date'], 6, 2) . '-' . $rs['pos_row'] . '-' . str_pad($rs['pos_sn'], 2, '0', STR_PAD_LEFT),
 				'mobile_phone' => $rs['mobile_phone'],
-				'order_sn'     => $rs['order_sn'], //implode(', ', $order_sn),
+				'shop_name'    => $rs['shop_name'],
+				'order_sn'     => $rs['order_sn'],
 				'postscript'   => $rs['postscript'],
+				'money_paid'   => 0,
 				'goods_list'   => array(),
 			);
+			
+			$order_id = 0;
 		}
 		
 		$pack = &$packlist[$pack_id];
@@ -111,6 +114,20 @@ elseif ($_REQUEST['act'] == 'print_shipping')
 			'goods_number' => $rs['goods_number'],
 			'total_number' => $rs['goods_number'] + get_free_more_number($rs['free_more'], $rs['goods_number']),
 		);
+		
+		// 计算订单金额
+		if ($order_id != $rs['order_id'])
+		{
+			$pack['money_paid'] += $rs['money_paid'];
+			$order_id = $rs['order_id'];
+		}
+		
+		// 设置分页符
+		if ($shop_id != $rs['shop_id'])
+		{
+			$pack['page_break'] = 1;
+			$shop_id = $rs['shop_id'];
+		}
 	}
 	
 	$smarty->assign('packlist', $packlist);
@@ -162,7 +179,7 @@ function pickup_pack_list()
     	$filter['mobile_phone'] = empty($_REQUEST['mobile_phone']) ? '' : trim($_REQUEST['mobile_phone']);
     	$filter['status'] = empty($_REQUEST['status']) ? '' : trim($_REQUEST['status']);
     	
-        $filter['sort_by'] = empty($_REQUEST['sort_by']) ? 'id' : trim($_REQUEST['sort_by']);
+        $filter['sort_by'] = empty($_REQUEST['sort_by']) ? 'user_id' : trim($_REQUEST['sort_by']);
         $filter['sort_order'] = empty($_REQUEST['sort_order']) ? 'ASC' : trim($_REQUEST['sort_order']);
 
         $where = '';
