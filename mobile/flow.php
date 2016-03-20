@@ -604,7 +604,7 @@ elseif ($_REQUEST['step'] == 'checkout')
     
     // 如果使用红包，取得用户可以使用的红包及用户选择的红包
     if ((!isset($_CFG['use_bonus']) || $_CFG['use_bonus'] == '1')
-    		&& ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS))
+    		&& ($flow_type != CART_GROUP_BUY_GOODS && $flow_type != CART_EXCHANGE_GOODS && $flow_type != CART_BARGAIN_GOODS))
     {
     	// 取得用户可用红包
     	$user_bonus = user_bonus($_SESSION['user_id'], $total['goods_price']);
