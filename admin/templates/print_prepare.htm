@@ -10,12 +10,21 @@ body{font-size:14px;color:#000;background-color:#fff;margin:0mm;size:A4;}
 
 h2{width:100%;text-align:center;}
 table{border-collapse:collapse;width:100%;border-color:#000;}
+span{display:inline-block;width:30%;line-height:30px;font-weight:bold;}
 
-.package{page-break-inside:avoid;padding-bottom:15px;margin-bottom:5px;border-bottom:1px #ccc dotted ;}
+.package{page-break-inside:avoid;padding-bottom:15px;margin-bottom:5px;border-bottom:1px #ccc dotted;}
+.page-break{page-break-before:always;}
 .blod{font-weight:bold;}
 </style>
 <body>
-<h4>日期：</h4>
+<table cellpadding="1">
+    <tbody>
+        <tr>
+            <td width="50%"><h4>日期：{$date}</h4></td>
+            <td align="right"><h4>汇总</h4></td>
+        </tr>
+    </tbody>
+</table>
 <table border="1">
     <tbody>
         <tr align="center">
@@ -23,7 +32,7 @@ table{border-collapse:collapse;width:100%;border-color:#000;}
             <td width="38%">名称</td>
             <td width="20%">规格</td>
             <td width="6%">优惠</td>
-            <td width="8%">售价</td>
+            <td width="8%">标价</td>
             <td width="6%">总数</td>
             <td width="12%">采购金额</td>
         </tr>
@@ -40,5 +49,45 @@ table{border-collapse:collapse;width:100%;border-color:#000;}
         <!-- {/foreach} -->
     </tbody>
 </table>
+<span>销售额：{$total.money_paid}元</span>
+<span>优惠券：{$total.bonus}元</span>
+<span>折扣：{$total.discount}元</span>
+<!-- {foreach from=$shop_list item=shop} -->
+<table cellpadding="1" class="page-break">
+    <tbody>
+        <tr>
+            <td width="50%"><h4>日期：{$date}</h4></td>
+            <td align="right"><h4>{$shop.shop_name}</h4></td>
+        </tr>
+    </tbody>
+</table>
+<table border="1">
+    <tbody>
+        <tr align="center">
+            <td width="10%">货号</td>
+            <td width="38%">名称</td>
+            <td width="20%">规格</td>
+            <td width="6%">优惠</td>
+            <td width="8%">标价</td>
+            <td width="6%">总数</td>
+            <td width="12%">备注</td>
+        </tr>
+        <!-- {foreach from=$shop.goods_list item=goods} -->
+        <tr>
+            <td align="center">{$goods.goods_sn}</td>
+            <td>{$goods.goods_name}</td>
+            <td>{$goods.goods_attr}</td>
+            <td align="center">{$goods.free_more}</td>
+            <td align="center">{$goods.goods_price}</td>
+            <td align="center">{$goods.goods_number}</td>
+            <td>&nbsp;</td>
+        </tr>
+        <!-- {/foreach} -->
+    </tbody>
+</table>
+<span>销售额：{$shop.money_paid}元</span>
+<span>优惠券：{$shop.bonus}元</span>
+<span>折扣：{$shop.discount}元</span>
+<!-- {/foreach} -->
 </body>
 </html>

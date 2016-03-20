@@ -3076,25 +3076,27 @@ elseif ($_REQUEST['act'] == 'operate')
     {
     	if ($_POST['print_prepare'])
     	{
-    		$cond = " AND a.order_status = 1 AND a.shipping_status = 3 ";
+    		$cond = " a.order_status = 1 AND a.shipping_status = 3 ";
     	}
     	else
     	{
-    		$cond = " AND a.order_status = 0 AND a.pay_status = 2 ";
+    		$cond = " a.order_status = 0 AND a.pay_status = 2 ";
     	}
     	
-    	$sql = "SELECT a.user_id, b.goods_sn, b.goods_name, b.goods_attr, b.goods_price, SUM(b.goods_number) AS goods_number, b.free_more FROM " .
+    	$sql = "SELECT a.shop_id, a.user_id, b.goods_sn, b.goods_name, b.goods_attr, b.goods_price, SUM(b.goods_number) AS goods_number, b.free_more FROM " .
       		$ecs->table('order_info', 'a') . ',' . $ecs->table('order_goods', 'b') .
-    		" WHERE a.order_id = b.order_id " . $cond .
-			" GROUP BY a.user_id, b.goods_id, b.goods_attr, b.free_more";
+    		" WHERE a.order_id = b.order_id AND " . $cond .
+			" GROUP BY a.shop_id, a.user_id, b.goods_id, b.goods_attr, b.free_more";
     	$query = $db->query($sql);
     	
     	$goods_list = array();
+    	$shop_list = array();
     	while($rs = $db->fetch_array($query))
     	{
     		$key = "{$rs[goods_sn]}-{$rs[goods_attr]}-{$rs[free_more]}";
     		$goods_number = $rs['goods_number'] + get_free_more_number($rs['free_more'], $rs['goods_number']);
     		
+    		// 汇总
     		if (array_key_exists($key, $goods_list))
     		{
     			$goods_list[$key]['goods_number'] += $goods_number;
@@ -3102,19 +3104,77 @@ elseif ($_REQUEST['act'] == 'operate')
     		else
     		{
     			$goods_list[$key] = array(
-    					'goods_sn'     => $rs['goods_sn'],
-    					'goods_name'   => $rs['goods_name'],
-    					'goods_attr'   => $rs['goods_attr'],
-    					'goods_price'  => $rs['goods_price'],
-    					'free_more'    => $rs['free_more'],
-    					'goods_number' => $goods_number,
+    				'goods_sn'     => $rs['goods_sn'],
+    				'goods_name'   => $rs['goods_name'],
+    				'goods_attr'   => $rs['goods_attr'],
+    				'goods_price'  => $rs['goods_price'],
+    				'free_more'    => $rs['free_more'],
+    				'goods_number' => $goods_number,
+    			);
+    		}
+    		
+    		// 门店别
+    		$shop = $rs['shop_id'];
+    		if (!array_key_exists($shop, $shop_list))
+    		{
+    			$shop_list[$shop] = array(
+    				'goods_list' => array(),
+    				'money_paid' => 0,
+    				'bonus'      => 0,
+    				'discount'   => 0,
+    			);
+    		}
+    		
+    		$list = &$shop_list[$shop]['goods_list'];
+    		
+    		if (array_key_exists($key, $list))
+    		{
+    			$list[$key]['goods_number'] += $goods_number;
+    		}
+    		else
+    		{
+    			$list[$key] = array(
+    				'goods_sn'     => $rs['goods_sn'],
+    				'goods_name'   => $rs['goods_name'],
+    				'goods_attr'   => $rs['goods_attr'],
+    				'goods_price'  => $rs['goods_price'],
+    				'free_more'    => $rs['free_more'],
+    				'goods_number' => $goods_number,
     			);
     		}
     	}
-    	
+
     	ksort($goods_list, SORT_STRING);
+    	ksort($shop_list, SORT_NUMERIC);
+    	
+    	foreach ($shop_list as $id => &$shop)
+    	{
+    		$shop['shop_name'] = $_CFG['shop'][$id]['short_name'];
+    		ksort($shop['goods_list'], SORT_STRING);
+    	}
+    	
+    	// 汇总销售额
+    	$sql = "SELECT a.shop_id, sum(a.money_paid) AS money_paid, sum(bonus) AS bonus, sum(discount) AS discount FROM " .
+    			$ecs->table('order_info', 'a') . " WHERE $cond GROUP BY a.shop_id";
+    	$query = $db->query($sql);
+    	
+    	$total = array('money_paid' => 0, 'bonus' => 0, 'discount' => 0);
+    	while ($rs = $db->fetch_array($query))
+    	{
+    		$total['money_paid'] += $rs['money_paid'];
+    		$total['bonus'] += $rs['bonus'];
+    		$total['discount'] += $rs['discount'];
+    		
+    		$shop = &$shop_list[$rs['shop_id']];
+    		$shop['money_paid'] += $rs['money_paid'];
+    		$shop['bonus'] += $rs['bonus'];
+    		$shop['discount'] += $rs['discount'];
+    	}
     	
     	$smarty->assign('goods_list', $goods_list);
+    	$smarty->assign('shop_list',  $shop_list);
+    	$smarty->assign('total',      $total);
+    	$smarty->assign('date',       date('Y/m/d', time()));
     	$smarty->assign('config', $_CFG);
     	$smarty->display('print_prepare.htm');
     	exit;
