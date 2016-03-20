@@ -2865,6 +2865,7 @@ function check_shop($shop_id)
 
 function get_shop($shop_id)
 {
-	return $GLOBALS['_CFG']['shop'][$shop_id];
+	global $db, $ecs;
+	return $db->getRow("SELECT * FROM " . $ecs->table('shop') . " WHERE shop_id = '$shop_id'");
 }
 ?>
