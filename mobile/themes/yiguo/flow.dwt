@@ -364,7 +364,7 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
         </dl>
         <!-- {foreach from=$goods_list item=goods} -->
         <dl>
-          <dd class="dd1 w60"> 
+          <dd class="dd1 w50"> 
             <!-- {if $goods.goods_id gt 0 && $goods.extension_code eq 'package_buy'} --> 
             <a href="javascript:void(0)" onClick="setSuitShow({$goods.goods_id})" >{$goods.goods_name}<span style="color:#FF0000;">（{$lang.remark_package}）</span></a> 
             <!-- { else } --> 
@@ -380,8 +380,11 @@ var flow_no_shipping  = "{$lang.flow_no_shipping}";
             <!-- {/if} --> 
             <!-- {/if} --> 
           </dd>
-          <dd class="dd2 w10 c999"> x {$goods.goods_number} </dd>
-          <dd class="dd3 w30"> {$goods.formated_subtotal} </dd>
+          <dd class="dd2 w30 c999">
+            <!--{if $goods.goods_attr}-->{$goods.goods_attr}<br/><!--{/if}-->
+            <span class="text-red"> x {$goods.goods_number_subtotal}</span>
+          </dd>
+          <dd class="dd3 w20"> {$goods.formated_subtotal} </dd>
         </dl>
         <!-- {/foreach} --> 
         <!-- #BeginLibraryItem "/Library/order_total.lbi" --><!-- #EndLibraryItem --> </div>

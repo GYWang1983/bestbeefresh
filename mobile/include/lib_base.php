@@ -1425,7 +1425,7 @@ function rands($length = 6, $mixed = 0, $casesensitive = FALSE)
 function http404() {
 	global $PHP_SELF;
 
-	header('Content-Type: text/html; charset='.WEB_LANG);
+	header('Content-Type: text/html; charset=' . EC_CHARSET);
 	header('HTTP/1.1 404 Not Found');
 	header("status: 404 Not Found");
 

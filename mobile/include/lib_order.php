@@ -882,9 +882,9 @@ function cart_goods($type = CART_GENERAL_GOODS)
     $sql = "SELECT c.rec_id, c.user_id, c.goods_id, c.goods_name, g.goods_thumb, c.goods_sn, c.goods_number, " .
             "c.market_price, c.goods_price, c.goods_attr, c.is_real, c.extension_code, c.extension_id, c.parent_id, c.is_gift, c.is_shipping, " .
             "c.goods_price * c.goods_number AS subtotal, c.free_more " .
-            "FROM " . $GLOBALS['ecs']->table('cart') .
-			" AS c LEFT JOIN ".$GLOBALS['ecs']->table('goods').
-            " AS g ON c.goods_id = g.goods_id WHERE " . get_cart_cond() .
+            "FROM " . $GLOBALS['ecs']->table('cart', 'c') .
+			" LEFT JOIN ".$GLOBALS['ecs']->table('goods', 'g').
+            " ON c.goods_id = g.goods_id WHERE " . get_cart_cond() .
             "AND rec_type = '$type'";
 
     $arr = $GLOBALS['db']->getAll($sql);
@@ -896,6 +896,7 @@ function cart_goods($type = CART_GENERAL_GOODS)
         $value['formated_goods_price']  = price_format($value['goods_price'], false);
         $value['formated_subtotal']     = price_format($value['subtotal'], false);
 		$value['free_more_desc']        = get_free_more_desc($value['free_more']);
+		$value['goods_number_subtotal'] = $value['goods_number'] + get_free_more_number($value['free_more'], $value['goods_number']);
 		
         if ($value['extension_code'] == 'package_buy')
         {
@@ -2073,13 +2074,13 @@ function flow_order_info()
 {
     $order = isset($_SESSION['flow_order']) ? $_SESSION['flow_order'] : array();
 
-    /* 初始化配送和支付方式 */
-    if (!isset($order['shipping_id']) || !isset($order['pay_id']))
+    // 初始化配送和支付方式
+    /*if (!isset($order['shipping_id']) || !isset($order['pay_id']))
     {
-        /* 如果还没有设置配送和支付 */
+        // 如果还没有设置配送和支付
         if ($_SESSION['user_id'] > 0)
         {
-            /* 用户已经登录了，则获得上次使用的配送和支付 */
+            // 用户已经登录了，则获得上次使用的配送和支付
             $arr = last_shipping_and_payment();
 
             if (!isset($order['shipping_id']))
@@ -2102,8 +2103,16 @@ function flow_order_info()
                 $order['pay_id'] = 0;
             }
         }
+    }*/
+    if (!isset($order['shipping_id']))
+    {
+    	$order['shipping_id'] = 0;
     }
-
+    if (!isset($order['pay_id']))
+    {
+    	$order['pay_id'] = 0;
+    }
+    
     if (!isset($order['pack_id']))
     {
         $order['pack_id'] = 0;  // 初始化包装
