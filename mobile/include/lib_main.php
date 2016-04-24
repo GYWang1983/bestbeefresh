@@ -1758,6 +1758,14 @@ function set_affiliate()
             {
                 $c = 24 * 7;
             }
+            elseif($config['config']['expire_unit'] == 'month')
+            {
+            	$c = 24 * 30;
+            }
+            elseif($config['config']['expire_unit'] == 'year')
+            {
+            	$c = 24 * 365;
+            }
             else
             {
                 $c = 1;

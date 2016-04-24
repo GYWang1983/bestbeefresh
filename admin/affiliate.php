@@ -29,7 +29,11 @@ if ($_REQUEST['act'] == 'list')
         $smarty->assign('full_page', 1);
     }
 
+    $sql = "SELECT rank_id, rank_name FROM ".$ecs->table('user_rank')." WHERE special_rank = 1";
+    $ranks = $db->getAll($sql);
+    
     $smarty->assign('ur_here', $_LANG['affiliate']);
+    $smarty->assign('user_ranks', $ranks);
     $smarty->assign('config', $config);
     $smarty->display('affiliate.htm');
 }
@@ -108,6 +112,7 @@ elseif ($_REQUEST['act'] == 'updata')
     $temp = array();
     $temp['config'] = array('expire'                => $_POST['expire'],        //COOKIE过期数字
                             'expire_unit'           => $_POST['expire_unit'],   //单位：小时、天、周
+                            'user_rank'             => $_POST['user_rank'],     //代理用户级别
                             'separate_by'           => $separate_by,            //分成模式：0、注册 1、订单
                             'level_point_all'       =>$_POST['level_point_all'],    //积分分成比
                             'level_money_all'       =>$_POST['level_money_all'],    //金钱分成比

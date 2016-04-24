@@ -206,7 +206,7 @@ class integrate
      *
      * @return int
      */
-    function add_user($username, $password, $email = '', $gender = -1, $bday = 0, $reg_date=0, $md5password='')
+    function add_user($username, $password, $email = '', $gender = -1, $bday = 0, $reg_date=0, $md5password='', $mobile_phone= NULL)
     {
         /* 将用户添加到整合方 */
         if ($this->check_user($username) > 0)
@@ -249,6 +249,17 @@ class integrate
         {
             $fields[] = $this->field_reg_date;
             $values[] = $reg_date;
+        }
+        
+        if (!empty($mobile_phone))
+        {
+        	if ($this->check_mobile_phone($mobile_phone))
+        	{
+        		return false;
+        	}
+        	
+        	$fields[] = $this->field_mobile;
+        	$values[] = $mobile_phone;
         }
 
         $sql = "INSERT INTO " . $this->table($this->user_table).
@@ -320,6 +331,22 @@ class integrate
             }
             $values[] = $this->field_email . "='". $cfg['email'] . "'";
         }*/
+        
+        if ((!empty($cfg['mobile_phone'])) && $this->field_mobile != 'NULL')
+        {
+        	// 检查email是否重复
+        	$sql = "SELECT " . $this->field_id .
+        	" FROM " . $this->table($this->user_table).
+        	" WHERE " . $this->field_mobile . " = '$cfg[mobile_phone]' ".
+        	" AND " . $this->field_name . " != '$cfg[post_username]'";
+        	if ($this->db->getOne($sql, true) > 0)
+        	{
+        		$this->error = ERR_MOBILE_EXISTS;
+        		return false;
+        	}
+        	$values[] = $this->field_mobile . "='". $cfg['mobile_phone'] . "'";
+        }
+        
 
         if (isset($cfg['gender']) && $this->field_gender != 'NULL')
         {

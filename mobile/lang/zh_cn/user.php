@@ -636,6 +636,8 @@ $_LANG['copy_to_clipboard'] = '已拷贝至剪贴板。';
 $_LANG['expire_unit']['hour'] = '小时';
 $_LANG['expire_unit']['day'] = '天';
 $_LANG['expire_unit']['week'] = '周';
+$_LANG['expire_unit']['month'] = '月';
+$_LANG['expire_unit']['year'] = '年';
 
 $_LANG['recommend_webcode'] = '网页签名代码';
 $_LANG['recommend_bbscode'] = '论坛签名代码';

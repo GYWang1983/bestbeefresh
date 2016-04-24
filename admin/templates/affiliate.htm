@@ -21,6 +21,14 @@
                         {$lang.separate_by.1}</td>
                 </tr>
                 <tr>
+                    <td width="20%" align="right" class="label">推广代理用户级别：  </td>
+                    <td>
+                        <select name="user_rank">
+                            {html_options options=$user_ranks value='rank_id' text='rank_name' selected=$config.config.user_rank}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td width="20%" align="right" class="label"><a href="javascript:showNotice('notice1');" title="{$lang.form_notice}"><img src="images/notice.gif" width="16" height="16" border="0" alt="{$lang.form_notice}" /></a>{$lang.expire} </td>
                     <td><input type="text" name="expire" maxlength="150" size="10" value="{$config.config.expire}" />
                         <select name="expire_unit">

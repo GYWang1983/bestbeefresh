@@ -107,6 +107,7 @@ elseif ($_REQUEST['act'] == 'insert')
     $username = empty($_POST['username']) ? '' : trim($_POST['username']);
     $password = empty($_POST['password']) ? '' : trim($_POST['password']);
     $email = empty($_POST['email']) ? '' : trim($_POST['email']);
+    $mobile_phone = empty($_POST['mobile_phone']) ? '' : trim($_POST['mobile_phone']);
     $sex = empty($_POST['sex']) ? 0 : intval($_POST['sex']);
     $sex = in_array($sex, array(0, 1, 2)) ? $sex : 0;
     $birthday = $_POST['birthdayYear'] . '-' .  $_POST['birthdayMonth'] . '-' . $_POST['birthdayDay'];
@@ -115,7 +116,7 @@ elseif ($_REQUEST['act'] == 'insert')
 
     $users =& init_users();
 
-    if (!$users->add_user($username, $password, $email))
+    if (!$users->add_user($username, $password, $email, -1, 0, 0, '', $mobile_phone))
     {
         /* 插入会员数据失败 */
         if ($users->error == ERR_INVALID_USERNAME)
@@ -141,6 +142,10 @@ elseif ($_REQUEST['act'] == 'insert')
         elseif ($users->error == ERR_EMAIL_EXISTS)
         {
             $msg = $_LANG['email_exists'];
+        }
+        elseif ($this->error == ERR_MOBILE_EXISTS)
+        {
+        	$msg = '手机号已存在';
         }
         else
         {
@@ -190,7 +195,7 @@ elseif ($_REQUEST['act'] == 'insert')
     $other['qq'] = isset($_POST['extend_field2']) ? htmlspecialchars(trim($_POST['extend_field2'])) : '';
     $other['office_phone'] = isset($_POST['extend_field3']) ? htmlspecialchars(trim($_POST['extend_field3'])) : '';
     $other['home_phone'] = isset($_POST['extend_field4']) ? htmlspecialchars(trim($_POST['extend_field4'])) : '';
-    $other['mobile_phone'] = isset($_POST['extend_field5']) ? htmlspecialchars(trim($_POST['extend_field5'])) : '';
+    //$other['mobile_phone'] = isset($_POST['extend_field5']) ? htmlspecialchars(trim($_POST['extend_field5'])) : '';
 
     $db->autoExecute($ecs->table('users'), $other, 'UPDATE', "user_name = '$username'");
 
@@ -346,6 +351,7 @@ elseif ($_REQUEST['act'] == 'update')
     $username = empty($_POST['username']) ? '' : trim($_POST['username']);
     $password = empty($_POST['password']) ? '' : trim($_POST['password']);
     $email = empty($_POST['email']) ? '' : trim($_POST['email']);
+    $mobile_phone = empty($_POST['mobile_phone']) ? '' : trim($_POST['mobile_phone']);
     $sex = empty($_POST['sex']) ? 0 : intval($_POST['sex']);
     $sex = in_array($sex, array(0, 1, 2)) ? $sex : 0;
     $birthday = $_POST['birthdayYear'] . '-' .  $_POST['birthdayMonth'] . '-' . $_POST['birthdayDay'];
@@ -354,11 +360,11 @@ elseif ($_REQUEST['act'] == 'update')
 
     $users  =& init_users();
 
-    if (!$users->edit_user(array('username'=>$username, 'password'=>$password, 'email'=>$email, 'gender'=>$sex, 'bday'=>$birthday ), 1))
+    if (!$users->edit_user(array('username'=>$username, 'password'=>$password, 'mobile_phone'=>$mobile_phone, 'gender'=>$sex, 'bday'=>$birthday ), 1))
     {
-        if ($users->error == ERR_EMAIL_EXISTS)
+        if ($users->error == ERR_MOBILE_EXISTS)
         {
-            $msg = $_LANG['email_exists'];
+            $msg = '手机号已存在';
         }
         else
         {
@@ -407,9 +413,31 @@ elseif ($_REQUEST['act'] == 'update')
     $other['qq'] = isset($_POST['extend_field2']) ? htmlspecialchars(trim($_POST['extend_field2'])) : '';
     $other['office_phone'] = isset($_POST['extend_field3']) ? htmlspecialchars(trim($_POST['extend_field3'])) : '';
     $other['home_phone'] = isset($_POST['extend_field4']) ? htmlspecialchars(trim($_POST['extend_field4'])) : '';
-    $other['mobile_phone'] = isset($_POST['extend_field5']) ? htmlspecialchars(trim($_POST['extend_field5'])) : '';
+    //$other['mobile_phone'] = isset($_POST['extend_field5']) ? htmlspecialchars(trim($_POST['extend_field5'])) : '';
 
     $db->autoExecute($ecs->table('users'), $other, 'UPDATE', "user_name = '$username'");
+    
+    $affiliate = unserialize($GLOBALS['_CFG']['affiliate']);
+    if ($affiliate['on'] == 1)
+    {
+    	// 检查当前用户是否分配了推广二维码
+    	$sql = "SELECT * FROM " . $ecs->table('promotion_agent') . " WHERE user_id = $user_id";
+    	$agent = $db->getRow($sql);
+    	if ($affiliate['config']['user_rank'] == $rank)
+    	{
+    		if (empty($agent))
+    		{
+    			create_promotion_agent($user_id);
+    		}
+    	}
+    	else
+    	{
+    		if (!empty($agent))
+    		{
+    			delete_promotion_agent($user_id);
+    		}
+    	}
+    }
 
     /* 记录管理员操作 */
     admin_log($username, 'edit', 'users');
@@ -753,4 +781,57 @@ function user_list()
     return $arr;
 }
 
+
+/**
+ * 创建推广代理
+ * @param int $user_id
+ */
+function create_promotion_agent($user_id)
+{
+	global $ecs, $db;
+	
+	// 查询可用的微信二维码
+	$sql = "SELECT id FROM " . $ecs->table('weixin_qrcode') . " WHERE in_use = 0 ORDER BY id ASC";
+	$qrcode = $db->getOne($sql);
+	
+	if (empty($qrcode))
+	{
+		$db->autoExecute($ecs->table('weixin_qrcode'), array(
+			'type' => 1,
+			'purpose' => 1,
+			'in_use'  => 1,
+		));
+		
+		$qrcode = $db->insert_id();
+		
+		// 通过微信接口创建
+		include_once(ROOT_PATH . '/includes/cls_wechat.php');
+		$wechat = new WechatApi();
+		
+		$wx_qr = $wechat->create_permanent_qrcode(WechatApi::QRCODE_SCENE_LIMIT, $qrcode);
+		$db->autoExecute($ecs->table('weixin_qrcode'), array('ticket'=> $wx_qr['ticket'], 'content' => $wx_qr['url']), 'UPDATE', "id = $qrcode");
+	}
+	else
+	{
+		$db->autoExecute($ecs->table('weixin_qrcode'), array('purpose' => 1, 'in_use' => 1), 'UPDATE', "id = $qrcode");
+	}
+	
+	$db->autoExecute($ecs->table('promotion_agent'), array('user_id' => $user_id, 'wx_qrcode' => $qrcode));
+}
+
+/**
+ * 删除推广代理
+ * @param int $user_id
+ */
+function delete_promotion_agent($user_id)
+{
+	global $ecs, $db;
+	
+	$sql = "SELECT wx_qrcode FROM " . $ecs->table('promotion_agent') . " WHERE user_id = $user_id";
+	$qrcode = $db->getOne($sql);
+	$db->autoExecute($ecs->table('weixin_qrcode'), array('in_use' => 0), 'UPDATE', "id = $qrcode");
+	
+	$sql = "DELETE FROM " . $ecs->table('promotion_agent') . " WHERE user_id = $user_id";
+	$db->query($sql);
+}
 ?>

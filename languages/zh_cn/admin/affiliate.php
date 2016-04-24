@@ -36,6 +36,8 @@ $_LANG['js_languages']['cancel'] = '取消';
 $_LANG['unit']['hour'] = '小时';
 $_LANG['unit']['day'] = '天';
 $_LANG['unit']['week'] = '周';
+$_LANG['unit']['month'] = '月';
+$_LANG['unit']['year'] = '年';
 
 $_LANG['addrow'] = '增加';
 

@@ -20,6 +20,10 @@ class WechatApi {
 	
 	const MEDIA_TYPE_TEXT  = 'text';
 	const MEDIA_TYPE_NEWS  = 'mpnews';
+	const MEDIA_TYPE_CARD  = 'wxcard';
+	
+	const QRCODE_SCENE_LIMIT = 'QR_LIMIT_SCENE';
+	const QRCODE_SCENE_LIMIT_STR = 'QR_LIMIT_STR_SCENE';
 	
 	private $cfg = array();
 	
@@ -292,6 +296,62 @@ class WechatApi {
     }
     
     /**
+     * 根据openid群发消息
+     * 
+     * @param string|array $openid
+     * @param string $msgtype
+     * @param mixed $content
+     */
+    public function mass_send_by_openid($openid, $msgtype, $content) {
+
+    	$touser = is_array($openid) ? $openid : array($openid);
+    	
+    	$data = array(
+    		'touser'       => $touser,
+    		'msgtype'	   => $msgtype,
+    	);
+    	
+    	if ($msgtype == WechatApi::MEDIA_TYPE_TEXT) {
+    		$data[$msgtype] = array('content'  => $content);
+    	} elseif ($msgtype == WechatApi::MEDIA_TYPE_CARD) {
+    		$data[$msgtype] = array('card_id'  => $content);
+    	} elseif ($msgtype == WechatApi::MEDIA_TYPE_VIDEO) {
+    		$data[$msgtype] = $content;
+    	} else {
+    		$data[$msgtype] = array('media_id' => $content);
+    	}
+    	
+    	$acctoken = $this->cfg['access_token'];
+    	$url = "https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=$acctoken";
+    	$result = $this->http_post($url, $data);
+    	$result = json_decode($result, true);
+    	return $result;
+    }
+    
+    /**
+     * 获取素材列表
+     * 
+     * @param string $type
+     * @param number $offset
+     * @param number $count
+     * @return array
+     */
+    public function get_material($type = 'news', $offset = 0, $count = 20) {
+    	
+    	$data = array(
+    		'type'    => $type,
+    		'offset'  => $offset,
+    		'count'   => $count
+    	);
+    	
+    	$acctoken = $this->cfg['access_token'];
+    	$url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=$acctoken";
+    	$result = $this->http_post($url, $data);
+    	$result = json_decode($result, true);
+    	return $result;
+    }
+    
+    /**
      * 获取用户信息
      * 
      * @param string $openid 用户OPENID
@@ -308,6 +368,31 @@ class WechatApi {
     	}
     	
     	return $json;
+    }
+    
+    /**
+     * 生成永久二维码
+     * @param string $type
+     * @param string|integer $scene_val
+     */
+    public function create_permanent_qrcode($type = WechatApi::QRCODE_SCENE_LIMIT, $scene_val) {
+    	
+    	if ($type == WechatApi::QRCODE_SCENE_LIMIT) {
+    		$scene = array('scene_id'  => $scene_val);
+    	} else {
+    		$scene = array('scene_str' => $scene_val);
+    	}
+    	
+    	$data = array(
+    		'action_name'  => $type,
+    		'action_info'  => array('scene' => $scene),
+    	);
+    	
+    	$acctoken = $this->cfg['access_token'];
+    	$url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=$acctoken";
+    	$result = $this->http_post($url, $data);
+    	$result = json_decode($result, true);
+    	return $result;
     }
     
     /**
@@ -330,7 +415,7 @@ class WechatApi {
     	} else {
     		$strPOST = $param;
     	}
-    	
+    	//var_dump($strPOST);exit;
     	if (empty($header)) {
     		if ($type == 'form') {
     			$header [] = "content-type: application/x-www-form-urlencoded; charset=UTF-8";
