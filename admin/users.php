@@ -720,11 +720,11 @@ function user_list()
         $ex_where = ' WHERE 1 ';
         if ($filter['keywords'])
         {
-            $ex_where .= " AND user_name LIKE '%" . mysql_like_quote($filter['keywords']) ."%'";
+            $ex_where .= " AND u.user_name LIKE '%" . mysql_like_quote($filter['keywords']) ."%'";
         }
         if ($filter['mobile_phone'])
         {
-        	$ex_where .= " AND mobile_phone LIKE '%" . mysql_like_quote($filter['mobile_phone']) ."%'";
+        	$ex_where .= " AND u.mobile_phone LIKE '%" . mysql_like_quote($filter['mobile_phone']) ."%'";
         }
         if ($filter['rank'])
         {
@@ -733,28 +733,31 @@ function user_list()
             if ($row['special_rank'] > 0)
             {
                 /* 特殊等级 */
-                $ex_where .= " AND user_rank = '$filter[rank]' ";
+                $ex_where .= " AND u.user_rank = '$filter[rank]' ";
             }
             else
             {
-                $ex_where .= " AND rank_points >= " . intval($row['min_points']) . " AND rank_points < " . intval($row['max_points']);
+                $ex_where .= " AND u.rank_points >= " . intval($row['min_points']) . " AND u.rank_points < " . intval($row['max_points']);
             }
         }
         if ($filter['pay_points_gt'])
         {
-             $ex_where .=" AND pay_points >= '$filter[pay_points_gt]' ";
+             $ex_where .=" AND u.pay_points >= '$filter[pay_points_gt]' ";
         }
         if ($filter['pay_points_lt'])
         {
-            $ex_where .=" AND pay_points < '$filter[pay_points_lt]' ";
+            $ex_where .=" AND u.pay_points < '$filter[pay_points_lt]' ";
         }
 
-        $filter['record_count'] = $GLOBALS['db']->getOne("SELECT COUNT(*) FROM " . $GLOBALS['ecs']->table('users') . $ex_where);
+        $filter['record_count'] = $GLOBALS['db']->getOne("SELECT COUNT(*) FROM " . $GLOBALS['ecs']->table('users', 'u') . $ex_where);
 
         /* 分页大小 */
         $filter = page_and_size($filter);
-        $sql = "SELECT user_id, user_name, mobile_phone, is_validated, user_money, frozen_money, rank_points, pay_points, reg_time ".
-                " FROM " . $GLOBALS['ecs']->table('users') . $ex_where .
+        $sql = "SELECT u.user_id, u.user_name, u.mobile_phone, u.is_validated, u.user_money, u.frozen_money, u.rank_points, u.pay_points, u.reg_time, q.ticket ".
+                " FROM " . $GLOBALS['ecs']->table('users', 'u') .
+                " LEFT JOIN " . $GLOBALS['ecs']->table('promotion_agent', 'p') . " ON p.user_id = u.user_id " .
+                " LEFT JOIN " . $GLOBALS['ecs']->table('weixin_qrcode', 'q') . " ON p.wx_qrcode = q.id " .
+                $ex_where .
                 " ORDER by " . $filter['sort_by'] . ' ' . $filter['sort_order'] .
                 " LIMIT " . $filter['start'] . ',' . $filter['page_size'];
 
