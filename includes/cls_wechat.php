@@ -44,6 +44,24 @@ class WechatApi {
 	}
 	
 	/**
+	 * 检查调用请求签名
+	 * 
+	 * @param string $signature
+	 * @param string $timestamp
+	 * @param string $nonce
+	 * @return boolean
+	 */
+	public function checkSignature($signature, $timestamp, $nonce) {
+	
+		//从缓存文件中获取token
+		$tmpArr = array($this->cfg['token'], $timestamp, $nonce);
+		sort($tmpArr, SORT_STRING);
+		$tmpStr = sha1(implode($tmpArr));
+	
+		return $tmpStr == $signature;
+	}
+	
+	/**
 	 * 上传媒体文件
 	 * 
 	 * @param $file  本地文件路径名

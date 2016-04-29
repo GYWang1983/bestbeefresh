@@ -67,7 +67,8 @@ function register($username, $password, $email = NULL, $other = array())
         return false;
     }
 
-    if (!$GLOBALS['user']->add_user($username, $password, $email))
+    $uid = $GLOBALS['user']->add_user($username, $password, $email);
+    if (empty($uid))
     {
         if ($GLOBALS['user']->error == ERR_INVALID_USERNAME)
         {
@@ -109,14 +110,17 @@ function register($username, $password, $email = NULL, $other = array())
         $GLOBALS['user']->set_session($username);
         $GLOBALS['user']->set_cookie($username);
 
-        /* 注册送积分 */
+        // 注册送积分
         if (!empty($GLOBALS['_CFG']['register_points']))
         {
             log_account_change($_SESSION['user_id'], 0, 0, $GLOBALS['_CFG']['register_points'], $GLOBALS['_CFG']['register_points'], $GLOBALS['_LANG']['register_points']);
         }
 
-        /*推荐处理*/
-        $affiliate  = unserialize($GLOBALS['_CFG']['affiliate']);
+        // 注册送红包
+        send_register_bonus($uid);
+        
+        // 推荐处理
+        /*$affiliate  = unserialize($GLOBALS['_CFG']['affiliate']);
         if (isset($affiliate['on']) && $affiliate['on'] == 1)
         {
             // 推荐开关开启
@@ -147,7 +151,7 @@ function register($username, $password, $email = NULL, $other = array())
 
                 $GLOBALS['db']->query($sql);
             }
-        }
+        }*/
 
         //定义other合法的变量数组
         $other_key_array = array('msn', 'qq', 'office_phone', 'home_phone', 'mobile_phone');
@@ -170,12 +174,45 @@ function register($username, $password, $email = NULL, $other = array())
         }
         $GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('users'), $update_data, 'UPDATE', 'user_id = ' . $_SESSION['user_id']);
 
-        update_user_info();      // 更新用户信息
-        update_user_cart();
-        recalculate_price();     // 重新计算购物车中的商品价格
+        if (function_exists('update_user_info')) {
+	        update_user_info();      // 更新用户信息
+	        update_user_cart();
+	        recalculate_price();     // 重新计算购物车中的商品价格
+        }
 
-        return true;
+        return $uid;
     }
+}
+
+/**
+ * 根据微信用户openid注册用户
+ *
+ * @access  public
+ * @param   string       $openid            Openid
+ * @param   string       $subscribe         是否关注
+ *
+ * @return  bool         $bool
+ */
+function register_openid($openid, $subscribe = FALSE) {
+	global $db;
+
+	$uid = register($openid, md5($openid));
+
+	if (!empty($uid)) {
+		$wxuser = array(
+				'uid'       => $uid,
+				'subscribe' => $subscribe ? 1 : 0,
+				'subscribe_time' => $subscribe ? time() : 0,
+				'wxid'		=> $openid,
+				'dateline'  => time(),
+		);
+
+		$db->autoExecute('wxch_user', $wxuser);
+
+		return $uid;
+	}
+
+	return false;
 }
 
 /**
@@ -438,4 +475,28 @@ function admin_registered( $adminname )
     return $res;
 }
 
+/**
+ * 送注册红包
+ */
+function send_register_bonus($user_id)
+{
+	global $ecs, $db;
+	
+	$now = time();
+	
+	//SEND_BY_REGISTER
+	$sql = "SELECT * FROM " . $ecs->table('bonus_type') . 
+		" WHERE send_type = " . SEND_BY_REGISTER . " AND send_start_date <= '$now' AND send_end_date >= '$now' " .
+		" ORDER BY type_id ASC";
+	$typelist = $db->getAll($sql);
+	
+	foreach ($typelist AS $type)
+	{
+		$expire_time = min($type['use_end_date'], $now + $type['use_time_limit']);
+		
+		$sql = "INSERT INTO " . $ecs->table('user_bonus') . " (bonus_type_id, bonus_sn, user_id, used_time, order_id, emailed,amount,add_time,expire_time) " .
+			" VALUES ('$type[type_id]', 0, '$user_id', 0, 0, " .BONUS_NOT_SMS. ",$type[type_money],$now,$expire_time)";
+		$db->query($sql);
+	}
+}
 ?>

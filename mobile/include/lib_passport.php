@@ -119,7 +119,7 @@ function register($username, $password, $email = NULL, $other = array())
         send_register_bonus();
         
         // 推荐处理
-        $affiliate  = unserialize($GLOBALS['_CFG']['affiliate']);
+        /*$affiliate  = unserialize($GLOBALS['_CFG']['affiliate']);
         if (isset($affiliate['on']) && $affiliate['on'] == 1)
         {
             // 推荐开关开启
@@ -150,7 +150,7 @@ function register($username, $password, $email = NULL, $other = array())
 
                 $GLOBALS['db']->query($sql);
             }
-        }
+        }*/
 
         //定义other合法的变量数组
         $other_key_array = array('msn', 'qq', 'office_phone', 'home_phone', 'mobile_phone', 'sina_weibo_id');
@@ -198,13 +198,14 @@ function register_openid($openid, $subscribe = FALSE) {
 		$wxuser = array(
 			'uid'       => $uid,
 			'subscribe' => $subscribe ? 1 : 0,
+			'subscribe_time' => $subscribe ? time() : 0,
 			'wxid'		=> $openid,
 			'dateline'  => time(),
 		);
 		
 		$db->autoExecute('wxch_user', $wxuser);
 		
-		return true;
+		return $uid;
 	}
 	
 	return false;

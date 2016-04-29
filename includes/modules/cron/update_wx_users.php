@@ -72,7 +72,7 @@ foreach ($rs as &$user)
 		else
 		{
 			$data = array (
-				'subscribe' => 0,
+				'subscribe' => $wx_user['subscribe'] > 0 ? 2 : 0,
 				'dateline'  => time(),
 			);
 		}

@@ -73,6 +73,7 @@ define('PHP_SELF', $php_self);
 
 require(ROOT_PATH . 'includes/inc_constant.php');
 require(ROOT_PATH . 'includes/cls_ecshop.php');
+require(ROOT_PATH . 'includes/cls_error.php');
 require(ROOT_PATH . 'includes/lib_base.php');
 require(ROOT_PATH . 'includes/lib_common.php');
 require(ROOT_PATH . 'includes/lib_time.php');
@@ -112,6 +113,9 @@ $_CFG = load_config();
 
 /* 初始化用户插件 */
 $user =& init_users();
+
+/* 创建错误处理对象 */
+$err = new ecs_error('message.dwt');
 
 if ((DEBUG_MODE & 1) == 1)
 {
