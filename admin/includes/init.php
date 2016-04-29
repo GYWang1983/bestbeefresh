@@ -121,6 +121,10 @@ require(ROOT_PATH . 'includes/cls_mysql.php');
 $db = new cls_mysql($db_host, $db_user, $db_pass, $db_name);
 $db_host = $db_user = $db_pass = $db_name = NULL;
 
+/* 初始化memcache */
+require(ROOT_PATH . 'includes/cls_memcached.php');
+$mem = new cls_memcached($mem_host, $mem_port, $mem_prefix);
+
 /* 创建错误处理对象 */
 $err = new ecs_error('message.htm');
 

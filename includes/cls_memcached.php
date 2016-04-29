@@ -20,9 +20,9 @@ class cls_memcached {
 	}
 	
 	
-	public function set($key, $value) {
+	public function set($key, $value, $expire = 0) {
 		$this->connect();
-		$this->connection->set($this->prefix . $key, $value);
+		$this->connection->set($this->prefix . $key, $value, $expire);
 	} 
 	
 	public function get($key) {

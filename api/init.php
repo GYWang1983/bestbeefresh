@@ -108,6 +108,10 @@ require(ROOT_PATH . 'includes/cls_session.php');
 $sess_name  = defined("SESS_NAME") ? SESS_NAME : 'ECS_ID';
 $sess       = new cls_session($db, $ecs->table('sessions'), $ecs->table('sessions_data'), $sess_name);
 
+/* 初始化memcache */
+require(ROOT_PATH . 'includes/cls_memcached.php');
+$mem = new cls_memcached($mem_host, $mem_port, $mem_prefix);
+
 /* 载入系统参数 */
 $_CFG = load_config();
 
