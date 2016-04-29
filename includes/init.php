@@ -111,6 +111,9 @@ $db = new cls_mysql($db_host, $db_user, $db_pass, $db_name);
 $db->set_disable_cache_tables(array($ecs->table('sessions'), $ecs->table('sessions_data'), $ecs->table('cart')));
 $db_host = $db_user = $db_pass = $db_name = NULL;
 
+require(ROOT_PATH . 'includes/cls_memcached.php');
+$mem = new cls_memcached($mem_host, $mem_port, $mem_prefix);
+
 /* 创建错误处理对象 */
 $err = new ecs_error('message.dwt');
 

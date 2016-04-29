@@ -59,30 +59,39 @@ if (!empty($wx) && $wx['dateline'] <= $timestamp) {
 		$db->query("UPDATE `wxch_config` SET access_token='{$tk[access_token]}', jsapi_token='{$jsticket}',dateline='$expire' WHERE `id`=1");
 	
 		//write to cache file
-		write_config('wxtoken', array(
+		$wxtk = array (
+			'token'        => $wx['token'],
 			'appid'        => $wx['appid'],
 			'appsecret'    => $wx['appsecret'],
 			'access_token' => $tk['access_token'],
 			'jsapi_token'  => $jsticket,
 			'expire'       => $expire,
-		));
+		);
+		write_config('wxtoken', $wxtk);
 	}
 	
 } elseif (!file_exists(ROOT_PATH . '/data/wxtoken.php')) {
 	
-	write_config('wxtoken', array(
-			'appid'        => $wx['appid'],
-			'appsecret'    => $wx['appsecret'],
-			'access_token' => $wx['access_token'],
-			'jsapi_token'  => $wx['jsapi_token'],
-			'expire'       => $wx['dateline'],
-	));
+	$wxtk = array (
+		'token'        => $wx['token'],
+		'appid'        => $wx['appid'],
+		'appsecret'    => $wx['appsecret'],
+		'access_token' => $wx['access_token'],
+		'jsapi_token'  => $wx['jsapi_token'],
+		'expire'       => $wx['dateline'],
+	);
+	write_config('wxtoken', $wxtk);
 }
 
 // copy to mobile dir
 $src  = ROOT_PATH . '/data/wxtoken.php';
 $dest = ROOT_PATH . '/mobile/data/wxtoken.php';
 @copy($src, $dest);
+
+// put to memcache
+if (!empty($wxtk)) {
+	$mem->set('wxtk_' . $wxtk['appid'], $wxtk);
+}
 
 function get_access_token($appid, $secret, $retry = 0) {
 
